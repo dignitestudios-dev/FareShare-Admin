@@ -7,7 +7,7 @@ import "./fonts/stylesheet.css";
 
 function App() {
   return (
-    <AuthProvider> {/* Wrap your routes with AuthProvider */}
+    // <AuthProvider> {/* Wrap your routes with AuthProvider */}
       <Routes>
         {AuthenticationRoutes.map((route) => {
           return (
@@ -20,7 +20,7 @@ function App() {
           );
         })}
       </Routes>
-    </AuthProvider>
+    // </AuthProvider>
   );
 }
 
