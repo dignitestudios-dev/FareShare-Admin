@@ -1,8 +1,8 @@
-import ForgotPassword from "../pages/onboarding/ForgotPassword";
+import ForgotPassword from "../pages/onboarding/ForgotPassword.jsx";
 // import UpdatePassword from "../pages/onboarding/UpdatePassword";
-import VerifyOtp from "../pages/onboarding/VerifyOtp";
-import Login from "../pages/Onboarding/Login";
-import ResetPassword from "../pages/Onboarding/ResetPassword";
+import VerifyOtp from "../pages/onboarding/VerifyOtp.jsx";
+import Login from "../pages/Onboarding/Login.jsx";
+import ResetPassword from "../pages/Onboarding/ResetPassword.jsx";
 
 export const AuthenticationRoutes = [
   {
