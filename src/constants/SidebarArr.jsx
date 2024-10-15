@@ -44,7 +44,7 @@ export const sidebarArr = [
     icon: <MdOutlineDocumentScanner className="text-red-600" />,
   },
   {
-    title: "Vehicle Approval",
+    title: "VehicleApproval",
     url: "/vehicle-approval",
     icon: <IoCarSportOutline className="text-red-600" />,
   },

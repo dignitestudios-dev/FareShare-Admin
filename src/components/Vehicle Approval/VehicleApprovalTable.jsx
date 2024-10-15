@@ -17,7 +17,7 @@ const VehicleApprovalTable = ({ data, loading }) => {
       {/* Header Section */}
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-[24px] font-bold text-black">
-          Vehicle Approval{" "}
+          VehicleApproval{" "}
           <span className="text-[16px] text-gray-500">({data.length})</span>
         </h3>
         {/* <input

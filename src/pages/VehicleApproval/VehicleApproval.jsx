@@ -29,7 +29,7 @@ const VehicleApproval = () => {
 
     <VehicleApprovalTable data={VehicleData} loading={loading}/>
     </div>
-  
+
   )
 }
 
