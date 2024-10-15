@@ -1,5 +1,5 @@
 import React from 'react'
-import NimtTable from '../../components/NIMT/NimtTable'
+import NimtTable from '../../components/Nimt/NimtTable'
 
 const Nimt = () => {
   return (
