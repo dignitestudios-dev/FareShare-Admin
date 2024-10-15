@@ -1,7 +1,7 @@
-import ForgotPassword from "../pages/onboarding/ForgotPassword";
+import ForgotPassword from "../pages/Onboarding/ForgotPassword";
 import Login from "../pages/Onboarding/Login";
 import ResetPassword from "../pages/Onboarding/ResetPassword";
-import VerifyOTP from "../pages/onboarding/VerifyOtp";
+import VerifyOTP from "../pages/Onboarding/VerifyOtp";
 
 export const AuthenticationRoutes = [
   {
