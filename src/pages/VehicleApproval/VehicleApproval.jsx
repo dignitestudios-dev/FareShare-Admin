@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import VehicleApprovalTable from '../../../components/VehicleApproval/VehicleApprovalTable'
-import axios from "../../../axios";
+import VehicleApprovalTable from '../../components/VehicleApproval/VehicleApprovalTable'
+import axios from "../../axios";
 
 
 const VehicleApproval = () => {
