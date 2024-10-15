@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
-import { AuthenticationRoutes } from "./routes/AuthenticationRoutes";
-import { normalRoutes } from "./routes/normalRoutes";
+import { AuthenticationRoutes } from "./routes/AuthenticationRoutes.jsx";
+import { normalRoutes } from "./routes/normalRoutes.jsx";
 import { AuthProvider } from "./contexts/AuthContext"; // Import the AuthProvider
 import "./App.css";
 import "./fonts/stylesheet.css";
