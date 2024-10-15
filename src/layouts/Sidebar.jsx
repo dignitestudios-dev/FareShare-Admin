@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Logo } from "../assets/export";
-import { sidebarArr } from "../constants/sidebarArr";
+import { sidebarArr } from "../constants/SidebarArr";
 import SidebarLink from "./SidebarLink";
 import { RiLogoutCircleLine, RiMenuLine } from "react-icons/ri";
 
