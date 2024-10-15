@@ -1,8 +1,7 @@
-import ForgotPassword from "../pages/onboarding/ForgotPassword.jsx";
-// import UpdatePassword from "../pages/onboarding/UpdatePassword";
-import VerifyOtp from "../pages/onboarding/VerifyOtp.jsx";
-import Login from "../pages/Onboarding/Login.jsx";
-import ResetPassword from "../pages/Onboarding/ResetPassword.jsx";
+import ForgotPassword from "../pages/onboarding/ForgotPassword";
+import Login from "../pages/Onboarding/Login";
+import ResetPassword from "../pages/Onboarding/ResetPassword";
+import VerifyOTP from "../pages/onboarding/VerifyOtp";
 
 export const AuthenticationRoutes = [
   {
@@ -18,7 +17,7 @@ export const AuthenticationRoutes = [
   {
     title: "Verify Otp",
     url: "/verify-otp",
-    page: <VerifyOtp />,
+    page: <VerifyOTP />,
   },
   {
     title: "Update Password",
