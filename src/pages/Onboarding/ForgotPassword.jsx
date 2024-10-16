@@ -30,13 +30,12 @@ const ForgotPassword = () => {
 
         <form
           onSubmit={() => navigate("/verify-otp")}
-          className="w-full flex flex-col gap-4"
+          className="w-[448px] h-[48px] flex flex-col gap-4"
         >
           <AuthInput
             text="Email Address"
             placeholder="mike.smith@gmail.com"
             type="email"
-            className="w-full"
           />
           <AuthSubmitBtn text="Next" className="bg-red-600 text-white w-full py-3" />
         </form>

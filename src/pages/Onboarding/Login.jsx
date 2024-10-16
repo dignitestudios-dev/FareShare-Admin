@@ -43,12 +43,11 @@ const Login = () => {
 
         {error && <div className="text-red-500 mb-4">{error}</div>}
 
-        <form onSubmit={handleLogin} className="w-full flex flex-col gap-3">
+        <form onSubmit={handleLogin} className="w-[448px] h-[48px] flex flex-col gap-3">
           <AuthInput
             text="Email Address"
             placeholder=""
             type="email"
-            className="w-full"
             state={email} // Pass email state
             setState={setEmail} // Pass setEmail function
           />

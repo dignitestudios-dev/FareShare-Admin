@@ -35,18 +35,16 @@ const ResetPassword = () => {
           Set new password
         </p>
 
-        <form onSubmit={handleNextClick} className="w-full flex flex-col gap-4">
+        <form onSubmit={handleNextClick} className="w-[448px] h-[48px] flex flex-col gap-4">
           <AuthInput
             text="New Password"
             placeholder="**********"
             type="password"
-            className="w-full"
           />
           <AuthInput
             text="Re-Type Password"
             placeholder="**********"
             type="password"
-            className="w-full"
           />
 
           <AuthSubmitBtn text="Next" className="bg-red-600 text-white w-full py-3" />
