@@ -76,9 +76,8 @@ const VehicleApprovalTable = ({ data, loading }) => {
                         <MdCheck className="w-5 h-5" />
                       </button>
                       {/* View button */}
-                      <div onClick={()=>handleView(vehicle)}  className="text-white bg-red-500 py-2 px-4 rounded-md flex items-center justify-center hover:bg-blue-600">
-                    <FiEye className="mr-1" />
-                    <span className="text-sm">View</span>
+                      <div onClick={()=>handleView(vehicle)}  className="text-white bg-[#9F9F9F] p-2 rounded-md flex items-center justify-center hover:bg-blue-600">
+                    <FiEye className="h-4 w-5" />
                   </div>
                     </td>
                   </tr>

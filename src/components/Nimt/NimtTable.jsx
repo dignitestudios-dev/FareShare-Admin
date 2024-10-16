@@ -22,7 +22,7 @@ const NimtTable = ({ data = [], loading }) => {
       case "pending":
         return "bg-yellow-200 text-yellow-800"; 
       case "approved":
-        return "bg-blue-200 text-blue-800"; 
+        return "bg-green-200 text-black"; 
       case "rejected":
         return "bg-red-200 text-red-800"; 
       default:
@@ -36,7 +36,7 @@ const NimtTable = ({ data = [], loading }) => {
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-[24px] font-bold text-black">
           NEMT{" "}
-          <span className="text-[16px] text-gray-500">({data.length})</span>
+          <span className="text-[16px] text-gray-500">({data?.length})</span>
         </h3>
         {/* <input
           type="text"
@@ -46,21 +46,22 @@ const NimtTable = ({ data = [], loading }) => {
           className="border rounded p-2"
         /> */}
         {/* Tab Section */}
-      <div className="flex mb-4">
-        {["All", "Requested", "Approved", "Rejected"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 text-sm font-semibold ${
-              activeTab === tab
-                ? "bg-red-600 text-white"
-                : "bg-white text-black"
-            } rounded-md mx-1`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
+        <div className="flex  px-1 py-1 border border-gray-300 bg-white rounded-md">
+  {["All", "Requested", "Approved", "Rejected"].map((tab, index, array) => (
+    <button
+      key={tab}
+      onClick={() => setActiveTab(tab)}
+      className={`px-4 py-2 text-sm font-semibold ${
+        activeTab === tab
+          ? "bg-red-600 text-white"
+          : "bg-white text-black"
+      } ${index === 0 ? "rounded-l" : ""} ${index === array.length - 1 ? "rounded-r" : ""}`}
+    >
+      {tab}
+    </button>
+  ))}
+</div>
+
       </div>
 
       
@@ -83,17 +84,17 @@ const NimtTable = ({ data = [], loading }) => {
           <tbody>
             {filteredData.map((item) => (
               <tr key={item._id} className="bg-white text-[14px] text-gray-900 hover:bg-gray-50">
-                <td className="py-3 px-4">{item.insuranceCarrier}</td>
-                <td className="py-3 px-4">{item.insuranceNumber}</td>
-                <td className="py-3 px-4">{item.subscriberNumber}</td>
+                <td className="py-3 px-4">{item?.insuranceCarrier}</td>
+                <td className="py-3 px-4">{item?.insuranceNumber}</td>
+                <td className="py-3 px-4">{item?.subscriberNumber}</td>
                 <td className="py-3 px-4">
-                  <span className={`py-1 px-2 rounded-full ${getStatusClass(item.status)}`}>
-                    {item.status}
+                  <span className={`py-1 px-2 rounded-full ${getStatusClass(item?.status)}`}>
+                    {item?.status}
                   </span>
                 </td>
                 <td className="py-3 px-4">
                   <Link
-                    to={`/nimt-details/${item._id}`}
+                    to={`/nimt-details/${item?._id}`}
                     className="text-white bg-red-500 py-1 px-3 rounded-md inline-flex items-center"
                   >
                     <FiEye className="mr-2 mb-1" />

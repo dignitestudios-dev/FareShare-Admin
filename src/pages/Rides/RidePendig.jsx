@@ -5,9 +5,21 @@ import { MdLocationOn } from "react-icons/md"; // Location icons
 import { AiOutlineCalendar } from "react-icons/ai"; // Calendar icon
 import { FaRegClock } from "react-icons/fa6";
 import { FaCcMastercard } from "react-icons/fa";
+import RideComplete from "../../components/Rides/RideCompleteModal";
 
 const RidePending = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isApproveModalOpen, setApproveModalOpen] = useState(false); // For Approve Modal
+
+  // Handlers for modal
+  const openApproveModal = () => setApproveModalOpen(true);
+  const closeApproveModal = () => setApproveModalOpen(false);
+
+  
+  const handleApproveConfirm = () => {
+    console.log("Approved");
+    closeApproveModal();
+  };
 
   return (
     <div className="w-full h-full bg-[#F5F7F7] p-10 overflow-auto ">
@@ -87,7 +99,7 @@ const RidePending = () => {
             </div>
           </div>
           <div className="flex justify-center mt-6">
-          <button className="bg-[#C00000] text-white font-semibold px-8 py-4 rounded-full w-full max-w-[100%]">Mark As Complete</button>
+          <button onClick={openApproveModal} className="bg-[#C00000] text-white font-semibold px-8 py-4 rounded-full w-full max-w-[100%]">Mark As Complete</button>
          </div>
         </div>
 
@@ -145,6 +157,11 @@ const RidePending = () => {
           </div>
         </div>
       </div>
+      <RideComplete
+        isOpen={isApproveModalOpen}
+        onRequestClose={closeApproveModal}
+        onConfirm={handleApproveConfirm}
+      />
     </div>
   );
 };

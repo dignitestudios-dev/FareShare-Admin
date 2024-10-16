@@ -101,15 +101,15 @@ const RidesTable = () => {
 
       {/* Table Section */}
       {showUsers ? (
-        <table className="min-w-full bg-white border-separate rounded-[18px]">
+        <table className="min-w-full  bg-white border-separate rounded-[18px]">
           <thead>
             <tr className="text-left text-[14px] text-gray-500">
-              <th className="py-2 px-4">Name</th>
-              <th className="py-2 px-4">Email</th>
-              <th className="py-2 px-4">Ridetype </th>
-              <th className="py-2 px-4">Registration Date</th>
-              <th className="py-2 px-4">status</th>
-              <th className="py-2 px-4">Action</th>
+              <th className="py-4 px-4">Name</th>
+              <th className="py-4 px-4">Email</th>
+              <th className="py-4 px-4">Ridetype </th>
+              <th className="py-4 px-4">Registration Date</th>
+              <th className="py-4 px-4">status</th>
+              <th className="py-4 px-4">Action</th>
             </tr>
           </thead>
           <tbody>
