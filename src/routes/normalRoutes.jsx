@@ -56,7 +56,7 @@ export const normalRoutes = [
       },
       {
         title: "User Details",
-        url: "/user-details",
+        url: "/user-details/:id",
         page: <GlobalLayout page={<UserDetails />} />,
       },
       {
@@ -71,7 +71,7 @@ export const normalRoutes = [
       },
       {
         title: "Driver Details",
-        url: "/driver-details-page",
+        url: "/driver-details-page/:id",
         page: <GlobalLayout page={<DriverDetailsPage />} />,
       },
       {
@@ -91,7 +91,7 @@ export const normalRoutes = [
       },
       {
         title: "Broker Details",
-        url: "/broker-details",
+        url: "/broker-details/:id",
         page: <GlobalLayout page={<BrokerDetails />} />,
       },
       {
@@ -111,7 +111,7 @@ export const normalRoutes = [
       },
       {
         title: "Vehicle Approve Details",
-        url: "/vehicle-approve-details",
+        url: "/vehicle-approve-details/:id",
         page: <GlobalLayout page={<VehicleApproveDetails />} />,
       },
       {

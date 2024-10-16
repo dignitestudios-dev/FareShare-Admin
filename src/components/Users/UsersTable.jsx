@@ -1,10 +1,15 @@
 import React from "react";
 import { FiEye } from "react-icons/fi";
 import { FiSearch } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
 
 const UsersTable = ({ data, loading }) => {
   const [searchQuery, setSearchQuery] = React.useState("");
+  const navigate = useNavigate()
+  const handleView=(user)=>{
+    navigate(`/user-details/${user._id}`, { state: user }); // Pass the entire driver object as state
+  }
 
   // Filter users based on the search query
   const filteredUsers = data.filter((user) =>
@@ -12,7 +17,11 @@ const UsersTable = ({ data, loading }) => {
   );
 
   if (loading) {
-    return <div>Loading...</div>; // Show a loading message or spinner
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-[#F5F7F7]">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    ); // Show a loading message or spinner
   }
 
   return (
@@ -62,13 +71,10 @@ const UsersTable = ({ data, loading }) => {
                 <td className="py-3 px-4">{user?.state}</td>
                 <td className="py-3 px-4">{new Date(user?.createdAt).toLocaleDateString()}</td>
                 <td className="py-3 px-4">
-                  <Link
-                    to={`/user-details/${user?._id}`} // Assuming you want to pass user ID
-                    className="text-white bg-red-500 py-1 px-3 rounded-md inline-flex items-center"
-                  >
-                    <FiEye className="mr-2 mb-1" />
-                    View
-                  </Link>
+                <div onClick={()=>handleView(user)}  className="text-white bg-red-500 py-2 px-4 rounded-md flex items-center justify-center hover:bg-blue-600">
+                    <FiEye className="mr-1" />
+                    <span className="text-sm">View</span>
+                  </div>
                 </td>
               </tr>
               <tr>

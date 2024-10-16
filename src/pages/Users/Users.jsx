@@ -1,16 +1,3 @@
-// import React from 'react'
-// import UsersTable from '../../components/Users/UsersTable'
-
-// const Users = () => {
-//   return (
-//     <UsersTable/>
-//   )
-// }
-
-// export default Users
-
-
-//api
 import React, { useState, useEffect } from 'react';
 import UsersTable from '../../components/Users/UsersTable';
 import axios from "../../axios";

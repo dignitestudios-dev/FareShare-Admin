@@ -39,12 +39,12 @@ export const sidebarArr = [
     icon: <LuUser2 className="text-red-600" />,
   },
   {
-    title: "NIMT Approval",
+    title: "NEMT Approval",
     url: "/nimt",
     icon: <MdOutlineDocumentScanner className="text-red-600" />,
   },
   {
-    title: "VehicleApproval",
+    title: "Vehicle Approval",
     url: "/vehicle-approval",
     icon: <IoCarSportOutline className="text-red-600" />,
   },

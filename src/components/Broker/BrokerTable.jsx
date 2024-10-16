@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { FiEye } from "react-icons/fi"; // Using the Eye icon for the action
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const BrokerTable = ({ data, loading }) => { // Accept data and loading as props
   const [searchQuery, setSearchQuery] = useState(""); // Search query state
-
   // Filter brokers based on search query
   const filteredBrokers = data.filter((broker) =>
     broker.accountHandlerName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
+  );  
+  const navigate = useNavigate()
+  const handleView=(broker)=>{
+    navigate(`/broker-details/${broker._id}`, { state: broker }); // Pass the entire driver object as state
+  }
   return (
     <div className="w-full h-screen bg-[#f8f8f8] p-4">
       {/* Header Section */}
@@ -29,8 +31,10 @@ const BrokerTable = ({ data, loading }) => { // Accept data and loading as props
 
       {/* Table Section */}
       {loading ? (
-        <div className="text-center">Loading...</div>
-      ) : (
+        <div className="w-full h-screen flex items-center justify-center bg-[#F5F7F7]">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+            ) : (
         <table className="min-w-full bg-white border-separate rounded-[18px]">
           <thead>
             <tr className="text-left text-[14px] text-gray-500">
@@ -50,13 +54,10 @@ const BrokerTable = ({ data, loading }) => { // Accept data and loading as props
                   <td className="py-3 px-4">{broker?.email}</td>
                   <td className="py-3 px-4">{broker?.companyTaxIdenfication}</td>
                   <td className="py-3 px-4">
-                    <Link
-                      to={`/broker-details/${broker?._id}`} // Use broker ID for details link
-                      className="text-white bg-red-500 py-1 px-3 rounded-md inline-flex items-center"
-                    >
-                      <FiEye className="mr-2 mb-1" />
-                      View
-                    </Link>
+                  <div onClick={()=>handleView(broker)}  className="text-white bg-red-500 py-2 px-4 rounded-md flex items-center justify-center hover:bg-blue-600">
+                    <FiEye className="mr-1" />
+                    <span className="text-sm">View</span>
+                  </div>
                   </td>
                 </tr>
                 <tr>
