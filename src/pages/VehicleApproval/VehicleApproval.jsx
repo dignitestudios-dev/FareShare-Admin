@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import VehicleApprovalTable from '../../components/VehicleApproval/VehicleApprovalTable'
+import React, { useState, useEffect } from "react";
+import VehicleApprovalTable from "../../components/VehicleApproval/VehicleApprovalTable";
 import axios from "../../axios";
-
 
 const VehicleApproval = () => {
   const [VehicleData, setVehicleData] = useState([]); // Updated variable name to camelCase
   const [loading, setLoading] = useState(false);
+  const [update, setUpdate] = useState(false);
 
   const getVehicles = async () => {
     try {
@@ -22,15 +22,19 @@ const VehicleApproval = () => {
 
   useEffect(() => {
     getVehicles();
-  }, []);
+  }, [update]);
 
   return (
-    <div className="overflow-auto h-screen w-full bg-[#f8f8f8]"> {/* Make the container scrollable */}
-
-    <VehicleApprovalTable data={VehicleData} loading={loading}/>
+    <div className="overflow-auto h-screen w-full bg-[#f8f8f8]">
+      {" "}
+      {/* Make the container scrollable */}
+      <VehicleApprovalTable
+        data={VehicleData}
+        loading={loading}
+        setUpdate={setUpdate}
+      />
     </div>
+  );
+};
 
-  )
-}
-
-export default VehicleApproval
+export default VehicleApproval;

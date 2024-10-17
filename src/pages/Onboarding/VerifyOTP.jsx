@@ -14,10 +14,14 @@ const VerifyOTP = () => {
       {/* Left Side: Form */}
       <form
         onSubmit={() => navigate("/reset-password")}
-        className="w-full lg:w-1/2 h-full bg-white px-4 py-8 lg:p-20 z-10 flex flex-col overflow-y-auto justify-start items-center gap-8"
+        className="w-full lg:w-1/2 h-full bg-white px-8 py-[44px] lg:px-[111px] z-10 flex flex-col overflow-y-auto justify-start items-center gap-8"
       >
         {/* Logo */}
-        <img src={Logo} alt="FareShare Logo" className="self-start w-[150px] mb-8" /> 
+        <img
+          src={Logo}
+          alt="FareShare Logo"
+          className="self-start w-[150px] mb-8"
+        />
 
         {/* Back Button */}
         <button
@@ -29,10 +33,10 @@ const VerifyOTP = () => {
 
         {/* Title and Description */}
         <div className="w-full flex justify-start items-start flex-col">
-          <h1 className="text-[48px] font-bold text-black leading-[64.8px] tracking-[-1.2px]">
+          <h1 className="text-[32px] lg:text-[36px] font-bold leading-[59.22px] text-black">
             Verification
           </h1>
-          <p className="font-normal text-[16px] text-[#868686] leading-[21.6px] tracking-[-1.2px]">
+          <p className="text-gray-500 text-[12px] lg:text-[14px] font-normal leading-[22.18px]  ">
             Enter verification code sent to your email
           </p>
         </div>
@@ -60,13 +64,18 @@ const VerifyOTP = () => {
             </button>
           </div>
         </div>
-
-        <AuthSubmitBtn text={"Verify"} />
+        <div className="w-full flex justify-start items-start flex-col">
+          <AuthSubmitBtn text={"Verify"} />
+        </div>
       </form>
 
       {/* Right Side: Illustration */}
-      <div className="hidden lg:flex w-1/2 h-full justify-center items-center">
-        <img src={Forgot} alt="Forgot Password Illustration" className="w-[400px] h-[400px]" />
+      <div className="hidden lg:flex w-1/2 bg-[#FBFBFB] h-full justify-center items-center">
+        <img
+          src={Forgot}
+          alt="Forgot Password Illustration"
+          className="w-[415px] "
+        />
       </div>
     </div>
   );

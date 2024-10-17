@@ -2,18 +2,85 @@ import React, { useState } from "react";
 import { FiEye } from "react-icons/fi";
 import { MdClose, MdCheck } from "react-icons/md"; // Close and Check icons
 import { Link, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import VehicleAcceptModal from "../../pages/VehicleApproval/VehicleAcceptModal";
+import VehicleRejectModal from "../../pages/VehicleApproval/VehicleRejectModal";
+import axios from "../../axios";
+import { ErrorToast, SuccessToast } from "../global/Toast";
 
-const VehicleApprovalTable = ({ data, loading }) => {
+const VehicleApprovalTable = ({ data, loading, setUpdate }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const navigate = useNavigate()
-  const handleView=(vehicle)=>{
-    navigate(`/vehicle-approve-details/${vehicle._id}`, { state: vehicle }); // Pass the entire driver object as state
-  }
+  const navigate = useNavigate();
+  const handleView = (vehicle) => {
+    Cookies.set("vehicle", JSON.stringify(vehicle));
+    navigate(`/vehicle-approve-details/${vehicle?._id}`); // Pass the entire driver object as state
+  };
   // Filter vehicles based on search query
   const filteredVehicles = data.filter((vehicle) => {
-    const vehicleName = vehicle.vehicleName ? vehicle.vehicleName.toLowerCase() : "";
+    const vehicleName = vehicle.vehicleName
+      ? vehicle.vehicleName.toLowerCase()
+      : "";
     return vehicleName.includes(searchQuery.toLowerCase());
   });
+
+  const [open, setOpen] = useState(false);
+  const [acceptLoading, setAcceptLoading] = useState(false);
+  const [declineLoading, setDeclineLoading] = useState(false);
+
+  const [vehicleType, setVehicleType] = useState("");
+  const [closeOpen, setCloseOpen] = useState(false);
+
+  const toggleAccept = async () => {
+    try {
+      setAcceptLoading(true);
+      if (vehicleType == "") {
+        ErrorToast("Please select a vehicle type");
+      } else {
+        const { data } = await axios.post("/admin/vehicle", {
+          vehicleId: JSON.parse(Cookies?.get("vehicle"))?._id,
+          isApproved: true,
+          vehicleType: vehicleType, //"Standard", "XL Vehicle", "Lux Vehicle", "Black Lux Vehicle", "Black Lux XL Vehicle", "Wheelchair Accessible Vehicle"
+          //"reason": "Poorly maintained" //Send when isApproved is false => for email
+        });
+        if (data?.success) {
+          setOpen(false);
+          setUpdate((prev) => !prev);
+          SuccessToast("Vehicle Approved Successfully.");
+        }
+      }
+
+      // Use the data from the API response
+    } catch (error) {
+      ErrorToast(error?.response?.data?.message);
+    } finally {
+      setAcceptLoading(false);
+    }
+  };
+
+  const toggleDecline = async () => {
+    try {
+      setDeclineLoading(true);
+
+      const { data } = await axios.post("/admin/vehicle", {
+        vehicleId: JSON.parse(Cookies?.get("vehicle"))?._id,
+        isApproved: false,
+        // vehicleType: vehicleType, //"Standard", "XL Vehicle", "Lux Vehicle", "Black Lux Vehicle", "Black Lux XL Vehicle", "Wheelchair Accessible Vehicle"
+        reason:
+          "Your vehicle was rejected as it did not meet FareShare Standard Compliance", //Send when isApproved is false => for email
+      });
+      if (data?.success) {
+        setCloseOpen(false);
+        setUpdate((prev) => !prev);
+        SuccessToast("Vehicle Declined Successfully.");
+      }
+
+      // Use the data from the API response
+    } catch (error) {
+      ErrorToast(error?.response?.data?.message);
+    } finally {
+      setDeclineLoading(false);
+    }
+  };
 
   return (
     <div className="w-full h-screen bg-[#f8f8f8] p-4">
@@ -31,17 +98,14 @@ const VehicleApprovalTable = ({ data, loading }) => {
           className="p-2 border rounded"
         /> */}
       </div>
+      <div className="w-full bg-white p-6 rounded-[18px] ">
+        {/* Table Section */}
 
-      {/* Table Section */}
-      {loading ? (
-        <div className="w-full h-screen flex items-center justify-center bg-[#F5F7F7]">
-        <div className="text-gray-500">Loading...</div>
-      </div>      ) : (
-        <div className="overflow-x-auto bg-white pt-4 pl-2 rounded-xl shadow-lg">
+        <div className="overflow-x-auto bg-white  rounded-xl ">
           <table className="min-w-full table-auto border-separate rounded-[18px]">
             <thead>
-              <tr className="text-left text-[14px] text-gray-500">
-                <th className="py-2 px-4">Name</th>
+              <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
+                <th className="py-2 ">Name</th>
                 <th className="py-2 px-4">Make</th>
                 <th className="py-2 px-4">Model</th>
                 <th className="py-2 px-4">Plate Number</th>
@@ -50,47 +114,126 @@ const VehicleApprovalTable = ({ data, loading }) => {
               </tr>
             </thead>
             <tbody>
-              {filteredVehicles.map((vehicle, index) => (
-                <React.Fragment key={index}>
-                  <tr className="bg-white border-b border-gray-200 text-[14px] text-gray-900 hover:bg-gray-50">
-                    {/* Name and profile image */}
-                    <td className="py-3 px-4 flex items-center">
-                      <img
-                        src={vehicle?.vehicleImageFront} // Use vehicle image
-                        alt="Vehicle"
-                        className="w-8 h-8 rounded-full mr-2"
-                      />
-                      {vehicle?.vehicleName}
-                    </td>
-                    <td className="py-3 px-4">{vehicle?.vehicleMake}</td>
-                    <td className="py-3 px-4">{vehicle?.vehicleModel}</td>
-                    <td className="py-3 px-4">{vehicle?.plateNumber}</td>
-                    <td className="py-3 px-4">{vehicle?.isWheelChairAccessible ? "Yes" : "No"}</td>
-                    <td className="py-3 px-4 flex space-x-2">
-                      {/* Reject button */}
-                      <button className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600">
-                        <MdClose className="w-5 h-5" />
-                      </button>
-                      {/* Approve button */}
-                      <button className="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600">
-                        <MdCheck className="w-5 h-5" />
-                      </button>
-                      {/* View button */}
-                      <div onClick={()=>handleView(vehicle)}  className="text-white bg-[#9F9F9F] p-2 rounded-md flex items-center justify-center hover:bg-blue-600">
-                    <FiEye className="h-4 w-5" />
-                  </div>
-                    </td>
-                  </tr>
-                  {/* Line under each row */}
-                  <tr>
-                    <td colSpan="6" className="border-b border-gray-200"></td>
-                  </tr>
-                </React.Fragment>
-              ))}
+              {loading
+                ? [...Array(15)].map((_, index) => (
+                    <React.Fragment key={index}>
+                      <tr className="bg-white border-b border-gray-200 text-[10px] text-gray-900">
+                        {/* Name and profile image */}
+                        <td className="py-1 flex items-center">
+                          <div className="w-[26px] h-[26px] bg-gray-300 animate-pulse rounded-full mr-2"></div>
+                          <div className="w-32 h-4 bg-gray-300 animate-pulse rounded"></div>
+                        </td>
+                        <td className="py-1 px-4">
+                          <div className="w-24 h-4 bg-gray-300 animate-pulse rounded"></div>
+                        </td>
+                        <td className="py-1 px-4">
+                          <div className="w-16 h-4 bg-gray-300 animate-pulse rounded"></div>
+                        </td>
+                        <td className="py-1 px-4">
+                          <div className="w-24 h-4 bg-gray-300 animate-pulse rounded"></div>
+                        </td>
+                        <td className="py-1 px-4">
+                          <div className="w-16 h-4 bg-gray-300 animate-pulse rounded"></div>
+                        </td>
+                        <td className="py-1 px-4 flex space-x-2">
+                          <div className="bg-gray-300 w-[26px] h-[26px] rounded-[8px] flex items-center justify-center"></div>
+                          <div className="bg-gray-300 w-[26px] h-[26px] rounded-[8px] flex items-center justify-center"></div>
+                          <div className="bg-gray-300 w-[26px] h-[26px] rounded-[8px] flex items-center justify-center"></div>
+                        </td>
+                      </tr>
+                      {/* Line under each row */}
+                      <tr>
+                        <td
+                          colSpan="6"
+                          className="border-b border-gray-200"
+                        ></td>
+                      </tr>
+                    </React.Fragment>
+                  ))
+                : filteredVehicles.map((vehicle, index) => (
+                    <React.Fragment key={index}>
+                      <tr className="bg-white border-b border-gray-200 text-[10px] text-gray-900 ">
+                        {/* Name and profile image */}
+                        <td className="py-1  flex items-center">
+                          <img
+                            src={vehicle?.vehicleImageFront} // Use vehicle image
+                            alt="Vehicle"
+                            className="w-[26px] h-[26px] rounded-full mr-2"
+                          />
+                          {vehicle?.vehicleName}
+                        </td>
+                        <td className="py-1 px-4">{vehicle?.vehicleMake}</td>
+                        <td className="py-1 px-4">{vehicle?.modelYear}</td>
+                        <td className="py-1 px-4">{vehicle?.plateNumber}</td>
+                        <td className="py-1 px-4">
+                          {vehicle?.isWheelChairAccessible ? "Yes" : "No"}
+                        </td>
+                        <td className="py-1 px-4 flex space-x-2">
+                          {/* Reject button */}
+                          <button
+                            onClick={() => {
+                              setCloseOpen(true);
+                              Cookies.set("vehicle", JSON.stringify(vehicle));
+                            }}
+                            className="bg-red-500 text-white w-[26px] h-[26px] flex items-center justify-center  rounded-[8px] hover:bg-red-600"
+                          >
+                            <MdClose className="w-5 h-5" />
+                          </button>
+                          {/* Approve button */}
+                          <button
+                            onClick={() => {
+                              setOpen(true);
+                              Cookies.set("vehicle", JSON.stringify(vehicle));
+                            }}
+                            className="bg-green-500 text-white w-[26px] h-[26px] flex items-center justify-center rounded-[8px] hover:bg-green-600"
+                          >
+                            <MdCheck className="w-5 h-5" />
+                          </button>
+                          {/* View button */}
+                          <div
+                            onClick={() => handleView(vehicle)}
+                            className="text-white w-[26px] h-[26px] bg-[#9F9F9F]  rounded-[8px] flex items-center justify-center hover:bg-blue-600"
+                          >
+                            <FiEye className="h-4 w-5" />
+                          </div>
+                        </td>
+                      </tr>
+                      {/* Line under each row */}
+                      <tr>
+                        <td
+                          colSpan="6"
+                          className="border-b border-gray-200"
+                        ></td>
+                      </tr>
+                    </React.Fragment>
+                  ))}
             </tbody>
           </table>
+
+          <VehicleAcceptModal
+            isOpen={open}
+            onRequestClose={() => {
+              setOpen(false);
+            }}
+            vehicleType={vehicleType}
+            setVehicleType={setVehicleType}
+            onConfirm={() => {
+              toggleAccept();
+            }}
+            loading={acceptLoading}
+          />
+          <VehicleRejectModal
+            isOpen={closeOpen}
+            onRequestClose={() => {
+              setCloseOpen(false);
+            }}
+            onConfirm={() => {
+              toggleDecline();
+            }}
+            loading={declineLoading}
+          />
         </div>
-      )}
+      </div>
     </div>
   );
 };

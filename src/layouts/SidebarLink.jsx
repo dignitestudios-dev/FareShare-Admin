@@ -16,7 +16,7 @@ const SidebarLink = ({ link, onCloseDrawer }) => {
   };
 
   return (
-    <div className="w-full relative">
+    <div className="w-full flex items-center relative">
       <button
         onClick={
           link.submenu
@@ -27,13 +27,13 @@ const SidebarLink = ({ link, onCloseDrawer }) => {
         ${
           activeLink === link?.title
             ? "bg-white text-black relative"
-            : "bg-transparent text-gray-600"
+            : "bg-transparent text-black/40"
         } 
         font-medium flex items-center justify-between transition-all duration-500  px-3 gap-2`}
       >
-        <div className="flex items-center gap-2">
-          <span className="text-2xl hover:text-white">{link?.icon}</span>
-          <span className="capitalize text-[13px] font-medium ">
+        <div className="flex items-center h-10  gap-2">
+          <span className="text-xl mb-1 ">{link?.icon}</span>
+          <span className="capitalize text-[13px]  leading-none font-bold ">
             {link?.title}
           </span>
         </div>
@@ -46,7 +46,7 @@ const SidebarLink = ({ link, onCloseDrawer }) => {
 
       {/* Red semicircle for the active link */}
       {activeLink === link?.title && (
-        <span className="absolute -left-4 top-1/2 transform -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-red-600"></span>
+        <span className="absolute -left-6 top-1/2 transform -translate-y-1/2 w-[10px] h-[18px] rounded-r-full bg-red-600"></span>
       )}
 
       {link.submenu && isOpen && (

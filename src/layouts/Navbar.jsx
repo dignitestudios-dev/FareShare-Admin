@@ -29,20 +29,22 @@ const Navbar = () => {
           <img
             src={`https://i.pravatar.cc/40?img=3`}
             alt="Profile"
-            className="w-[28px] h-[28px] rounded-full cursor-pointer"
+            className="w-[28px] h-[28px] rounded-[8px] cursor-pointer"
             onClick={() => navigate("/profile", "Profile")}
           />
           <div className="w-auto flex flex-col justify-start items-start">
-            <p className="text-[11px] font-normal text-black" onClick={() => navigate("/profile", "Profile")}
-            >Welcome back,</p>
-            <p className="text-[11px] font-medium text-black" onClick={() => navigate("/profile", "Profile")}
-            >Kevin Brian</p>
+            <p className="text-[11px] font-normal leading-[17.42px] text-black">
+              Welcome back,
+            </p>
+            <p className="text-[11px] font-medium leading-[17.64px] text-black">
+              Kevin Brian
+            </p>
           </div>
 
           <button className="text-xl text-black">
             {/* <RxCaretDown /> */}
           </button>
-          
+
           {/* Dropdown menu
           <div
             className={`w-[120px] h-[60px] rounded-[12px] absolute top-12 shadow-md p-3 transition-all duration-300 flex flex-col justify-start items-start gap-2 right-0 bg-[#21344C] z-[1000] ${

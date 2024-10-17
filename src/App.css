@@ -1,1 +1,28 @@
+/* width */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 2px;
+}
 
+/* Track */
+::-webkit-scrollbar-track {
+  background: #fff;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #c00000;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #c00000d8;
+  cursor: pointer;
+}
+
+.swiper-pagination {
+  margin-bottom: 5px;
+}
+.swiper-pagination-bullet-active {
+  background-color: #fff;
+}

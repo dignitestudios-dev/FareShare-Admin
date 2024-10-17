@@ -35,19 +35,19 @@ const Home = () => {
         </div>
 
         {/* Users table */}
-        <div className="w-full bg-white p-6 rounded-[18px] shadow-md">
+        <div className="w-full bg-white p-6 rounded-[18px] ">
           <DashboardUsersTable />
         </div>
 
         {/* Bottom tables (Rides and Driver) */}
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Rides Table */}
-          <div className="w-full bg-white rounded-[10px] shadow-md flex">
+          <div className="w-full bg-white rounded-[18px]  flex">
             <DashboardRidesTable />
           </div>
 
           {/* Driver Table */}
-          <div className="w-full bg-white rounded-[10px] shadow-md flex">
+          <div className="w-full bg-white rounded-[18px]  flex">
             <DashboardDriverTable />
           </div>
         </div>

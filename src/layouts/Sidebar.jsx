@@ -4,6 +4,7 @@ import { Logo } from "../assets/export";
 import { sidebarArr } from "../constants/SidebarArr";
 import SidebarLink from "./SidebarLink";
 import { RiLogoutCircleLine, RiMenuLine } from "react-icons/ri";
+import Cookies from "js-cookie";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -50,7 +51,8 @@ const Sidebar = () => {
         {/* Logout button at the bottom */}
         <button
           onClick={() => {
-            navigate("/login", "Home");
+            navigate("/", "Home");
+            Cookies.removeItem("token");
             handleCloseDrawer();
           }}
           className={`w-full h-[46px] outline-none rounded-[12px] 
@@ -58,10 +60,12 @@ const Sidebar = () => {
             font-medium flex items-center justify-start transition-all duration-500 
              hover:text-white px-3 gap-2 mt-auto`}
         >
-          <span className="text-2xl">
-            <RiLogoutCircleLine  className="hover:text-white text-[#C00000]" />
+          <span className="text-xl mb-1">
+            <RiLogoutCircleLine className=" text-[#C00000]" />
           </span>
-          <span className="capitalize text-black font-medium text-[13px] ">Logout</span>
+          <span className="capitalize bg-transparent text-black/40 font-bold text-[13px] ">
+            Logout
+          </span>
         </button>
       </div>
 

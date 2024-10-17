@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import DriverTable from "../../components/Driver/DriverTable";
 import axios from "../../axios";
 
 const Driver = () => {
-  const [DriverData, setDriverData] = useState([]);
+  const [driverData, setDriverData] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const getDrivers = async () => {
@@ -23,9 +23,10 @@ const Driver = () => {
   }, []);
 
   return (
-    <div className="overflow-auto h-screen w-full bg-[#f8f8f8]"> {/* Make the container scrollable */}
-
-    <DriverTable data={DriverData} loading={loading} />
+    <div className="overflow-auto h-screen w-full bg-[#f8f8f8]">
+      {" "}
+      {/* Make the container scrollable */}
+      <DriverTable data={driverData} loading={loading} />
     </div>
   );
 };

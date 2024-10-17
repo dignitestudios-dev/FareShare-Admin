@@ -3,27 +3,30 @@ import { FiEye } from "react-icons/fi";
 import { FiSearch } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 
-
 const UsersTable = ({ data, loading }) => {
   const [searchQuery, setSearchQuery] = React.useState("");
-  const navigate = useNavigate()
-  const handleView=(user)=>{
+  const navigate = useNavigate();
+  const handleView = (user) => {
     navigate(`/user-details/${user._id}`, { state: user }); // Pass the entire driver object as state
-  }
+  };
 
   // Filter users based on the search query
   const filteredUsers = data.filter((user) =>
-    `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
+    `${user.firstName} ${user.lastName}`
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
   );
 
-  if (loading) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center bg-[#F5F7F7]">
-        <div className="text-gray-500">Loading...</div>
-      </div>
-    ); // Show a loading message or spinner
-  }
+  function convertToMMDDYYYY(dateString) {
+    const date = new Date(dateString);
 
+    // Get the month, day, and year
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+    const day = String(date.getDate()).padStart(2, "0");
+    const year = date.getFullYear();
+
+    return `${month}-${day}-${year}`;
+  }
   return (
     <div className="w-full h-screen overflow-auto bg-[#F5F7F7] p-4">
       <div className="flex justify-between items-center mb-4">
@@ -42,48 +45,92 @@ const UsersTable = ({ data, loading }) => {
           <FiSearch className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400" />
         </div>
       </div>
-
-      <table className="min-w-full bg-white border-separate rounded-[18px]">
-        <thead>
-          <tr className="text-left text-[14px] text-gray-500">
-            <th className="py-2 px-4">Name</th>
-            <th className="py-2 px-4">Email</th>
-            <th className="py-2 px-4">City</th>
-            <th className="py-2 px-4">State</th>
-            <th className="py-2 px-4">Registration Date</th>
-            <th className="py-2 px-4">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredUsers.map((user) => (
-            <React.Fragment key={user?._id}>
-              <tr className="bg-white text-[14px] text-gray-900 hover:bg-gray-50">
-                <td className="py-3 px-4 flex items-center gap-3">
-                  <img
-                    src={user?.profilePicture || `https://i.pravatar.cc/40?img=${user?._id}`}
-                    alt={`${user?.firstName} ${user?.lastName}`}
-                    className="w-8 h-8 rounded-full"
-                  />
-                  <span>{`${user?.firstName} ${user?.lastName}`}</span>
-                </td>
-                <td className="py-3 px-4">{user?.email}</td>
-                <td className="py-3 px-4">{user?.city}</td>
-                <td className="py-3 px-4">{user?.state}</td>
-                <td className="py-3 px-4">{new Date(user?.createdAt).toLocaleDateString()}</td>
-                <td className="py-3 px-4">
-                <div onClick={()=>handleView(user)}  className="text-white bg-red-500 py-2 px-4 rounded-md flex items-center justify-center hover:bg-blue-600">
-                    <FiEye className="mr-1" />
-                    <span className="text-sm">View</span>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td colSpan="6" className="border-b border-gray-200"></td>
-              </tr>
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
+      <div className="w-full bg-white p-6 rounded-[18px] ">
+        <table className="min-w-full bg-white border-separate">
+          <thead>
+            <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
+              <th className="">Name</th>
+              <th className="px-4">Email</th>
+              <th className="px-4">Contact No.</th>
+              <th className="px-4">Address</th>
+              <th className="px-4">Registration Date</th>
+              <th className="pl-4">Action</th>
+            </tr>
+          </thead>
+          <tbody className="mt-2">
+            {loading
+              ? [...Array(5)].map((_, index) => (
+                  <React.Fragment key={index}>
+                    <tr className="bg-white text-[10px] text-gray-900">
+                      <td className="flex items-center gap-3 py-1">
+                        <div className="w-8 h-8 bg-gray-300 animate-pulse rounded-full"></div>
+                        <div className="w-32 h-4 bg-gray-300 animate-pulse rounded"></div>
+                      </td>
+                      <td className="py-1 px-4">
+                        <div className="w-40 h-4 bg-gray-300 animate-pulse rounded"></div>
+                      </td>
+                      <td className="py-1 px-4">
+                        <div className="w-24 h-4 bg-gray-300 animate-pulse rounded"></div>
+                      </td>
+                      <td className="py-1 px-4">
+                        <div className="w-40 h-4 bg-gray-300 animate-pulse rounded"></div>
+                      </td>
+                      <td className="py-1 px-4">
+                        <div className="w-32 h-4 bg-gray-300 animate-pulse rounded"></div>
+                      </td>
+                      <td className="py-1 px-4">
+                        <div className="w-20 h-4 bg-gray-300 animate-pulse rounded"></div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan="6" className="border-b border-gray-200"></td>
+                    </tr>
+                  </React.Fragment>
+                ))
+              : data?.map((user, index) => (
+                  <React.Fragment key={index}>
+                    <tr className="bg-white text-[10px] text-gray-900 ">
+                      <td className="flex  items-center gap-3 py-1">
+                        <img
+                          src={user?.profilePicture}
+                          alt={user?.firstName}
+                          className="w-8 h-8 rounded-full"
+                        />
+                        <span>
+                          {user?.firstName} {user?.lastName}
+                        </span>
+                      </td>
+                      <td className="py-1 px-4">{user?.email}</td>
+                      <td className="py-1 px-4">{user?.phoneNo}</td>
+                      <td className="py-1 px-4">{user?.street}</td>
+                      <td className="py-1 px-4">
+                        {convertToMMDDYYYY(user?.createdAt)}
+                      </td>
+                      <td className="py-1 px-4">
+                        <Link
+                          to={`/user-details/${user?._id}`}
+                          className="    rounded-[8px] justify-center bg-[#c00000] flex  h-[26px] gap-1 w-[75px]  items-center"
+                        >
+                          <img
+                            src={`/eye-icon-white.png`}
+                            alt={user?.firstName}
+                            className="mb-[0.2px]"
+                          />
+                          <span className=" text-white font-medium text-[11px] leading-none">
+                            View
+                          </span>
+                        </Link>
+                      </td>
+                    </tr>
+                    {/* Line under each row */}
+                    <tr>
+                      <td colSpan="6" className="border-b border-gray-200"></td>
+                    </tr>
+                  </React.Fragment>
+                ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

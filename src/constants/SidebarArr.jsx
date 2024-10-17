@@ -6,12 +6,6 @@ import { LuUser2 } from "react-icons/lu";
 import { MdOutlineDocumentScanner } from "react-icons/md";
 import { IoCarSportOutline } from "react-icons/io5";
 
-
-
-
-
-
-
 export const sidebarArr = [
   {
     title: "Home",
@@ -29,18 +23,18 @@ export const sidebarArr = [
     icon: <BiCar className="text-red-600" />,
   },
   {
-    title: "Driver",
+    title: "Drivers",
     url: "/driver",
     icon: <GrUserPolice className="text-red-600" />,
   },
   {
-    title: "Broker",
+    title: "Brokers",
     url: "/broker",
     icon: <LuUser2 className="text-red-600" />,
   },
   {
     title: "NEMT Approval",
-    url: "/nimt",
+    url: "/nemt",
     icon: <MdOutlineDocumentScanner className="text-red-600" />,
   },
   {
