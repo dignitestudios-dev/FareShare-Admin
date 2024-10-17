@@ -104,7 +104,7 @@ const DashboardDriverTable = () => {
                       <td className="py-1 px-4">{user?.email}</td>
 
                       <td className="py-1 px-4">{user?.vehicleCount}</td>
-                      <td className="py-1 px-4">
+                      <td className="py-1 ">
                         <button
                           onClick={() => handleView(user)}
                           className="  px-3 py-2 rounded-full flex gap-1 h-6  items-center"

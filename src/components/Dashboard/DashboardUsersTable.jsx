@@ -116,7 +116,7 @@ const DashboardUsersTable = () => {
                     <td className="py-1 px-4">
                       {convertToMMDDYYYY(user?.createdAt)}
                     </td>
-                    <td className="py-1 px-4">
+                    <td className="py-1 ">
                       <button
                         onClick={() => handleView(user)}
                         className="  px-3 py-2 rounded-full flex gap-1 h-6  items-center"

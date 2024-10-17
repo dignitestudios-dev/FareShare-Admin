@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import UsersTable from '../../components/Users/UsersTable';
+import React, { useState, useEffect } from "react";
+import UsersTable from "../../components/Users/UsersTable";
 import axios from "../../axios";
 
 const Users = () => {
   const [UserData, setUserData] = useState([]);
-  console.log(UserData)
+
   const [loading, setLoading] = useState(false);
 
   const getUsers = async () => {
@@ -24,9 +24,7 @@ const Users = () => {
     getUsers();
   }, []);
 
-  return (
-    <UsersTable data={UserData} loading={loading} />
-  );
+  return <UsersTable data={UserData} loading={loading} />;
 };
 
 export default Users;
