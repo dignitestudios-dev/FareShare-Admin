@@ -105,19 +105,15 @@ const DashboardDriverTable = () => {
 
                       <td className="py-1 px-4">{user?.vehicleCount}</td>
                       <td className="py-1 px-4">
-                        <Link
-                          to={`/user-details/${user?._id}`}
-                          className="    rounded-[8px] justify-center bg-[#c00000] flex  h-[26px] gap-1 w-[75px]  items-center"
+                        <button
+                          onClick={() => handleView(user)}
+                          className="  px-3 py-2 rounded-full flex gap-1 h-6  items-center"
                         >
-                          <img
-                            src={`/eye-icon-white.png`}
-                            alt={user?.firstName}
-                            className="mb-[0.2px]"
-                          />
-                          <span className=" text-white font-medium text-[11px] leading-none">
+                          <img src={`/eye-icon.png`} alt={user.name} />
+                          <span className=" text-black font-medium text-[10px] leading-[17.42px]">
                             View
                           </span>
-                        </Link>
+                        </button>
                       </td>
                     </tr>
                     {/* Line under each row */}

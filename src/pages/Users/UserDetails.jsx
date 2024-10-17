@@ -5,10 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 const UserDetails = () => {
   const location = useLocation();
   const user = location.state; // Get user data from location state
-
-  if (!user) {
-    return <div className="text-red-500">User data not found.</div>;
-  }
+  console.log(user);
 
   // Sample users data for rides taken (can be replaced with actual data)
   const users = [
@@ -44,7 +41,7 @@ const UserDetails = () => {
           <div className="bg-white rounded-[18px] p-4 pl-8 mb-6 shadow-lg flex items-center gap-6">
             {/* Profile Picture */}
             <img
-              src={user.profilePicture || "https://i.pravatar.cc/100"}
+              src={user?.profilePicture || "https://i.pravatar.cc/100"}
               alt="profile"
               className="w-[100px] h-[100px] rounded-full"
             />
@@ -54,50 +51,68 @@ const UserDetails = () => {
 
           {/* General Information Container */}
           <div className="bg-white rounded-[18px] p-7 shadow-lg">
-            <h3 className="font-semibold mb-4 text-black text-[24px]">General Information</h3>
+            <h3 className="font-semibold mb-4 text-black text-[24px]">
+              General Information
+            </h3>
             <div className="grid grid-cols-2 gap-6">
               {/* Full Name */}
               <div className="flex flex-col bg-[#FAFAFA] p-4 rounded-lg">
                 <span className="text-[14px] text-[#9E9E9E]">Full Name</span>
                 <span className="text-[16px] font-medium text-black">{`${user?.firstName} ${user?.lastName}`}</span>
               </div>
-              
+
               {/* Email Address */}
               <div className="flex flex-col bg-[#FAFAFA] p-4 rounded-lg">
-                <span className="text-[14px] text-[#9E9E9E]">Email Address</span>
-                <span className="text-[16px] font-medium text-black">{user?.email}</span>
+                <span className="text-[14px] text-[#9E9E9E]">
+                  Email Address
+                </span>
+                <span className="text-[16px] font-medium text-black">
+                  {user?.email}
+                </span>
               </div>
-              
+
               {/* Phone Number */}
               <div className="flex flex-col bg-[#FAFAFA] p-4 rounded-lg">
                 <span className="text-[14px] text-[#9E9E9E]">Phone Number</span>
-                <span className="text-[16px] font-medium text-black">+1 856 558 0215</span>
+                <span className="text-[16px] font-medium text-black">
+                  +1 856 558 0215
+                </span>
               </div>
-              
+
               {/* MI */}
               <div className="flex flex-col bg-[#FAFAFA] p-4 rounded-lg">
                 <span className="text-[14px] text-[#9E9E9E]">MI</span>
-                <span className="text-[16px] font-medium text-black">{user?.MI || "N/A"}</span>
+                <span className="text-[16px] font-medium text-black">
+                  {user?.MI || "N/A"}
+                </span>
               </div>
-              
+
               {/* Suffix */}
               <div className="flex flex-col bg-[#FAFAFA] p-4 rounded-lg">
                 <span className="text-[14px] text-[#9E9E9E]">Suffix</span>
-                <span className="text-[16px] font-medium text-black">{user?.suffix || "N/A"}</span>
+                <span className="text-[16px] font-medium text-black">
+                  {user?.suffix || "N/A"}
+                </span>
               </div>
-              
+
               {/* Gender */}
               <div className="flex flex-col bg-[#FAFAFA] p-4 rounded-lg">
                 <span className="text-[14px] text-[#9E9E9E]">Gender</span>
-                <span className="text-[16px] font-medium text-black">{user?.gender}</span>
+                <span className="text-[16px] font-medium text-black">
+                  {user?.gender}
+                </span>
               </div>
-              
+
               {/* Patient Date of Birth */}
               <div className="flex flex-col bg-[#FAFAFA] p-4 rounded-lg">
-                <span className="text-[14px] text-[#9E9E9E]">Patient Date of Birth</span>
-                <span className="text-[16px] font-medium text-black">{new Date(user?.patientDateofBirth).toLocaleDateString()}</span>
+                <span className="text-[14px] text-[#9E9E9E]">
+                  Patient Date of Birth
+                </span>
+                <span className="text-[16px] font-medium text-black">
+                  {new Date(user?.patientDateofBirth).toLocaleDateString()}
+                </span>
               </div>
-              
+
               {/* Address */}
               <div className="col-span-2 flex flex-col bg-[#FAFAFA] p-4 rounded-lg">
                 <span className="text-[14px] text-[#9E9E9E]">Address</span>
@@ -111,7 +126,9 @@ const UserDetails = () => {
 
         {/* Right side: Rides Taken */}
         <div className="bg-white rounded-[18px] p-6 w-[50%] h-[50%] shadow-lg">
-          <h3 className="font-semibold mb-4 text-black text-[24px]">Rides Taken</h3>
+          <h3 className="font-semibold mb-4 text-black text-[24px]">
+            Rides Taken
+          </h3>
           <table className="w-full">
             <thead>
               <tr className="text-gray-500 text-[14px] text-left">
@@ -135,13 +152,15 @@ const UserDetails = () => {
                   <td className="py-3">{ride?.contact}</td>
                   <td className="py-3">{ride?.bookingDate}</td>
                   <td className="py-3">
-                    <Link
-                      to={`/ride-details`}
-                      className="text-red-500 flex items-center gap-1"
+                    <button
+                      onClick={() => Navigate("/ride-details")}
+                      className="  px-3 py-2 rounded-full flex gap-1 h-6  items-center"
                     >
-                      <FiEye className="text-[18px]" />
-                      <span>View</span>
-                    </Link>
+                      <img src={`/eye-icon.png`} alt={user.name} />
+                      <span className=" text-black font-medium text-[10px] leading-[17.42px]">
+                        View
+                      </span>
+                    </button>
                   </td>
                 </tr>
               ))}

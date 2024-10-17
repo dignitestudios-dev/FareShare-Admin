@@ -10,7 +10,7 @@ const VehicleApproval = () => {
   const getVehicles = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get("/admin/vehicle/all");
+      const { data } = await axios.get("/admin/vehicle/pending");
       console.log("🚀 ~ getVehicles ~ data:", data);
       setVehicleData(data?.data); // Store the actual data from the response
     } catch (error) {

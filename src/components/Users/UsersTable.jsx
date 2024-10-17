@@ -7,7 +7,7 @@ const UsersTable = ({ data, loading }) => {
   const [searchQuery, setSearchQuery] = React.useState("");
   const navigate = useNavigate();
   const handleView = (user) => {
-    navigate(`/user-details/${user._id}`, { state: user }); // Pass the entire driver object as state
+    navigate(`/user-details/${user?._id}`, { state: user }); // Pass the entire driver object as state
   };
 
   // Filter users based on the search query
@@ -107,8 +107,8 @@ const UsersTable = ({ data, loading }) => {
                         {convertToMMDDYYYY(user?.createdAt)}
                       </td>
                       <td className="py-1 px-4">
-                        <Link
-                          to={`/user-details/${user?._id}`}
+                        <button
+                          onClick={() => handleView(user)}
                           className="    rounded-[8px] justify-center bg-[#c00000] flex  h-[26px] gap-1 w-[75px]  items-center"
                         >
                           <img
@@ -119,7 +119,7 @@ const UsersTable = ({ data, loading }) => {
                           <span className=" text-white font-medium text-[11px] leading-none">
                             View
                           </span>
-                        </Link>
+                        </button>
                       </td>
                     </tr>
                     {/* Line under each row */}

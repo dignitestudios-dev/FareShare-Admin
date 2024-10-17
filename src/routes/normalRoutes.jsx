@@ -30,7 +30,7 @@ export const normalRoutes = [
   },
   {
     title: "Home",
-    url: "/Users",
+    url: "/users",
     page: <GlobalLayout page={<Users />} />,
   },
   {
