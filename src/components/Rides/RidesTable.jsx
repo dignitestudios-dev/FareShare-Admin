@@ -1,134 +1,70 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { FiEye } from "react-icons/fi"; // Using the Eye icon for the action
 import { Link } from "react-router-dom";
 import { FiSearch } from "react-icons/fi"; // Importing the Search icon
+import { GlobalContext } from "../../contexts/GlobalContext";
+import io from "socket.io-client";
+
+const SOCKET_SERVER_URL = "https://backend.faresharellc.com";
 
 const RidesTable = () => {
+  const { navigate } = useContext(GlobalContext);
   const [searchQuery, setSearchQuery] = useState(""); // Search query state
   const [showUsers, setShowUsers] = useState(true);
 
-  // Sample users data (you can replace this with actual data)
-  const users = [
-    {
-      name: "Mike Smith",
-      email: "mikesmith12@gmail.com",
-      ridetype: "(619) 602-6578 X6033",
-      status: "Ongoing",
-      registrationDate: "2023/5/16",
-    },
-    {
-      name: "Olivia James",
-      email: "oliviajames@gmail.com",
-      ridetype: "742.486.7602 X9129",
-      status: "Completed",
-      registrationDate: "2022-01-11",
-    },
-    {
-      name: "Olivia James",
-      email: "oliviajames@gmail.com",
-      ridetype: "742.486.7602 X9129",
-      status: "Cancelled",
-      registrationDate: "2022-01-11",
-    },
-    {
-      name: "Olivia James",
-      email: "oliviajames@gmail.com",
-      ridetype: "742.486.7602 X9129",
-      status: "Pending",
-      registrationDate: "2022-01-11",
-    },
+  const [rides, setRides] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-    {
-      name: "Mike Smith",
-      email: "mikesmith12@gmail.com",
-      ridetype: "(619) 602-6578 X6033",
-      status: "Ongoing",
-      registrationDate: "2023/5/16",
-    },
-    {
-      name: "Olivia James",
-      email: "oliviajames@gmail.com",
-      ridetype: "742.486.7602 X9129",
-      status: "Completed",
-      registrationDate: "2022-01-11",
-    },
-    {
-      name: "Olivia James",
-      email: "oliviajames@gmail.com",
-      ridetype: "742.486.7602 X9129",
-      status: "Cancelled",
-      registrationDate: "2022-01-11",
-    },
-    {
-      name: "Olivia James",
-      email: "oliviajames@gmail.com",
-      ridetype: "742.486.7602 X9129",
-      status: "Pending",
-      registrationDate: "2022-01-11",
-    },
-    {
-      name: "Mike Smith",
-      email: "mikesmith12@gmail.com",
-      ridetype: "(619) 602-6578 X6033",
-      status: "Ongoing",
-      registrationDate: "2023/5/16",
-    },
-    {
-      name: "Olivia James",
-      email: "oliviajames@gmail.com",
-      ridetype: "742.486.7602 X9129",
-      status: "Completed",
-      registrationDate: "2022-01-11",
-    },
-    {
-      name: "Olivia James",
-      email: "oliviajames@gmail.com",
-      ridetype: "742.486.7602 X9129",
-      status: "Cancelled",
-      registrationDate: "2022-01-11",
-    },
-    {
-      name: "Olivia James",
-      email: "oliviajames@gmail.com",
-      ridetype: "742.486.7602 X9129",
-      status: "Pending",
-      registrationDate: "2022-01-11",
-    },
-    {
-      name: "Mike Smith",
-      email: "mikesmith12@gmail.com",
-      ridetype: "(619) 602-6578 X6033",
-      status: "Ongoing",
-      registrationDate: "2023/5/16",
-    },
-    {
-      name: "Olivia James",
-      email: "oliviajames@gmail.com",
-      ridetype: "742.486.7602 X9129",
-      status: "Completed",
-      registrationDate: "2022-01-11",
-    },
-    {
-      name: "Olivia James",
-      email: "oliviajames@gmail.com",
-      ridetype: "742.486.7602 X9129",
-      status: "Cancelled",
-      registrationDate: "2022-01-11",
-    },
-    {
-      name: "Olivia James",
-      email: "oliviajames@gmail.com",
-      ridetype: "742.486.7602 X9129",
-      status: "Pending",
-      registrationDate: "2022-01-11",
-    },
-    // Add more user data here...
-  ];
+  const [date, setDate] = useState(null);
+  const [rideType, setRideType] = useState("User");
+  const [category, setCategory] = useState("On Demand");
+  const [status, setStatus] = useState("All");
+  const [search, setSearch] = useState("");
 
-  // Filter users based on search query
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    setTimeout(() => {
+      setSearch(searchQuery);
+    }, 400);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setLoading(true);
+    const socket = io(SOCKET_SERVER_URL);
+    socket.on("connect", () => {
+      console.log("Socket connected:", socket.id);
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("Connection error:", err);
+    });
+
+    socket.on("disconnect", (reason) => {
+      console.warn("Socket disconnected:", reason);
+    });
+
+    socket.emit(
+      "getRidesAdmin",
+      JSON.stringify({
+        adminId: localStorage.getItem("adminId"),
+        rideType: rideType, //Broker, User
+        category: category, // medical, corporate, On Demand, scheduled
+        status: status == "All" ? null : status, //"InProgress",//"Pending", "InProgress", "Completed"
+        search: searchQuery,
+      })
+    );
+
+    // Listen for the response from the server
+    socket.on("getRidesAdminResponse", (response) => {
+      console.log(response);
+      setLoading(false);
+      setRides(response?.data || []);
+    });
+
+    // Cleanup: Disconnect socket when component unmounts
+    return () => {
+      socket.disconnect();
+    };
+  }, [rideType, category, status, search]);
 
   function convertToMMDDYYYY(dateString) {
     const date = new Date(dateString);
@@ -147,51 +83,120 @@ const RidesTable = () => {
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-[24px] font-bold text-black">
           Rides{" "}
-          <span className="text-[16px] text-gray-500">({users.length})</span>
+          <span className="text-[16px] text-gray-500">({rides?.length})</span>
         </h3>
         {/* Filters and Search Bar */}
         <div className="flex gap-2">
           {/* Date Filter */}
-          <div className="relative">
+          {/* <div className="relative">
             <input
               type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
               className="border rounded-[10px] px-4 py-4 text-sm text-gray-700 focus:outline-none w-[184px] h-[45px]"
               placeholder="date"
             />
-          </div>
+          </div> */}
           {/* ridetype Filter */}
-          <div className="relative">
-            <select className="border  rounded-[10px] px-1 text-sm text-gray-700 focus:outline-none w-[120px] h-[45px]">
-              <option value={""}>Ride Type</option>
+          <div class="relative w-[200px] h-[50px]  text-gray-800 ">
+            <select
+              value={rideType}
+              onChange={(e) => setRideType(e.target.value)}
+              class="peer p-3 pe-9 block w-[200px] h-[50px] border rounded-lg  outline-none disabled:opacity-50 disabled:pointer-events-none  text-xs
+  focus:pt-6
+  focus:pb-2
+  [&:not(:placeholder-shown)]:pt-6
+  [&:not(:placeholder-shown)]:pb-2
+  autofill:pt-6
+  autofill:pb-2"
+            >
               <option value={"User"}>User</option>
               <option value={"Broker"}>Broker</option>
             </select>
+            <label
+              class="absolute -top-1 start-0 p-4 h-full truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  peer-disabled:opacity-50 peer-disabled:pointer-events-none
+    peer-focus:text-xs
+    peer-focus:-translate-y-1.5
+    peer-focus:text-gray-500 
+    peer-[:not(:placeholder-shown)]:text-xs
+    peer-[:not(:placeholder-shown)]:-translate-y-1.5
+    peer-[:not(:placeholder-shown)]:text-gray-500 "
+            >
+              Select Ride Type
+            </label>
           </div>
+
           {/* Status Filter */}
-          <div className="relative">
-            <select className="border  rounded-[10px] text-sm px-1 text-gray-700 focus:outline-none w-[110px] h-[45px]">
-              <option value={""}>Status</option>
-              <option value={"InProgress"}>InProgress</option>
+          <div class="relative w-[150px] h-[50px]  text-gray-800 ">
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              class="peer p-3 pe-9 block w-[150px] h-[50px] border rounded-lg  outline-none disabled:opacity-50 disabled:pointer-events-none text-xs
+  focus:pt-6
+  focus:pb-2
+  [&:not(:placeholder-shown)]:pt-6
+  [&:not(:placeholder-shown)]:pb-2
+  autofill:pt-6
+  autofill:pb-2"
+            >
+              <option value={"All"}>All</option>
+
+              <option value={"InProgress"}>In Progress</option>
               <option value={"Pending"}>Pending</option>
               <option value={"Completed"}>Completed</option>
+              <option value={"Cancelled"}>Cancelled</option>
             </select>
+            <label
+              class="absolute -top-1 start-0 p-4 h-full truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  peer-disabled:opacity-50 peer-disabled:pointer-events-none
+    peer-focus:text-xs
+    peer-focus:-translate-y-1.5
+    peer-focus:text-gray-500 
+    peer-[:not(:placeholder-shown)]:text-xs
+    peer-[:not(:placeholder-shown)]:-translate-y-1.5
+    peer-[:not(:placeholder-shown)]:text-gray-500 "
+            >
+              Select Status
+            </label>
           </div>
-          {/* Status Filter */}
-          <div className="relative">
-            <select className="border  rounded-[10px] text-sm px-1 text-gray-700 focus:outline-none w-[110px] h-[45px]">
-              <option value={""}>Category</option>
+
+          <div class="relative w-[150px] h-[50px]  text-gray-800 ">
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              class="peer p-3 pe-9 block w-[150px] h-[50px] border rounded-lg outline-none disabled:opacity-50 disabled:pointer-events-none text-xs
+  focus:pt-6
+  focus:pb-2
+  [&:not(:placeholder-shown)]:pt-6
+  [&:not(:placeholder-shown)]:pb-2
+  autofill:pt-6
+  autofill:pb-2"
+            >
               <option value={"medical"}>Medical</option>
               <option value={"corporate"}>Corporate</option>
               <option value={"On Demand"}>On Demand</option>
               <option value={"Scheduled"}>Scheduled</option>
             </select>
+            <label
+              class="absolute -top-1 start-0 p-4 h-full truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  peer-disabled:opacity-50 peer-disabled:pointer-events-none
+    peer-focus:text-xs
+    peer-focus:-translate-y-1.5
+    peer-focus:text-gray-500 
+    peer-[:not(:placeholder-shown)]:text-xs
+    peer-[:not(:placeholder-shown)]:-translate-y-1.5
+    peer-[:not(:placeholder-shown)]:text-gray-500 "
+            >
+              Select Category
+            </label>
           </div>
+
           {/* Search Input */}
           <div className="relative">
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+              }}
               placeholder="Search"
               className="border rounded-[10px] pl-4 pr-10 py-4 text-sm text-gray-700 focus:outline-none w-[338px] h-[45px]" // Increased size
             />
@@ -202,63 +207,66 @@ const RidesTable = () => {
 
       {/* Table Section */}
       <div className="w-full bg-white p-6 rounded-[18px] ">
-        (
-        <table className="min-w-full bg-white border-separate">
-          <thead>
-            <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
-              <th className="py-2 ">Name</th>
-              <th className="py-2 px-4">Email</th>
-              <th className="py-2 px-4">Ridetype </th>
-              <th className="py-2 px-4">Registration Date</th>
-              <th className="py-2 px-4">Status</th>
-              <th className="py-2 px-4">Action</th>
-            </tr>
-          </thead>
-          <tbody className="mt-2">
-            {users?.map((user, index) => (
-              <React.Fragment key={index}>
-                <tr className="bg-white text-[10px] text-gray-900 ">
-                  <td className="flex  items-center gap-3 py-1">
-                    <img
-                      src={
-                        "https://cdn.pixabay.com/photo/2019/08/29/12/10/model-4438821_640.jpg"
-                      }
-                      alt={user?.firstName}
-                      className="w-8 h-8 rounded-full"
-                    />
-                    <span>{user?.name}</span>
-                  </td>
-                  <td className="py-1 px-4">{user?.email}</td>
-                  <td className="py-1 px-4">{user?.ridetype}</td>
-                  <td className="py-1 px-4">
-                    {convertToMMDDYYYY(user?.registrationDate)}
-                  </td>
-                  <td className="py-1 px-4">{user?.status}</td>
-                  <td className="py-1 px-4">
-                    <Link
-                      to={`/user-details/${user?._id}`}
-                      className="    rounded-[8px] justify-center bg-[#c00000] flex  h-[26px] gap-1 w-[75px]  items-center"
-                    >
+        {/* Table Section */}
+        <div className="overflow-x-auto bg-white  rounded-xl ">
+          <table className="min-w-full bg-white border-separate">
+            <thead>
+              <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
+                <th className="py-2 ">Name</th>
+                <th className="py-2 px-4">Email</th>
+                <th className="py-2 px-4">Ridetype </th>
+                <th className="py-2 px-4">Registration Date</th>
+                <th className="py-2 px-4">Status</th>
+                <th className="py-2 px-4">Action</th>
+              </tr>
+            </thead>
+            <tbody className="mt-2">
+              {rides?.map((ride, index) => (
+                <React.Fragment key={index}>
+                  <tr className="bg-white text-[10px] text-gray-900 ">
+                    <td className="flex  items-center gap-3 py-1">
                       <img
-                        src={`/eye-icon-white.png`}
-                        alt={user?.name}
-                        className="mb-[0.2px]"
+                        src={ride?.user?.profilePicture}
+                        alt={ride?.user?.name}
+                        className="w-8 h-8 rounded-full"
                       />
-                      <span className=" text-white font-medium text-[11px] leading-none">
-                        View
-                      </span>
-                    </Link>
-                  </td>
-                </tr>
-                {/* Line under each row */}
-                <tr>
-                  <td colSpan="6" className="border-b border-gray-200"></td>
-                </tr>
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
-        )
+                      <span>{ride?.user?.name}</span>
+                    </td>
+                    <td className="py-1 px-4">{ride?.user?.email}</td>
+                    <td className="py-1 px-4">{ride?.ride?.rideType}</td>
+                    <td className="py-1 px-4">
+                      {convertToMMDDYYYY(ride?.ride?.registrationDate)}
+                    </td>
+                    <td className="py-1 px-4 capitalize">
+                      {ride?.ride?.status}
+                    </td>
+                    <td className="py-1 px-4">
+                      {ride?.ride?.status !== "cancelled" && (
+                        <Link
+                          to={`/user-details/${ride?._id}`}
+                          className="    rounded-[8px] justify-center bg-[#c00000] flex  h-[26px] gap-1 w-[75px]  items-center"
+                        >
+                          <img
+                            src={`/eye-icon-white.png`}
+                            alt={ride?.user?.name}
+                            className="mb-[0.2px]"
+                          />
+                          <span className=" text-white font-medium text-[11px] leading-none">
+                            View
+                          </span>
+                        </Link>
+                      )}
+                    </td>
+                  </tr>
+                  {/* Line under each row */}
+                  <tr>
+                    <td colSpan="6" className="border-b border-gray-200"></td>
+                  </tr>
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        </div>{" "}
       </div>
     </div>
   );

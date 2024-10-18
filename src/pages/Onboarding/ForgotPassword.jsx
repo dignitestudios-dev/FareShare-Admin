@@ -1,12 +1,45 @@
-import React, { useContext } from "react";
 import { Forgot, Logo } from "../../assets/export"; // Add FareShare logo here
+import React, { useContext, useState } from "react";
 import AuthInput from "../../components/onboarding/AuthInput";
 import AuthSubmitBtn from "../../components/onboarding/AuthSubmitBtn";
 import { GlobalContext } from "../../contexts/GlobalContext";
+import { AuthContext } from "../../contexts/AuthContext";
+import axios from "../../axios";
+import { ErrorToast, SuccessToast } from "../../components/global/Toast";
 import { BiArrowBack } from "react-icons/bi";
 
 const ForgotPassword = () => {
   const { navigate } = useContext(GlobalContext);
+  const { login } = useContext(AuthContext);
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleForgot = async (e) => {
+    e.preventDefault();
+    try {
+      if (email == "") {
+        ErrorToast("Email cannot be left empty.");
+      } else {
+        setLoading(true);
+
+        const response = await axios.post("/auth/sendPassOTP", {
+          email,
+          isAdmin: true,
+        });
+        if (response?.status === 201) {
+          setLoading(false);
+
+          localStorage.setItem("email", email);
+          SuccessToast("Verification Code Sent Successfully.");
+          navigate("/verify-otp");
+        }
+      }
+    } catch (error) {
+      setLoading(false);
+      ErrorToast(error?.response?.data?.message || "Something went wrong");
+    }
+  };
 
   return (
     <div className="w-full h-screen flex justify-center items-center">
@@ -35,11 +68,17 @@ const ForgotPassword = () => {
           </p>
 
           <form
-            onSubmit={() => navigate("/verify-otp")}
+            onSubmit={handleForgot}
             className="w-[448px]  flex flex-col gap-4"
           >
-            <AuthInput text="Email Address" type="email" />
+            <AuthInput
+              text="Email Address"
+              type="email"
+              state={email}
+              setState={setEmail}
+            />
             <AuthSubmitBtn
+              loading={loading}
               text="Next"
               className="bg-red-600 text-white w-full py-3"
             />

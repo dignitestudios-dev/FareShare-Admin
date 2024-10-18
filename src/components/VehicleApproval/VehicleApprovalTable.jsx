@@ -110,7 +110,7 @@ const VehicleApprovalTable = ({ data, loading, setUpdate }) => {
                 <th className="py-2 px-4">Model</th>
                 <th className="py-2 px-4">Plate Number</th>
                 <th className="py-2 px-4">Wheelchair Accessible</th>
-                <th className="py-2 px-4">Action</th>
+                <th className="py-2 px-4 flex justify-center">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -168,7 +168,7 @@ const VehicleApprovalTable = ({ data, loading, setUpdate }) => {
                         <td className="py-1 px-4">
                           {vehicle?.isWheelChairAccessible ? "Yes" : "No"}
                         </td>
-                        <td className="py-1 px-4 flex space-x-2">
+                        <td className="py-1 px-4 flex space-x-1 justify-center">
                           {/* Reject button */}
                           <button
                             onClick={() => {

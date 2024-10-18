@@ -24,6 +24,7 @@ const AuthInput = ({ state, setState, text, type, error, placeholder }) => {
           />
           <button
             type="button"
+            tabIndex={-1}
             onClick={() => setIsPassVisible((prev) => !prev)}
             className="absolute top-[14px] text-md right-3"
             style={{ color: "#6B7373" }}

@@ -1,8 +1,14 @@
 import React, { useState } from "react";
 import { FiEye } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { MdCheck, MdClose } from "react-icons/md";
+import { Link, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import axios from "../../axios";
+import RejectModal from "./RejectModal";
+import ApproveModal from "./ApproveModal";
+import { ErrorToast, SuccessToast } from "../global/Toast";
 
-const NimtTable = ({ data = [], loading }) => {
+const NimtTable = ({ data, loading, setUpdate }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("All");
 
@@ -16,6 +22,13 @@ const NimtTable = ({ data = [], loading }) => {
       item.status.toLowerCase() === activeTab.toLowerCase();
     return matchesSearch && matchesTab;
   });
+
+  const navigate = useNavigate();
+
+  const handleView = (nemt) => {
+    Cookies.set("nemt", JSON.stringify(nemt));
+    navigate(`/nemt-details/${nemt?._id}`, { state: nemt });
+  };
 
   const getStatusClass = (status) => {
     switch (status) {
@@ -31,6 +44,57 @@ const NimtTable = ({ data = [], loading }) => {
         return "bg-red-200 text-red-800";
       default:
         return "";
+    }
+  };
+
+  const [open, setOpen] = useState(false);
+  const [acceptLoading, setAcceptLoading] = useState(false);
+  const [declineLoading, setDeclineLoading] = useState(false);
+
+  const [closeOpen, setCloseOpen] = useState(false);
+
+  const toggleAccept = async () => {
+    try {
+      setAcceptLoading(true);
+      const { data } = await axios.post("/admin/approveUser", {
+        userId: JSON.parse(Cookies?.get("nemt"))?.userId?._id,
+        isApproved: true,
+      });
+      if (data?.success) {
+        setOpen(false);
+        setUpdate((prev) => !prev);
+        SuccessToast("NEMT Approved Successfully.");
+      }
+
+      // Use the data from the API response
+    } catch (error) {
+      ErrorToast(error?.response?.data?.message);
+    } finally {
+      setAcceptLoading(false);
+    }
+  };
+
+  const toggleDecline = async () => {
+    try {
+      setDeclineLoading(true);
+
+      const { data } = await axios.post("/admin/approveUser", {
+        userId: JSON.parse(Cookies?.get("nemt"))?.userId?._id,
+        isApproved: false,
+        reason:
+          "Your NEMT request was rejected as it did not meet FareShare Compliance",
+      });
+      if (data?.success) {
+        setCloseOpen(false);
+        setUpdate((prev) => !prev);
+        SuccessToast("NEMT Rejected Successfully.");
+      }
+
+      // Use the data from the API response
+    } catch (error) {
+      ErrorToast(error?.response?.data?.message);
+    } finally {
+      setDeclineLoading(false);
     }
   };
 
@@ -51,23 +115,21 @@ const NimtTable = ({ data = [], loading }) => {
         /> */}
         {/* Tab Section */}
         <div className="flex  px-1 py-1 border border-gray-300 bg-white rounded-md">
-          {["All", "Pending", "Approved", "Rejected"].map(
-            (tab, index, array) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 text-sm font-semibold ${
-                  activeTab === tab
-                    ? "bg-red-600 text-white"
-                    : "bg-white text-black"
-                } ${index === 0 ? "rounded-l" : ""} ${
-                  index === array.length - 1 ? "rounded-r" : ""
-                }`}
-              >
-                {tab}
-              </button>
-            )
-          )}
+          {["All", "Pending", "Approved"].map((tab, index, array) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 text-sm font-semibold ${
+                activeTab === tab
+                  ? "bg-red-600 text-white"
+                  : "bg-white text-black"
+              } ${index === 0 ? "rounded-l" : ""} ${
+                index === array.length - 1 ? "rounded-r" : ""
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -80,7 +142,7 @@ const NimtTable = ({ data = [], loading }) => {
               <th className="py-2 px-4">Insurance Number</th>
               <th className="py-2 px-4">Subscriber Number</th>
               <th className="py-2 px-4">Status</th>
-              <th className="py-2 px-4">Action</th>
+              <th className="py-2 px-4 flex justify-center">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -128,20 +190,51 @@ const NimtTable = ({ data = [], loading }) => {
                           {item?.status}
                         </span>
                       </td>
-                      <td className="py-1 px-4">
-                        <Link
-                          to={`/nemt-details/${item?._id}`}
-                          className="    rounded-[8px] justify-center bg-[#c00000] flex  h-[26px] gap-1 w-[75px]  items-center"
-                        >
-                          <img
-                            src={`/eye-icon-white.png`}
-                            alt={item?.insuranceNumber}
-                            className="mb-[0.2px]"
-                          />
-                          <span className=" text-white font-medium text-[10px] leading-none">
-                            View
-                          </span>
-                        </Link>
+                      <td className="py-1 flex space-x-1 justify-center">
+                        {item?.status == "approved" ? (
+                          <button
+                            onClick={() => handleView(item)}
+                            className="    rounded-[8px] justify-center bg-[#c00000] flex  h-[26px] gap-1 w-[75px]  items-center"
+                          >
+                            <img
+                              src={`/eye-icon-white.png`}
+                              alt={item?.insuranceNumber}
+                              className="mb-[0.2px]"
+                            />
+                            <span className=" text-white font-medium text-[10px] leading-none">
+                              View
+                            </span>
+                          </button>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => {
+                                setCloseOpen(true);
+                                Cookies.set("nemt", JSON.stringify(item));
+                              }}
+                              className="bg-red-500 text-white w-[26px] h-[26px] flex items-center justify-center  rounded-[8px] hover:bg-red-600"
+                            >
+                              <MdClose className="w-5 h-5" />
+                            </button>
+                            {/* Approve button */}
+                            <button
+                              onClick={() => {
+                                setOpen(true);
+                                Cookies.set("nemt", JSON.stringify(item));
+                              }}
+                              className="bg-green-500 text-white w-[26px] h-[26px] flex items-center justify-center rounded-[8px] hover:bg-green-600"
+                            >
+                              <MdCheck className="w-5 h-5" />
+                            </button>
+                            {/* View button */}
+                            <div
+                              onClick={() => handleView(item)}
+                              className="text-white w-[26px] h-[26px] bg-[#9F9F9F]  rounded-[8px] flex items-center justify-center hover:bg-blue-600"
+                            >
+                              <FiEye className="h-4 w-5" />
+                            </div>
+                          </>
+                        )}
                       </td>
                     </tr>
                     {/* Line under each row */}
@@ -152,6 +245,21 @@ const NimtTable = ({ data = [], loading }) => {
                 ))}
           </tbody>
         </table>
+
+        <ApproveModal
+          isOpen={open}
+          onRequestClose={() => setOpen(false)}
+          onConfirm={() => toggleAccept()}
+          loading={acceptLoading}
+        />
+
+        {/* Reject Modal */}
+        <RejectModal
+          isOpen={closeOpen}
+          onRequestClose={() => setCloseOpen(false)}
+          onConfirm={() => toggleDecline()}
+          loading={declineLoading}
+        />
       </div>
     </div>
   );

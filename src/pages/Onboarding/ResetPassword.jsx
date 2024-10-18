@@ -1,18 +1,52 @@
-import React, { useContext, useState } from "react";
 import { Forgot, Logo } from "../../assets/export"; // Add FareShare logo here
+import React, { useContext, useState } from "react";
 import AuthInput from "../../components/onboarding/AuthInput";
 import AuthSubmitBtn from "../../components/onboarding/AuthSubmitBtn";
 import { GlobalContext } from "../../contexts/GlobalContext";
+import { AuthContext } from "../../contexts/AuthContext";
+import axios from "../../axios";
+import { ErrorToast, SuccessToast } from "../../components/global/Toast";
 import { BiArrowBack } from "react-icons/bi";
 import EmailVerificationSuccessModal from "./EmailVerificationSuccessModal";
 
 const ResetPassword = () => {
-  const { navigate } = useContext(GlobalContext);
   const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+  const { navigate } = useContext(GlobalContext);
+  const { login } = useContext(AuthContext);
+  const [password, setPassword] = useState("");
+  const [confPass, setConfPass] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleNextClick = (e) => {
-    e.preventDefault(); // Prevent form submission
-    setIsModalOpen(true); // Open the modal
+  const handleForgot = async (e) => {
+    e.preventDefault();
+    try {
+      if (password == "") {
+        ErrorToast("Password cannot be left empty.");
+      } else if (confPass == "") {
+        ErrorToast("You must re-enter the password.");
+      } else if (password !== confPass) {
+        ErrorToast("Passwords must match.");
+      } else {
+        setLoading(true);
+
+        const response = await axios.post("/auth/updatePassOTP", {
+          email: localStorage.getItem("email"),
+          password: password,
+          confirmPassword: confPass,
+          resetToken: localStorage.getItem("resetToken"),
+        });
+        if (response?.status === 200) {
+          localStorage.removeItem("resetToken");
+          localStorage.removeItem("email");
+          setLoading(false);
+          setIsModalOpen(true);
+        }
+      }
+    } catch (error) {
+      setLoading(false);
+      ErrorToast(error?.response?.data?.message || "Something went wrong");
+    }
   };
 
   return (
@@ -41,14 +75,25 @@ const ResetPassword = () => {
         </p>
 
         <form
-          onSubmit={handleNextClick}
+          onSubmit={handleForgot}
           className="w-[448px]  flex flex-col gap-4"
         >
-          <AuthInput text="New Password" type="password" />
-          <AuthInput text="Re-Type Password" type="password" />
+          <AuthInput
+            text="New Password"
+            type="password"
+            state={password}
+            setState={setPassword}
+          />
+          <AuthInput
+            text="Re-Type Password"
+            type="password"
+            state={confPass}
+            setState={setConfPass}
+          />
 
           <AuthSubmitBtn
-            text="Next"
+            loading={loading}
+            text="Update"
             className="bg-red-600 text-white w-full py-3"
           />
         </form>

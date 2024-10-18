@@ -1,5 +1,6 @@
 import React from "react";
 import { FiEye } from "react-icons/fi";
+import { MdCheck, MdClose } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
 
 const DriverTable = ({ data, loading }) => {
@@ -89,20 +90,36 @@ const DriverTable = ({ data, loading }) => {
                       <td className="py-1 px-4">
                         {convertToMMDDYYYY(user?.createdAt)}
                       </td>
-                      <td className="py-1 px-4">
-                        <Link
-                          to={`/user-details/${user?._id}`}
-                          className="    rounded-[8px] justify-center bg-[#c00000] flex  h-[26px] gap-1 w-[75px]  items-center"
-                        >
-                          <img
-                            src={`/eye-icon-white.png`}
-                            alt={user?.firstName}
-                            className="mb-[0.2px]"
-                          />
-                          <span className=" text-white font-medium text-[11px] leading-none">
-                            View
-                          </span>
-                        </Link>
+                      <td className="py-1 flex space-x-1 justify-center ">
+                        {user?.status == "approved" ? (
+                          <Link
+                            to={`/user-details/${user?._id}`}
+                            className="    rounded-[8px] justify-center bg-[#c00000] flex  h-[26px] gap-1 w-[75px]  items-center"
+                          >
+                            <img
+                              src={`/eye-icon-white.png`}
+                              alt={user?.firstName}
+                              className="mb-[0.2px]"
+                            />
+                            <span className=" text-white font-medium text-[11px] leading-none">
+                              View
+                            </span>
+                          </Link>
+                        ) : (
+                          <>
+                            <button className="bg-red-500 text-white w-[26px] h-[26px] flex items-center justify-center  rounded-[8px] hover:bg-red-600">
+                              <MdClose className="w-5 h-5" />
+                            </button>
+                            {/* Approve button */}
+                            <button className="bg-green-500 text-white w-[26px] h-[26px] flex items-center justify-center rounded-[8px] hover:bg-green-600">
+                              <MdCheck className="w-5 h-5" />
+                            </button>
+                            {/* View button */}
+                            <div className="text-white w-[26px] h-[26px] bg-[#9F9F9F]  rounded-[8px] flex items-center justify-center hover:bg-blue-600">
+                              <FiEye className="h-4 w-5" />
+                            </div>
+                          </>
+                        )}
                       </td>
                     </tr>
                     {/* Line under each row */}

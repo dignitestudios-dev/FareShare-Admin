@@ -6,7 +6,7 @@ const EmailVerificationSuccessModal = ({ isOpen, setIsOpen }) => {
   const { navigate } = useContext(GlobalContext);
   useEffect(() => {
     setTimeout(() => {
-      navigate("/dashboard");
+      navigate("/");
       setIsOpen(false);
     }, 2000);
   }, []);

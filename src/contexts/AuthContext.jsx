@@ -12,6 +12,7 @@ const AuthProvider = ({ children }) => {
       localStorage.setItem("token", data?.token);
       // localStorage.setItem("name", data?.data?.userRecord?.name);
       localStorage.setItem("email", data?.data?.email);
+      localStorage.setItem("adminId", data?.data?._id);
 
       setToken(data?.data?.token);
       setName(data?.data?.userRecord?.name);
