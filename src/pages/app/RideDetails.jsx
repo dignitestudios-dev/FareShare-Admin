@@ -15,6 +15,7 @@ import "swiper/css/pagination";
 import "swiper/css/autoplay";
 import { ErrorToast, SuccessToast } from "../../components/app/global/Toast";
 import { FiDollarSign } from "react-icons/fi";
+import BlockModal from "../../components/app/global/BlockModal";
 
 const RideDetails = () => {
   const navigate = useNavigate();
@@ -110,6 +111,8 @@ const RideDetails = () => {
       });
       if (data?.success) {
         setUserLoading(false);
+        localStorage.setItem("title", "Users");
+
         navigate("/users");
         SuccessToast(
           isBlocked
@@ -136,6 +139,7 @@ const RideDetails = () => {
       });
       if (data?.success) {
         setDriverLoading(false);
+        localStorage.setItem("title", "Drivers");
         navigate("/drivers");
         SuccessToast(
           isBlocked
@@ -152,6 +156,9 @@ const RideDetails = () => {
       setDriverLoading(false);
     }
   };
+
+  const [userOpen, setUserOpen] = useState(false);
+  const [driverOpen, setDriverOpen] = useState(false);
 
   return (
     <div className="w-full h-auto  ">
@@ -474,12 +481,14 @@ const RideDetails = () => {
 
               <div className="grid grid-cols-1 gap-4">
                 <div className="bg-gray-100 border rounded-lg p-2 relative">
-                  <button
-                    onClick={() => toggleUserBlock(true, rides?.user?.id)}
-                    className="w-24 px-3 h-7 rounded-md absolute top-2 right-2 flex items-center justify-center text-xs font-medium bg-[#1c1c1c] text-white"
-                  >
-                    {userLoading ? "Loading.." : "Block User"}
-                  </button>
+                  {rides?.user?.id && (
+                    <button
+                      onClick={() => setUserOpen(true)}
+                      className="w-24 px-3 h-7 rounded-md absolute top-2 right-2 flex items-center justify-center text-xs font-medium bg-[#1c1c1c] text-white"
+                    >
+                      {"Block User"}
+                    </button>
+                  )}
                   <p className="text-[14px] text-black">User</p>
                   <p className="text-[16px] font-medium text-black">
                     {rides?.ride?.cancelledBy == "user" &&
@@ -488,13 +497,31 @@ const RideDetails = () => {
                       : "Automated Cancellation - No Driver Found."}
                   </p>
                 </div>
+
+                <BlockModal
+                  isOpen={userOpen}
+                  onRequestClose={() => setUserOpen(false)}
+                  onConfirm={() => toggleUserBlock(true, rides?.user?.id)}
+                  loading={userLoading}
+                  isBlocked={true}
+                />
                 <div className="bg-gray-100 border rounded-lg p-2 relative">
-                  <button
-                    onClick={() => toggleDriverBlock(true, rides?.driver?.id)}
-                    className="w-24 px-3 h-7 rounded-md absolute top-2 right-2 flex items-center justify-center text-xs font-medium bg-[#1c1c1c] text-white"
-                  >
-                    {driverLoading ? "Loading.." : "Block Driver"}
-                  </button>
+                  {rides?.driver?.id && (
+                    <button
+                      onClick={() => setDriverOpen(true)}
+                      className="w-24 px-3 h-7 rounded-md absolute top-2 right-2 flex items-center justify-center text-xs font-medium bg-[#1c1c1c] text-white"
+                    >
+                      {"Block Driver"}
+                    </button>
+                  )}
+
+                  <BlockModal
+                    isOpen={driverOpen}
+                    onRequestClose={() => setDriverOpen(false)}
+                    onConfirm={() => toggleDriverBlock(true, rides?.driver?.id)}
+                    loading={driverLoading}
+                    isBlocked={true}
+                  />
 
                   <p className="text-[14px] text-black">Driver</p>
                   <p className="text-[16px] font-medium text-black">

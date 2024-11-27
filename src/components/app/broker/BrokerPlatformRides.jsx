@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { FiEye, FiUser } from "react-icons/fi"; // Using the Eye icon for the action
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { FiSearch } from "react-icons/fi"; // Importing the Search icon
 import axios from "../../../axios";
 import { GlobalContext } from "../../../contexts/GlobalContext";
@@ -8,7 +8,10 @@ import { FaCar, FaRegUser } from "react-icons/fa";
 import { PiUsersThreeBold } from "react-icons/pi";
 
 const BrokerPlatformRides = ({ broker, loading }) => {
-  const { navigate } = useContext(GlobalContext);
+  const navigate = useNavigate();
+  const handleView = (ride) => {
+    navigate(`/rides/${ride?._id}`, { state: ride }); // Pass the entire driver object as state
+  };
   const [searchQuery, setSearchQuery] = useState(""); // Search query state
 
   function convertToMMDDYYYY(dateString) {
@@ -105,13 +108,19 @@ const BrokerPlatformRides = ({ broker, loading }) => {
                         <td className=" gap-3 py-1">
                           <div className="w-auto flex justify-start items-start gap-2">
                             <img
-                              src={ride?.user?.profilePicture}
+                              src={
+                                ride?.user?.profilePicture
+                                  ? ride?.user?.profilePicture
+                                  : "https://placehold.co/400"
+                              }
                               alt={ride?.user?.name}
                               className="w-8 h-8 rounded-full"
                             />
                             <span className=" flex flex-col  justify-start items-start">
-                              <span>{ride?.user?.name}</span>
-                              <span className="">{ride?.user?.email}</span>
+                              <span>{ride?.user?.name || "N/A"}</span>
+                              <span className="">
+                                {ride?.user?.email || "N/A"}
+                              </span>
                             </span>
                           </div>
                         </td>
@@ -119,13 +128,19 @@ const BrokerPlatformRides = ({ broker, loading }) => {
                         <td className=" gap-3 py-1">
                           <div className="w-auto flex justify-start items-start gap-2">
                             <img
-                              src={ride?.driver?.profilePicture}
+                              src={
+                                ride?.driver?.profilePicture
+                                  ? ride?.driver?.profilePicture
+                                  : "https://placehold.co/400"
+                              }
                               alt={ride?.driver?.name}
                               className="w-8 h-8 rounded-full"
                             />
                             <span className=" flex flex-col  justify-start items-start">
-                              <span>{ride?.driver?.name}</span>
-                              <span className="">{ride?.driver?.email}</span>
+                              <span>{ride?.driver?.name || "N/A"}</span>
+                              <span className="">
+                                {ride?.driver?.email || "N/A"}
+                              </span>
                             </span>
                           </div>
                         </td>

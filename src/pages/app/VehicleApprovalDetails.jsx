@@ -215,6 +215,14 @@ const VehicleApprovalDetails = () => {
             </div>
             <div className="bg-gray-100 border flex flex-col gap-2 justify-start items-start rounded-lg p-2">
               <p className="text-[14px] font-medium leading-[20px] text-[#9E9E9E]">
+                Vehicle Type
+              </p>
+              <p className="text-[16px] font-normal leading-[20px] text-black">
+                {vehicle?.vehicleType || "N/A"}
+              </p>
+            </div>
+            <div className="bg-gray-100 border flex flex-col gap-2 justify-start items-start rounded-lg p-2">
+              <p className="text-[14px] font-medium leading-[20px] text-[#9E9E9E]">
                 Model Year
               </p>
               <p className="text-[16px] font-normal leading-[20px] text-black">

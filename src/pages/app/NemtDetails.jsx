@@ -82,18 +82,22 @@ const NemtDetails = () => {
             General Information
           </h3>
           <div className="w-auto flex justify-start items-center gap-1">
-            <button
-              onClick={() => setCloseOpen(true)}
-              className="w-auto px-3 h-7 rounded-full flex items-center justify-center text-xs font-medium bg-[#c00000] text-white"
-            >
-              {"Decline"}
-            </button>
-            <button
-              onClick={() => setOpen(true)}
-              className="w-auto px-3 h-7 rounded-full flex items-center justify-center text-xs font-medium bg-[#1c1c1c] text-white"
-            >
-              {"Approve"}
-            </button>
+            {nemt?.status.toLowerCase() !== "approved" && (
+              <>
+                <button
+                  onClick={() => setCloseOpen(true)}
+                  className="w-auto px-3 h-7 rounded-full flex items-center justify-center text-xs font-medium bg-[#c00000] text-white"
+                >
+                  {"Decline"}
+                </button>
+                <button
+                  onClick={() => setOpen(true)}
+                  className="w-auto px-3 h-7 rounded-full flex items-center justify-center text-xs font-medium bg-[#1c1c1c] text-white"
+                >
+                  {"Approve"}
+                </button>
+              </>
+            )}
           </div>
         </div>
         <div className="w-full grid grid-cols-4 justify-start items-start gap-4">

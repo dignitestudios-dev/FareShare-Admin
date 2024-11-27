@@ -7,6 +7,12 @@ import BrokerInvoiceRow from "../../components/app/invoices/broker/BrokerInvoice
 import { useNavigate } from "react-router-dom";
 import { MdCheck } from "react-icons/md";
 import InvoiceModal from "../../components/app/global/InvoiceModal";
+import {
+  FaSortNumericDown,
+  FaSortNumericDownAlt,
+  FaSortNumericUp,
+  FaSortNumericUpAlt,
+} from "react-icons/fa";
 
 const NemtInvoicesCreate = () => {
   const [insurance, setInsurance] = useState(null);
@@ -210,21 +216,30 @@ const NemtInvoicesCreate = () => {
     }
   };
 
-  const filteredData = invoices.filter((ride) => {
-    const search = searchQuery?.trim()?.toLowerCase();
-    const userName = ride?.user?.name?.toLowerCase() || "";
-    const userEmail = ride?.user?.email?.toLowerCase() || "";
-    const driverName = ride?.driver?.name?.toLowerCase() || "";
-    const driverEmail = ride?.driver?.email?.toLowerCase() || "";
+  const [sort, setSort] = useState(true);
 
-    return (
-      userName.includes(search) ||
-      userEmail.includes(search) ||
-      driverName.includes(search) ||
-      driverEmail.includes(search)
-    );
-  });
+  const filteredData = invoices
+    .filter((ride) => {
+      const search = searchQuery?.trim()?.toLowerCase();
+      const userName = ride?.user?.name?.toLowerCase() || "";
+      const userEmail = ride?.user?.email?.toLowerCase() || "";
+      const driverName = ride?.driver?.name?.toLowerCase() || "";
+      const driverEmail = ride?.driver?.email?.toLowerCase() || "";
 
+      return (
+        userName.includes(search) ||
+        userEmail.includes(search) ||
+        driverName.includes(search) ||
+        driverEmail.includes(search)
+      );
+    })
+    .sort((a, b) => {
+      const fareA = a?.ride?.fare || 0;
+      const fareB = b?.ride?.fare || 0;
+
+      // Sort in descending order if `sort` is true, otherwise ascending
+      return sort ? fareB - fareA : fareA - fareB;
+    });
   useEffect(() => {
     insurance && getInvoice();
   }, [insurance, users]);
@@ -549,7 +564,12 @@ const NemtInvoicesCreate = () => {
                     <span className="col-span-2">Driver</span>
                     <span>Ride Type</span>
                     <span>Registration Date</span>
-                    <span>Fare</span>
+                    <span className="flex gap-1 justify-start items-center">
+                      <span>Fare</span>
+                      <button onClick={() => setSort((prev) => !prev)}>
+                        {sort ? <FaSortNumericDownAlt /> : <FaSortNumericUp />}
+                      </button>
+                    </span>
                     <span className="w-full flex justify-center items-center">
                       Action
                     </span>
