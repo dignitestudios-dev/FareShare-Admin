@@ -92,13 +92,12 @@ const ChangePassword = () => {
                 placeholder="Enter password"
                 class="px-4 py-3.5 bg-white w-full text-sm border-2 border-gray-200 focus:border-[#c00000] rounded-lg outline-none"
               />
-              <button
-                type="button"
-                className="absolute right-4 text-gray-400"
+              <span
+                className="absolute cursor-pointer right-4 text-gray-400"
                 onClick={() => setShow((prev) => !prev)}
               >
                 {showConf ? <FaRegEye /> : <FaRegEyeSlash />}
-              </button>
+              </span>
             </div>
             {errors.password && touched.password ? (
               <p className="text-red-700 ml-1 mt-1 text-sm font-medium">
@@ -121,13 +120,12 @@ const ChangePassword = () => {
                 placeholder="Re enter password"
                 class="px-4 py-3.5 bg-white w-full text-sm border-2 border-gray-200 focus:border-[#c00000] rounded-lg outline-none"
               />
-              <button
-                type="button"
-                className="absolute right-4 text-gray-400"
+              <span
+                className="absolute cursor-pointer right-4 text-gray-400"
                 onClick={() => setShowConf((prev) => !prev)}
               >
                 {showConf ? <FaRegEye /> : <FaRegEyeSlash />}
-              </button>
+              </span>
             </div>
             {errors.confirmPassword && touched.confirmPassword ? (
               <p className="text-red-700 ml-1 mt-1 text-sm font-medium">
