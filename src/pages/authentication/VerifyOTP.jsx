@@ -108,7 +108,7 @@ const VerifyOTP = () => {
                 type="button"
                 disabled={resend}
                 onClick={resentOTP}
-                className="absolute right-2 w-auto py-2 rounded-md px-2 bg-[#c00000] text-white text-sm font-medium flex items-center justify-center"
+                className="absolute right-2 w-16 py-2 rounded-md px-2 bg-[#c00000] text-white text-sm font-medium flex items-center justify-center"
               >
                 {resend ? (
                   <div
