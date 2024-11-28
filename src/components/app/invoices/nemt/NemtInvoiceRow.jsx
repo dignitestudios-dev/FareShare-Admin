@@ -33,6 +33,7 @@ const NemtInvoiceRow = ({ invoice, setUpdate }) => {
 
   function convertToMMDDYYYY(dateString) {
     if (dateString == null) return "Invalid Date";
+
     const date = new Date(dateString);
 
     // Get the month, day, and year
