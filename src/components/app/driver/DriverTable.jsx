@@ -17,6 +17,7 @@ const DriverTable = ({ data, loading, setUpdate }) => {
   };
 
   function convertToMMDDYYYY(dateString) {
+    if (dateString == null) return "Invalid Date";
     const date = new Date(dateString);
 
     // Get the month, day, and year
@@ -89,8 +90,11 @@ const DriverTable = ({ data, loading, setUpdate }) => {
     const fullName = `${driver?.firstName || ""} ${
       driver?.lastName || ""
     }`.toLowerCase();
+    const email = `${driver?.email}`;
     const driverStatus = driver?.status?.toLowerCase();
-    const searchMatch = fullName.includes(searchQuery.toLowerCase());
+    const searchMatch =
+      fullName.includes(searchQuery.toLowerCase()) ||
+      email.includes(searchQuery?.toLowerCase());
     const statusMatch = tab == "" ? true : driverStatus === tab;
 
     return searchMatch && statusMatch; // Both conditions must match
@@ -178,123 +182,136 @@ const DriverTable = ({ data, loading, setUpdate }) => {
 
       <div className="w-full bg-gray-50 border px-5 py-4 rounded-[18px] ">
         <table className="min-w-full  border-separate">
-          <thead>
-            <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
-              <th className="">Name</th>
-              <th className="px-4">Email</th>
-              <th className="px-4">Contact No.</th>
-              <th className="px-4">Address</th>
-              <th className="px-4">Registration Date</th>
-              <th className="pl-4">Action</th>
-            </tr>
-          </thead>
+          {filteredDrivers?.length > 0 && (
+            <thead>
+              <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
+                <th className="">Name</th>
+                <th className="px-4">Email</th>
+                <th className="px-4">Contact No.</th>
+                <th className="px-4">Address</th>
+                <th className="px-4">Registration Date</th>
+                <th className="pl-4">Action</th>
+              </tr>
+            </thead>
+          )}
+
           <tbody className="mt-2">
-            {loading
-              ? [...Array(10)].map((_, index) => (
+            {loading ? (
+              [...Array(10)].map((_, index) => (
+                <React.Fragment key={index}>
+                  <tr className=" text-[10px] text-gray-900">
+                    <td className="flex items-center gap-3 py-1">
+                      <div className="w-8 h-8 bg-gray-300 animate-pulse rounded-full"></div>
+                      <div className="w-32 h-4 bg-gray-300 animate-pulse rounded"></div>
+                    </td>
+                    <td className="py-1 px-4">
+                      <div className="w-40 h-4 bg-gray-300 animate-pulse rounded"></div>
+                    </td>
+                    <td className="py-1 px-4">
+                      <div className="w-24 h-4 bg-gray-300 animate-pulse rounded"></div>
+                    </td>
+                    <td className="py-1 px-4">
+                      <div className="w-40 h-4 bg-gray-300 animate-pulse rounded"></div>
+                    </td>
+                    <td className="py-1 px-4">
+                      <div className="w-32 h-4 bg-gray-300 animate-pulse rounded"></div>
+                    </td>
+                    <td className="py-1 px-4">
+                      <div className="w-20 h-4 bg-gray-300 animate-pulse rounded"></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colSpan="6" className="border-b border-gray-200"></td>
+                  </tr>
+                </React.Fragment>
+              ))
+            ) : filteredDrivers?.length > 0 ? (
+              currentData?.map((user, index) => {
+                return (
                   <React.Fragment key={index}>
-                    <tr className=" text-[10px] text-gray-900">
-                      <td className="flex items-center gap-3 py-1">
-                        <div className="w-8 h-8 bg-gray-300 animate-pulse rounded-full"></div>
-                        <div className="w-32 h-4 bg-gray-300 animate-pulse rounded"></div>
+                    <tr className=" text-[10px] text-gray-900 ">
+                      <td className="flex  items-center gap-3 py-1">
+                        <img
+                          src={user?.profilePicture}
+                          alt={user?.firstName}
+                          className="w-[26px] h-[26px] rounded-full"
+                        />
+                        <span>
+                          {user?.firstName} {user?.lastName}
+                        </span>
                       </td>
+                      <td className="py-1 px-4">{user?.email}</td>
+                      <td className="py-1 px-4">{user?.phoneNo}</td>
+                      <td className="py-1 px-4">{user?.street}</td>
                       <td className="py-1 px-4">
-                        <div className="w-40 h-4 bg-gray-300 animate-pulse rounded"></div>
+                        {convertToMMDDYYYY(user?.createdAt)}
                       </td>
-                      <td className="py-1 px-4">
-                        <div className="w-24 h-4 bg-gray-300 animate-pulse rounded"></div>
-                      </td>
-                      <td className="py-1 px-4">
-                        <div className="w-40 h-4 bg-gray-300 animate-pulse rounded"></div>
-                      </td>
-                      <td className="py-1 px-4">
-                        <div className="w-32 h-4 bg-gray-300 animate-pulse rounded"></div>
-                      </td>
-                      <td className="py-1 px-4">
-                        <div className="w-20 h-4 bg-gray-300 animate-pulse rounded"></div>
+                      <td className="py-1 flex space-x-1 justify-center ">
+                        {user?.status == "approved" ? (
+                          <button
+                            onClick={() => handleView(user)}
+                            className="    rounded-full justify-center bg-[#c00000] flex  h-[26px] gap-1 w-[75px]  items-center"
+                          >
+                            <img
+                              src={`/eye-icon-white.png`}
+                              alt={user?.firstName}
+                              className="mb-[0.2px]"
+                            />
+                            <span className=" text-white font-medium text-[11px] leading-none">
+                              View
+                            </span>
+                          </button>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => {
+                                setCloseOpen(true);
+                                Cookies.set("driver", JSON.stringify(user));
+                              }}
+                              className="bg-red-500 text-white w-[26px] h-[26px] flex items-center justify-center  rounded-[8px] hover:bg-red-600"
+                            >
+                              <MdClose className="w-5 h-5" />
+                            </button>
+                            {/* Approve button */}
+                            <button
+                              onClick={() => {
+                                setOpen(true);
+                                Cookies.set("driver", JSON.stringify(user));
+                              }}
+                              className="bg-green-500 text-white w-[26px] h-[26px] flex items-center justify-center rounded-[8px] hover:bg-green-600"
+                            >
+                              <MdCheck className="w-5 h-5" />
+                            </button>
+                            {/* View button */}
+                            <button
+                              onClick={() => handleView(user)}
+                              className="text-white w-[26px] h-[26px] bg-[#9F9F9F]  rounded-[8px] flex items-center justify-center hover:bg-blue-600"
+                            >
+                              <FiEye className="h-4 w-5" />
+                            </button>
+                          </>
+                        )}
                       </td>
                     </tr>
+                    {/* Line under each row */}
                     <tr>
                       <td colSpan="6" className="border-b border-gray-200"></td>
                     </tr>
                   </React.Fragment>
-                ))
-              : currentData?.map((user, index) => {
-                  return (
-                    <React.Fragment key={index}>
-                      <tr className=" text-[10px] text-gray-900 ">
-                        <td className="flex  items-center gap-3 py-1">
-                          <img
-                            src={user?.profilePicture}
-                            alt={user?.firstName}
-                            className="w-[26px] h-[26px] rounded-full"
-                          />
-                          <span>
-                            {user?.firstName} {user?.lastName}
-                          </span>
-                        </td>
-                        <td className="py-1 px-4">{user?.email}</td>
-                        <td className="py-1 px-4">{user?.phoneNo}</td>
-                        <td className="py-1 px-4">{user?.street}</td>
-                        <td className="py-1 px-4">
-                          {convertToMMDDYYYY(user?.createdAt)}
-                        </td>
-                        <td className="py-1 flex space-x-1 justify-center ">
-                          {user?.status == "approved" ? (
-                            <button
-                              onClick={() => handleView(user)}
-                              className="    rounded-full justify-center bg-[#c00000] flex  h-[26px] gap-1 w-[75px]  items-center"
-                            >
-                              <img
-                                src={`/eye-icon-white.png`}
-                                alt={user?.firstName}
-                                className="mb-[0.2px]"
-                              />
-                              <span className=" text-white font-medium text-[11px] leading-none">
-                                View
-                              </span>
-                            </button>
-                          ) : (
-                            <>
-                              <button
-                                onClick={() => {
-                                  setCloseOpen(true);
-                                  Cookies.set("driver", JSON.stringify(user));
-                                }}
-                                className="bg-red-500 text-white w-[26px] h-[26px] flex items-center justify-center  rounded-[8px] hover:bg-red-600"
-                              >
-                                <MdClose className="w-5 h-5" />
-                              </button>
-                              {/* Approve button */}
-                              <button
-                                onClick={() => {
-                                  setOpen(true);
-                                  Cookies.set("driver", JSON.stringify(user));
-                                }}
-                                className="bg-green-500 text-white w-[26px] h-[26px] flex items-center justify-center rounded-[8px] hover:bg-green-600"
-                              >
-                                <MdCheck className="w-5 h-5" />
-                              </button>
-                              {/* View button */}
-                              <button
-                                onClick={() => handleView(user)}
-                                className="text-white w-[26px] h-[26px] bg-[#9F9F9F]  rounded-[8px] flex items-center justify-center hover:bg-blue-600"
-                              >
-                                <FiEye className="h-4 w-5" />
-                              </button>
-                            </>
-                          )}
-                        </td>
-                      </tr>
-                      {/* Line under each row */}
-                      <tr>
-                        <td
-                          colSpan="6"
-                          className="border-b border-gray-200"
-                        ></td>
-                      </tr>
-                    </React.Fragment>
-                  );
-                })}
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan="6">
+                  <div className="w-full min-h-[70vh] flex flex-col items-center justify-center">
+                    <img src="/no-data.png" alt="" className="w-[230px]" />
+                    <span className="font-semibold text-center text-[#0e0e10] text-[24px] ">
+                      You don’t have added any <br /> Listing Here
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
 

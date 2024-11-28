@@ -302,6 +302,10 @@ const RideDetails = () => {
                     <p className="text-[16px] text-black">
                       {rides?.user?.email}
                     </p>
+                    <p className="text-[16px] text-black">
+                      <span className="text-[#c00000]">Insurance #</span>{" "}
+                      {rides?.user?.insuranceNumber || "N/A"}
+                    </p>
                   </div>
                 </div>
                 {/* <div>
@@ -333,13 +337,12 @@ const RideDetails = () => {
               </span>
               <div className="w-auto flex flex-col justify-start items-start">
                 <span className="text-[18px] font-bold text-black">
-                  {rides?.user?.preferrability
-                    ? parseFloat(rides?.user?.preferrability * 100).toFixed(2)
-                    : 0}
-                  %
+                  {rides?.feedback?.userReview?.preferredAgain == true
+                    ? "Yes"
+                    : "No"}
                 </span>
                 <span className="text-black text-[14px] font-normal">
-                  User Preferrability
+                  User Preferred
                 </span>
               </div>
             </span>
@@ -350,13 +353,12 @@ const RideDetails = () => {
               </span>
               <div className="w-auto flex flex-col justify-start items-start">
                 <span className="text-[18px] font-bold text-black">
-                  {rides?.driver?.preferrability
-                    ? parseFloat(rides?.driver?.preferrability * 100).toFixed(2)
-                    : 0}
-                  %
+                  {rides?.feedback?.driverReview?.preferredAgain == true
+                    ? "Yes"
+                    : "No"}
                 </span>{" "}
                 <span className="text-black text-[14px] font-normal">
-                  Driver Preferrability
+                  Driver Preferred
                 </span>
               </div>
             </span>
@@ -443,25 +445,31 @@ const RideDetails = () => {
               <div className="bg-gray-100 border rounded-lg p-2">
                 <p className="text-[14px] text-black">Make</p>
                 <p className="text-[16px] font-medium text-black">
-                  {rides?.vehicle?.vehicleMake}
+                  {rides?.vehicle?.vehicleMake || "N/A"}
+                </p>
+              </div>
+              <div className="bg-gray-100 border rounded-lg p-2">
+                <p className="text-[14px] text-black">Vehicle Type</p>
+                <p className="text-[16px] font-medium text-black">
+                  {rides?.vehicle?.vehicleType || "N/A"}
                 </p>
               </div>
               <div className="bg-gray-100 border rounded-lg p-2">
                 <p className="text-[14px] text-black">Name</p>
                 <p className="text-[16px] font-medium text-black">
-                  {rides?.vehicle?.vehicleName}
+                  {rides?.vehicle?.vehicleName || "N/A"}
                 </p>
               </div>
               <div className="bg-gray-100 border rounded-lg p-2">
                 <p className="text-[14px] text-black">Model Year</p>
                 <p className="text-[16px] font-medium text-black">
-                  {rides?.vehicle?.modelYear}
+                  {rides?.vehicle?.modelYear || "N/A"}
                 </p>
               </div>
               <div className="bg-gray-100 border rounded-lg p-2">
                 <p className="text-[14px] text-black">Plate Number</p>
                 <p className="text-[16px] font-medium text-black">
-                  {rides?.vehicle?.plateNumber}
+                  {rides?.vehicle?.plateNumber || "N/A"}
                 </p>
               </div>
               <div className="bg-gray-100 border rounded-lg p-2">

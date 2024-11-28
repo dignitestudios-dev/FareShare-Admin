@@ -280,7 +280,7 @@ const VehicleApprovalDetails = () => {
             <div className="grid grid-cols-2 gap-4">
               {[
                 {
-                  label: "Registration Card",
+                  label: "Registration",
                   icon: vehicle?.vehicleRegistrationCard,
                 },
                 {

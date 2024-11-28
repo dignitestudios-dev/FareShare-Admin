@@ -32,6 +32,7 @@ const NemtInvoiceRow = ({ invoice, setUpdate }) => {
   };
 
   function convertToMMDDYYYY(dateString) {
+    if (dateString == null) return "Invalid Date";
     const date = new Date(dateString);
 
     // Get the month, day, and year
@@ -104,7 +105,8 @@ const NemtInvoiceRow = ({ invoice, setUpdate }) => {
             )}
           </span>
         </td>
-        <td className="py-1 px-4">{convertToMMDDYYYY(invoice?.createdAt)}</td>
+        <td className="py-1 px-3">{convertToMMDDYYYY(invoice?.createdAt)}</td>
+        <td className="py-1 px-3">{convertToMMDDYYYY(invoice?.completedOn)}</td>
 
         <td className="py-1 flex space-x-1 justify-center">
           {invoice?.status == "paid" ? (
@@ -166,7 +168,7 @@ const NemtInvoiceRow = ({ invoice, setUpdate }) => {
       </tr>
       {/* Line under each row */}
       <tr>
-        <td colSpan="6" className="border-b border-gray-200"></td>
+        <td colSpan="7" className="border-b border-gray-200"></td>
       </tr>
     </React.Fragment>
   );

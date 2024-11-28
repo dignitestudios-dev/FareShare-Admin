@@ -114,13 +114,13 @@ const Notifications = () => {
         </button>
       </div>
 
-      <div className="w-full h-auto grid grid-cols-3 gap-2 justify-start items-start">
+      <div className="w-full h-auto grid grid-cols-3 p-4 bg-gray-50 border rounded-3xl gap-2 justify-start items-start">
         {!loading && filteredData?.length > 0
           ? currentData?.map((notification, index) => {
               return (
                 <div
                   key={index}
-                  class=" px-4 py-4 bg-gray-50 border rounded-3xl h-28  w-full"
+                  class=" px-4 py-4 bg-gray-100 border rounded-3xl h-28  w-full"
                 >
                   <div class=" inline-flex items-center justify-between w-full">
                     <div class="inline-flex gap-2 items-center">
@@ -144,12 +144,15 @@ const Notifications = () => {
               );
             })
           : !loading && (
-              <div className="w-full col-span-3 h-[90vh] flex items-center justify-center">
-                <img src="/no-data.jpg" alt="" className="h-96" />
+              <div className="w-full min-h-[70vh] flex col-span-3 flex-col items-center justify-center">
+                <img src="/no-data.png" alt="" className="w-[230px]" />
+                <span className="font-semibold text-center text-[#0e0e10] text-[24px] ">
+                  You don’t have added any <br /> Listing Here
+                </span>
               </div>
             )}
       </div>
-      {!loading && (
+      {!loading && filteredData?.length > 0 && (
         <nav
           class="flex w-full items-center  justify-end mt-2 -space-x-px"
           aria-label="Pagination"

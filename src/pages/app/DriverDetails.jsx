@@ -385,11 +385,9 @@ const DriverDetails = () => {
               </span>
             </div>
 
-            {/* Patient Date of Birth */}
+            {/* Date of Birth */}
             <div className="flex flex-col bg-gray-100 border p-2 rounded-xl">
-              <span className="text-[12px] text-[#9E9E9E]">
-                Patient Date of Birth
-              </span>
+              <span className="text-[12px] text-[#9E9E9E]">Date of Birth</span>
               <span className="text-[13px] font-medium text-black">
                 {new Date(driver?.dateOfBirth).toLocaleDateString()}
               </span>
@@ -412,10 +410,18 @@ const DriverDetails = () => {
             </div>
 
             {/* Address */}
-            <div className="col-span-3 flex flex-col bg-gray-100 border p-2 rounded-xl">
+            <div className="col-span-2 flex flex-col bg-gray-100 border p-2 rounded-xl">
               <span className="text-[12px] text-[#9E9E9E]">Address</span>
               <span className="text-[13px] font-medium text-black">
                 {`${driver?.street}, ${driver?.city}, ${driver?.state}, ${driver?.postalCode}, U.S.A.`}
+              </span>
+            </div>
+
+            {/* Patient Date of Birth */}
+            <div className="flex flex-col bg-gray-100 border p-2 rounded-xl">
+              <span className="text-[12px] text-[#9E9E9E]">Wallet Balance</span>
+              <span className="text-[13px] font-medium text-black">
+                {driver?.wallet || 0}
               </span>
             </div>
           </div>
@@ -479,100 +485,114 @@ const DriverDetails = () => {
             Customer Feedback
           </h3>
 
-          {currentData?.map((user, index) => (
-            <div key={index} className="mb-2 bg-gray-100 border p-3 rounded-xl">
-              <div className="flex items-center gap-4">
-                <img
-                  src={user?.userId?.profilePicture}
-                  alt="Customer"
-                  className="w-[50px] h-[50px] rounded-full"
-                />
-                <div>
-                  <p className="text-[16px] font-semibold text-black">
-                    {user?.userId?.firstName} {user?.userId?.lastName}
-                  </p>{" "}
-                  {/* Replace with actual data */}
-                  <div className="flex items-center text-gray-600">
-                    {user?.userId?.email}
+          {feedback?.length > 0 ? (
+            currentData?.map((user, index) => (
+              <div
+                key={index}
+                className="mb-2 bg-gray-100 border p-3 rounded-xl"
+              >
+                <div className="flex items-center gap-4">
+                  <img
+                    src={user?.userId?.profilePicture}
+                    alt="Customer"
+                    className="w-[50px] h-[50px] rounded-full"
+                  />
+                  <div>
+                    <p className="text-[16px] font-semibold text-black">
+                      {user?.userId?.firstName} {user?.userId?.lastName}
+                    </p>{" "}
+                    {/* Replace with actual data */}
+                    <div className="flex items-center text-gray-600">
+                      {user?.userId?.email}
+                    </div>
                   </div>
                 </div>
+                <p className="text-gray-800 text-[14px] mt-2">
+                  {user?.feedback || "N/A"}
+                </p>
               </div>
-              <p className="text-gray-800 text-[14px] mt-2">
-                {user?.feedback || "N/A"}
-              </p>
+            ))
+          ) : (
+            <div className="w-full min-h-52 col-span-2 flex flex-col items-center justify-center">
+              <img src="/no-data.png" alt="" className="w-[150px]" />
+              <span className="font-semibold text-center text-[#0e0e10] text-[20px] ">
+                You don’t have added any <br /> Listing Here
+              </span>
             </div>
-          ))}
+          )}
 
-          <nav
-            class="flex items-center  justify-end mt-2 -space-x-px"
-            aria-label="Pagination"
-          >
-            <button
-              type="button"
-              onClick={() =>
-                goToPage(currentPage > 1 ? currentPage - 1 : currentPage)
-              }
-              class="min-h-[38px] min-w-[38px] py-2 bg-gray-100 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
-              aria-label="Previous"
+          {feedback?.length > 0 && (
+            <nav
+              class="flex items-center  justify-end mt-2 -space-x-px"
+              aria-label="Pagination"
             >
-              <svg
-                class="shrink-0 size-3.5"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="m15 18-6-6 6-6"></path>
-              </svg>
-              <span class="hidden sm:block">Previous</span>
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => (
               <button
                 type="button"
-                key={i}
-                onClick={() => goToPage(i + 1)}
-                class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${
-                  currentPage === i + 1
-                    ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
-                    : "border bg-gray-100"
-                }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
-                aria-current="page"
+                onClick={() =>
+                  goToPage(currentPage > 1 ? currentPage - 1 : currentPage)
+                }
+                class="min-h-[38px] min-w-[38px] py-2 bg-gray-100 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
+                aria-label="Previous"
               >
-                {i + 1}
+                <svg
+                  class="shrink-0 size-3.5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="m15 18-6-6 6-6"></path>
+                </svg>
+                <span class="hidden sm:block">Previous</span>
               </button>
-            ))}
-            <button
-              type="button"
-              onClick={() =>
-                goToPage(
-                  currentPage < totalPages ? currentPage + 1 : currentPage
-                )
-              }
-              class="min-h-[38px] min-w-[38px] py-2 bg-gray-100 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
-              aria-label="Next"
-            >
-              <span class="hidden sm:block">Next</span>
-              <svg
-                class="shrink-0 size-3.5"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  type="button"
+                  key={i}
+                  onClick={() => goToPage(i + 1)}
+                  class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${
+                    currentPage === i + 1
+                      ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
+                      : "border bg-gray-100"
+                  }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
+                  aria-current="page"
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() =>
+                  goToPage(
+                    currentPage < totalPages ? currentPage + 1 : currentPage
+                  )
+                }
+                class="min-h-[38px] min-w-[38px] py-2 bg-gray-100 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
+                aria-label="Next"
               >
-                <path d="m9 18 6-6-6-6"></path>
-              </svg>
-            </button>
-          </nav>
+                <span class="hidden sm:block">Next</span>
+                <svg
+                  class="shrink-0 size-3.5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="m9 18 6-6-6-6"></path>
+                </svg>
+              </button>
+            </nav>
+          )}
         </div>
       </div>
 
@@ -580,147 +600,137 @@ const DriverDetails = () => {
       <div className="bg-gray-50 border w-full rounded-3xl p-6 ">
         <h3 className="text-[24px] font-semibold mb-6 text-black">Vehicles</h3>
         <div className="grid grid-cols-4 gap-4">
-          {vehicles?.map((vehicle, index) => (
-            <div
-              key={index}
-              className="bg-gray-100 border  relative rounded-2xl p-4"
-            >
-              <Swiper
-                spaceBetween={10}
-                centeredSlides={true}
-                autoplay={{
-                  delay: 2500,
-                  disableOnInteraction: false,
-                }}
-                pagination={{
-                  clickable: true,
-                }}
-                modules={[Autoplay, Pagination]}
-                className="mySwiper"
-              >
-                <SwiperSlide>
-                  <img
-                    src={
-                      vehicle?.vehicleImageFront ||
-                      "https://via.placeholder.com/300"
-                    }
-                    alt="Vehicle"
-                    className="w-full h-[140px] rounded-xl object-cover mb-4"
-                  />
-                </SwiperSlide>
-                <SwiperSlide>
-                  <img
-                    src={
-                      vehicle?.vehicleImageRear ||
-                      "https://via.placeholder.com/300"
-                    }
-                    alt="Vehicle"
-                    className="w-full h-[140px] rounded-xl object-cover mb-4"
-                  />
-                </SwiperSlide>
-                <SwiperSlide>
-                  <img
-                    src={
-                      vehicle?.vehicleImagePassengerSide ||
-                      "https://via.placeholder.com/300"
-                    }
-                    alt="Vehicle"
-                    className="w-full h-[140px] rounded-xl object-cover mb-4"
-                  />
-                </SwiperSlide>
-                <SwiperSlide>
-                  <img
-                    src={
-                      vehicle?.vehicleImageDriverSide ||
-                      "https://via.placeholder.com/300"
-                    }
-                    alt="Vehicle"
-                    className="w-full h-[140px] rounded-xl object-cover mb-4"
-                  />
-                </SwiperSlide>
-                <SwiperSlide>
-                  <img
-                    src={
-                      vehicle?.vehicleImageInteriorFront ||
-                      "https://via.placeholder.com/300"
-                    }
-                    alt="Vehicle"
-                    className="w-full h-[140px] rounded-xl object-cover mb-4"
-                  />
-                </SwiperSlide>
-                <SwiperSlide>
-                  <img
-                    src={
-                      vehicle?.vehicleImageInteriorBack ||
-                      "https://via.placeholder.com/300"
-                    }
-                    alt="Vehicle"
-                    className="w-full h-[140px] rounded-xl object-cover mb-4"
-                  />
-                </SwiperSlide>
-              </Swiper>
-
-              <div className="flex justify-between items-start">
-                <div className="mt-2">
-                  <p className="text-[14px] text-gray-500">Vehicle Make:</p>
-                  <p className="text-[16px] font-medium text-black">
-                    {vehicle?.vehicleMake}
-                  </p>{" "}
-                  {/* Replace with actual data */}
-                </div>
-                <div className="mt-2">
-                  <p className="text-[14px] text-gray-500">Vehicle Name:</p>
-                  <p className="text-[16px] font-medium text-black">
-                    {vehicle?.vehicleName}
-                  </p>{" "}
-                  {/* Replace with actual data */}
-                </div>
-
-                {/* Replace with actual data */}
-              </div>
-              <div className="flex justify-between items-start">
-                <div className="mt-2">
-                  <p className="text-[14px] text-gray-500">Model Year:</p>
-                  <p className="text-[16px] font-medium text-black">
-                    {vehicle?.modelYear}
-                  </p>{" "}
-                  {/* Replace with actual data */}
-                </div>
-                <div className="mt-2">
-                  <p className="text-[14px] text-gray-500">Plate Number:</p>
-                  <p className="text-[16px] font-medium text-black">
-                    {vehicle?.plateNumber}
-                  </p>{" "}
-                  {/* Replace with actual data */}
-                </div>
-              </div>
-
+          {vehicles?.length > 0 ? (
+            vehicles?.map((vehicle, index) => (
               <div
-                className={`grid grid-cols-2  
+                key={index}
+                className="bg-gray-100 border  relative rounded-2xl p-4"
+              >
+                <Swiper
+                  spaceBetween={10}
+                  centeredSlides={true}
+                  autoplay={{
+                    delay: 2500,
+                    disableOnInteraction: false,
+                  }}
+                  pagination={{
+                    clickable: true,
+                  }}
+                  modules={[Autoplay, Pagination]}
+                  className="mySwiper"
+                >
+                  <SwiperSlide>
+                    <img
+                      src={
+                        vehicle?.vehicleImageFront ||
+                        "https://via.placeholder.com/300"
+                      }
+                      alt="Vehicle"
+                      className="w-full h-[140px] rounded-xl object-cover mb-4"
+                    />
+                  </SwiperSlide>
+                  <SwiperSlide>
+                    <img
+                      src={
+                        vehicle?.vehicleImageRear ||
+                        "https://via.placeholder.com/300"
+                      }
+                      alt="Vehicle"
+                      className="w-full h-[140px] rounded-xl object-cover mb-4"
+                    />
+                  </SwiperSlide>
+                  <SwiperSlide>
+                    <img
+                      src={
+                        vehicle?.vehicleImagePassengerSide ||
+                        "https://via.placeholder.com/300"
+                      }
+                      alt="Vehicle"
+                      className="w-full h-[140px] rounded-xl object-cover mb-4"
+                    />
+                  </SwiperSlide>
+                  <SwiperSlide>
+                    <img
+                      src={
+                        vehicle?.vehicleImageDriverSide ||
+                        "https://via.placeholder.com/300"
+                      }
+                      alt="Vehicle"
+                      className="w-full h-[140px] rounded-xl object-cover mb-4"
+                    />
+                  </SwiperSlide>
+                  <SwiperSlide>
+                    <img
+                      src={
+                        vehicle?.vehicleImageInteriorFront ||
+                        "https://via.placeholder.com/300"
+                      }
+                      alt="Vehicle"
+                      className="w-full h-[140px] rounded-xl object-cover mb-4"
+                    />
+                  </SwiperSlide>
+                  <SwiperSlide>
+                    <img
+                      src={
+                        vehicle?.vehicleImageInteriorBack ||
+                        "https://via.placeholder.com/300"
+                      }
+                      alt="Vehicle"
+                      className="w-full h-[140px] rounded-xl object-cover mb-4"
+                    />
+                  </SwiperSlide>
+                </Swiper>
+
+                <div className="flex justify-between items-start">
+                  <div className="mt-2">
+                    <p className="text-[14px] text-gray-500">Vehicle Make:</p>
+                    <p className="text-[16px] font-medium text-black">
+                      {vehicle?.vehicleMake}
+                    </p>{" "}
+                    {/* Replace with actual data */}
+                  </div>
+                  <div className="mt-2">
+                    <p className="text-[14px] text-gray-500">Vehicle Name:</p>
+                    <p className="text-[16px] font-medium text-black">
+                      {vehicle?.vehicleName}
+                    </p>{" "}
+                    {/* Replace with actual data */}
+                  </div>
+
+                  {/* Replace with actual data */}
+                </div>
+                <div className="flex justify-between items-start">
+                  <div className="mt-2">
+                    <p className="text-[14px] text-gray-500">Model Year:</p>
+                    <p className="text-[16px] font-medium text-black">
+                      {vehicle?.modelYear}
+                    </p>{" "}
+                    {/* Replace with actual data */}
+                  </div>
+                  <div className="mt-2">
+                    <p className="text-[14px] text-gray-500">Plate Number:</p>
+                    <p className="text-[16px] font-medium text-black">
+                      {vehicle?.plateNumber}
+                    </p>{" "}
+                    {/* Replace with actual data */}
+                  </div>
+                </div>
+
+                <div
+                  className={`grid grid-cols-2  
                     justify-between
                  gap-2 items-start`}
-              >
-                <div className="mt-2">
-                  <p className="text-[14px] text-gray-500">Wheelchair:</p>
-                  <p className="text-[16px] font-medium text-black">
-                    {vehicle?.isWheelChairAccessible ? "Yes" : "No"}
-                  </p>{" "}
-                  {/* Replace with actual data */}
-                </div>
+                >
+                  <div className="mt-2">
+                    <p className="text-[14px] text-gray-500">Wheelchair:</p>
+                    <p className="text-[16px] font-medium text-black">
+                      {vehicle?.isWheelChairAccessible ? "Yes" : "No"}
+                    </p>{" "}
+                    {/* Replace with actual data */}
+                  </div>
 
-                <div className="w-auto flex justify-center mt-4 items-end gap-1">
-                  {vehicle?.status?.toLowerCase() == "approved" ? (
-                    <button
-                      onClick={() => {
-                        setCloseOpen(true);
-                        Cookies.set("vehicle", JSON.stringify(vehicle));
-                      }}
-                      className="bg-red-500 text-white cursor-pointer w-[26px] h-[26px] flex items-center justify-center  rounded-[8px] hover:bg-red-600"
-                    >
-                      <MdClose className="w-5 h-5" />
-                    </button>
-                  ) : (
-                    <>
+                  <div className="w-auto flex justify-center mt-4 items-end gap-1">
+                    {vehicle?.status?.toLowerCase() == "approved" ? (
                       <button
                         onClick={() => {
                           setCloseOpen(true);
@@ -730,36 +740,55 @@ const DriverDetails = () => {
                       >
                         <MdClose className="w-5 h-5" />
                       </button>
-                      {/* Approve button */}
-                      <button
-                        onClick={() => {
-                          setOpen(true);
-                          Cookies.set("vehicle", JSON.stringify(vehicle));
-                        }}
-                        className="bg-green-500 text-white cursor-pointer w-[26px] h-[26px] flex items-center justify-center rounded-[8px] hover:bg-green-600"
-                      >
-                        <MdCheck className="w-5 h-5" />
-                      </button>
-                    </>
-                  )}
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => {
+                            setCloseOpen(true);
+                            Cookies.set("vehicle", JSON.stringify(vehicle));
+                          }}
+                          className="bg-red-500 text-white cursor-pointer w-[26px] h-[26px] flex items-center justify-center  rounded-[8px] hover:bg-red-600"
+                        >
+                          <MdClose className="w-5 h-5" />
+                        </button>
+                        {/* Approve button */}
+                        <button
+                          onClick={() => {
+                            setOpen(true);
+                            Cookies.set("vehicle", JSON.stringify(vehicle));
+                          }}
+                          className="bg-green-500 text-white cursor-pointer w-[26px] h-[26px] flex items-center justify-center rounded-[8px] hover:bg-green-600"
+                        >
+                          <MdCheck className="w-5 h-5" />
+                        </button>
+                      </>
+                    )}
 
-                  {/* View button */}
-                  <div
-                    onClick={() => {
-                      navigate(`/vehicle-approval/${vehicle?._id}`, {
-                        state: vehicleLoading,
-                      });
-                      Cookies.set("vehicle", JSON.stringify(vehicle));
-                      localStorage.setItem("title", "Vehicle Approval");
-                    }}
-                    className="text-white cursor-pointer w-[26px] h-[26px] bg-[#9F9F9F]  rounded-[8px] flex items-center justify-center hover:bg-blue-600"
-                  >
-                    <FiEye className="h-4 w-5" />
+                    {/* View button */}
+                    <div
+                      onClick={() => {
+                        navigate(`/vehicle-approval/${vehicle?._id}`, {
+                          state: vehicleLoading,
+                        });
+                        Cookies.set("vehicle", JSON.stringify(vehicle));
+                        localStorage.setItem("title", "Vehicle Approval");
+                      }}
+                      className="text-white cursor-pointer w-[26px] h-[26px] bg-[#9F9F9F]  rounded-[8px] flex items-center justify-center hover:bg-blue-600"
+                    >
+                      <FiEye className="h-4 w-5" />
+                    </div>
                   </div>
                 </div>
               </div>
+            ))
+          ) : (
+            <div className="w-full min-h-52 col-span-4 flex flex-col items-center justify-center">
+              <img src="/no-data.png" alt="" className="w-[150px]" />
+              <span className="font-semibold text-center text-[#0e0e10] text-[20px] ">
+                You don’t have added any <br /> Listing Here
+              </span>
             </div>
-          ))}
+          )}
 
           <VehicleAcceptModal
             isOpen={open}

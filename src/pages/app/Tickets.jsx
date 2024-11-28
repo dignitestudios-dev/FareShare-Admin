@@ -156,7 +156,7 @@ const Tickets = () => {
         </div>
       </div>
 
-      <div className="w-full  h-auto relative rounded-3xl bg-gray-50 border  p-3 grid grid-cols-2 gap-2">
+      <div className="w-full  h-auto relative rounded-3xl bg-gray-50 border  p-4  grid grid-cols-2 gap-2">
         {currentData?.length > 0 ? (
           currentData?.map((ticket, key) => {
             return (
@@ -169,80 +169,85 @@ const Tickets = () => {
             );
           })
         ) : (
-          <div className="w-full h-[70vh] col-span-2 flex items-center justify-center text-md font-medium text-gray-600">
-            No Data available to show.
+          <div className="w-full min-h-[70vh] flex col-span-2 flex-col items-center justify-center">
+            <img src="/no-data.png" alt="" className="w-[230px]" />
+            <span className="font-semibold text-center text-[#0e0e10] text-[24px] ">
+              You don’t have added any <br /> Listing Here
+            </span>
           </div>
         )}
       </div>
 
-      <nav
-        class="flex w-full items-center  justify-end mt-2 -space-x-px"
-        aria-label="Pagination"
-      >
-        <button
-          type="button"
-          onClick={() =>
-            goToPage(currentPage > 1 ? currentPage - 1 : currentPage)
-          }
-          class="min-h-[38px] min-w-[38px] py-2 bg-gray-50 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
-          aria-label="Previous"
+      {!loading && filteredData?.length > 0 && (
+        <nav
+          class="flex w-full items-center  justify-end mt-2 -space-x-px"
+          aria-label="Pagination"
         >
-          <svg
-            class="shrink-0 size-3.5"
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="m15 18-6-6 6-6"></path>
-          </svg>
-          <span class="hidden sm:block">Previous</span>
-        </button>
-        {Array.from({ length: totalPages }, (_, i) => (
           <button
             type="button"
-            key={i}
-            onClick={() => goToPage(i + 1)}
-            class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${
-              currentPage === i + 1
-                ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
-                : "border bg-gray-50"
-            }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
-            aria-current="page"
+            onClick={() =>
+              goToPage(currentPage > 1 ? currentPage - 1 : currentPage)
+            }
+            class="min-h-[38px] min-w-[38px] py-2 bg-gray-50 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
+            aria-label="Previous"
           >
-            {i + 1}
+            <svg
+              class="shrink-0 size-3.5"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m15 18-6-6 6-6"></path>
+            </svg>
+            <span class="hidden sm:block">Previous</span>
           </button>
-        ))}
-        <button
-          type="button"
-          onClick={() =>
-            goToPage(currentPage < totalPages ? currentPage + 1 : currentPage)
-          }
-          class="min-h-[38px] min-w-[38px] py-2 bg-gray-50 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
-          aria-label="Next"
-        >
-          <span class="hidden sm:block">Next</span>
-          <svg
-            class="shrink-0 size-3.5"
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              type="button"
+              key={i}
+              onClick={() => goToPage(i + 1)}
+              class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${
+                currentPage === i + 1
+                  ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
+                  : "border bg-gray-50"
+              }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
+              aria-current="page"
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              goToPage(currentPage < totalPages ? currentPage + 1 : currentPage)
+            }
+            class="min-h-[38px] min-w-[38px] py-2 bg-gray-50 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
+            aria-label="Next"
           >
-            <path d="m9 18 6-6-6-6"></path>
-          </svg>
-        </button>
-      </nav>
+            <span class="hidden sm:block">Next</span>
+            <svg
+              class="shrink-0 size-3.5"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m9 18 6-6-6-6"></path>
+            </svg>
+          </button>
+        </nav>
+      )}
     </div>
   );
 };

@@ -10,6 +10,7 @@ const InvoiceModal = ({
   onConfirm,
   loading,
   invoiceData,
+  count,
 }) => {
   const navigate = useNavigate();
   const navigateToInvoice = () => {
@@ -39,8 +40,8 @@ const InvoiceModal = ({
 
         {invoiceData == null ? (
           <p className="text-[#252525] text-[16px] font-normal leading-[25.34px] mb-6">
-            Are you sure you want to generate invoice <br /> for selected rides
-            ?
+            Are you sure you want to generate invoice <br /> for ({count})
+            selected rides ?
           </p>
         ) : (
           <p className="text-[#252525] text-[16px] font-normal leading-[25.34px] mb-6">

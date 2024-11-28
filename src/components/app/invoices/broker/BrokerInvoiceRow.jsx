@@ -30,6 +30,7 @@ const BrokerInvoiceRow = ({ invoice, setUpdate }) => {
   };
 
   function convertToMMDDYYYY(dateString) {
+    if (dateString == null) return "Invalid Date";
     const date = new Date(dateString);
 
     // Get the month, day, and year
@@ -91,6 +92,10 @@ const BrokerInvoiceRow = ({ invoice, setUpdate }) => {
         </td>
         <td className="py-1 px-4">{convertToMMDDYYYY(invoice?.dueDate)}</td>
         <td className="py-1 px-4">
+          {convertToMMDDYYYY(invoice?.completionDate)}
+        </td>
+
+        <td className="py-1 px-4">
           <span className={`py-1 px-2 capitalize  `}>
             {invoice?.status == "unpaid" ? (
               <span className="text-[#f73e3e] border border-[#f73e3e] bg-[#f73e3e]/[0.1]  px-2 py-1 rounded-full">
@@ -102,6 +107,10 @@ const BrokerInvoiceRow = ({ invoice, setUpdate }) => {
               </span>
             )}
           </span>
+        </td>
+        <td className="py-1 px-6">
+          {" "}
+          {parseFloat(invoice?.amount)?.toFixed(2) || 0}
         </td>
         <td className="py-1 flex space-x-1 justify-center">
           {invoice?.status == "paid" ? (
@@ -145,7 +154,7 @@ const BrokerInvoiceRow = ({ invoice, setUpdate }) => {
       </tr>
       {/* Line under each row */}
       <tr>
-        <td colSpan="6" className="border-b border-gray-200"></td>
+        <td colSpan="7" className="border-b border-gray-200"></td>
       </tr>
     </React.Fragment>
   );

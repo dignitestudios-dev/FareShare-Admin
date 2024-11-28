@@ -34,6 +34,7 @@ const DashboardUsersTable = () => {
   }, []);
 
   function convertToMMDDYYYY(dateString) {
+    if (dateString == null) return "Invalid Date";
     const date = new Date(dateString);
 
     // Get the month, day, and year
@@ -50,7 +51,7 @@ const DashboardUsersTable = () => {
         <h3 className="text-[18px] font-bold leading-[24.3px] text-black">
           Users{" "}
           <span className="text-[12px] font-normal text-black">
-            ({users.length})
+            ({users?.length})
           </span>
         </h3>
         <button
@@ -65,83 +66,99 @@ const DashboardUsersTable = () => {
       </div>
 
       <table className="min-w-full bg-gray-50 border-separate">
-        <thead>
-          <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
-            <th className="">Name</th>
-            <th className="px-4">Email</th>
-            <th className="px-4">Contact No.</th>
-            <th className="px-4">Address</th>
-            <th className="px-4">Registration Date</th>
-            <th className="pl-4">Action</th>
-          </tr>
-        </thead>
+        {users?.length > 0 && (
+          <thead>
+            <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
+              <th className="">Name</th>
+              <th className="px-4">Email</th>
+              <th className="px-4">Contact No.</th>
+              <th className="px-4">Address</th>
+              <th className="px-4">Registration Date</th>
+              <th className="pl-4">Action</th>
+            </tr>
+          </thead>
+        )}
+
         <tbody className="mt-2">
-          {loading
-            ? [...Array(5)].map((_, index) => (
-                <React.Fragment key={index}>
-                  <tr className="bg-gray-50 text-[10px] text-gray-900">
-                    <td className="flex items-center gap-3 py-1">
-                      <div className="w-8 h-8 bg-gray-300 animate-pulse rounded-full"></div>
-                      <div className="w-32 h-4 bg-gray-300 animate-pulse rounded"></div>
-                    </td>
-                    <td className="py-1 px-4">
-                      <div className="w-40 h-4 bg-gray-300 animate-pulse rounded"></div>
-                    </td>
-                    <td className="py-1 px-4">
-                      <div className="w-24 h-4 bg-gray-300 animate-pulse rounded"></div>
-                    </td>
-                    <td className="py-1 px-4">
-                      <div className="w-40 h-4 bg-gray-300 animate-pulse rounded"></div>
-                    </td>
-                    <td className="py-1 px-4">
-                      <div className="w-32 h-4 bg-gray-300 animate-pulse rounded"></div>
-                    </td>
-                    <td className="py-1 px-4">
-                      <div className="w-20 h-4 bg-gray-300 animate-pulse rounded"></div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colSpan="6" className="border-b border-gray-200"></td>
-                  </tr>
-                </React.Fragment>
-              ))
-            : users?.slice(0, 5)?.map((user, index) => (
-                <React.Fragment key={index}>
-                  <tr className="bg-gray-50 text-[10px] text-gray-900 ">
-                    <td className="flex  items-center gap-3 py-1">
-                      <img
-                        src={user?.profilePicture}
-                        alt={user?.firstName}
-                        className="w-8 h-8 rounded-full"
-                      />
-                      <span>
-                        {user?.firstName} {user?.lastName}
+          {loading ? (
+            [...Array(5)].map((_, index) => (
+              <React.Fragment key={index}>
+                <tr className="bg-gray-50 text-[10px] text-gray-900">
+                  <td className="flex items-center gap-3 py-1">
+                    <div className="w-8 h-8 bg-gray-300 animate-pulse rounded-full"></div>
+                    <div className="w-32 h-4 bg-gray-300 animate-pulse rounded"></div>
+                  </td>
+                  <td className="py-1 px-4">
+                    <div className="w-40 h-4 bg-gray-300 animate-pulse rounded"></div>
+                  </td>
+                  <td className="py-1 px-4">
+                    <div className="w-24 h-4 bg-gray-300 animate-pulse rounded"></div>
+                  </td>
+                  <td className="py-1 px-4">
+                    <div className="w-40 h-4 bg-gray-300 animate-pulse rounded"></div>
+                  </td>
+                  <td className="py-1 px-4">
+                    <div className="w-32 h-4 bg-gray-300 animate-pulse rounded"></div>
+                  </td>
+                  <td className="py-1 px-4">
+                    <div className="w-20 h-4 bg-gray-300 animate-pulse rounded"></div>
+                  </td>
+                </tr>
+                <tr>
+                  <td colSpan="6" className="border-b border-gray-200"></td>
+                </tr>
+              </React.Fragment>
+            ))
+          ) : users?.length > 0 ? (
+            users?.slice(0, 5)?.map((user, index) => (
+              <React.Fragment key={index}>
+                <tr className="bg-gray-50 text-[10px] text-gray-900 ">
+                  <td className="flex  items-center gap-3 py-1">
+                    <img
+                      src={user?.profilePicture}
+                      alt={user?.firstName}
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <span>
+                      {user?.firstName} {user?.lastName}
+                    </span>
+                  </td>
+                  <td className="py-1 px-4">{user?.email}</td>
+                  <td className="py-1 px-4">{user?.phoneNo}</td>
+                  <td className="py-1 px-4">{user?.street}</td>
+                  <td className="py-1 px-4">
+                    {convertToMMDDYYYY(user?.createdAt)}
+                  </td>
+                  <td className="py-1 ">
+                    <button
+                      onClick={() => handleView(user)}
+                      className="  px-3 py-2 rounded-full flex gap-1 h-6  items-center"
+                    >
+                      <img src={`/eye-icon.png`} alt={user.name} />
+                      <span className=" text-black font-medium text-[10px] leading-[17.42px]">
+                        View
                       </span>
-                    </td>
-                    <td className="py-1 px-4">{user?.email}</td>
-                    <td className="py-1 px-4">{user?.phoneNo}</td>
-                    <td className="py-1 px-4">{user?.street}</td>
-                    <td className="py-1 px-4">
-                      {convertToMMDDYYYY(user?.createdAt)}
-                    </td>
-                    <td className="py-1 ">
-                      <button
-                        onClick={() => handleView(user)}
-                        className="  px-3 py-2 rounded-full flex gap-1 h-6  items-center"
-                      >
-                        <img src={`/eye-icon.png`} alt={user.name} />
-                        <span className=" text-black font-medium text-[10px] leading-[17.42px]">
-                          View
-                        </span>
-                      </button>
-                    </td>
-                  </tr>
-                  {/* Line under each row */}
-                  <tr>
-                    <td colSpan="6" className="border-b border-gray-200"></td>
-                  </tr>
-                </React.Fragment>
-              ))}
+                    </button>
+                  </td>
+                </tr>
+                {/* Line under each row */}
+                <tr>
+                  <td colSpan="6" className="border-b border-gray-200"></td>
+                </tr>
+              </React.Fragment>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="6">
+                <div className="w-full min-h-52 flex flex-col items-center justify-center">
+                  <img src="/no-data.png" alt="" className="w-[150px]" />
+                  <span className="font-semibold text-center text-[#0e0e10] text-[20px] ">
+                    You don’t have added any <br /> Listing Here
+                  </span>
+                </div>
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

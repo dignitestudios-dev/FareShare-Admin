@@ -50,16 +50,16 @@ const Sidebar = () => {
         </div>
 
         {/* Logout button at the bottom */}
-        <button
+        {/* <button
           onClick={() => {
             navigate("/", "Home");
             Cookies.remove("token");
             handleCloseDrawer();
           }}
-          className={`w-full h-[46px] outline-none rounded-[12px] 
+          className={`w-full h-[46px] mt-4 outline-none rounded-full 
             bg-transparent text-black 
-            font-medium flex items-center justify-start transition-all duration-500 
-             hover:text-white px-3 gap-2 mt-auto`}
+            font-medium flex items-center justify-start hover:bg-[#c00000] transition-all duration-500 
+             hover:text-white px-3 gap-2 `}
         >
           <span className="text-xl mb-1">
             <RiLogoutCircleLine className=" text-[#C00000]" />
@@ -67,7 +67,7 @@ const Sidebar = () => {
           <span className="capitalize bg-transparent text-black/40 font-bold text-[13px] ">
             Logout
           </span>
-        </button>
+        </button> */}
       </div>
 
       {/* Overlay when drawer is open */}

@@ -135,120 +135,130 @@ const VehicleApprovalTable = ({ data, loading, setUpdate }) => {
 
         <div className="overflow-x-auto   rounded-xl ">
           <table className="min-w-full table-auto border-separate rounded-[18px]">
-            <thead>
-              <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
-                <th className="py-2 ">Name</th>
-                <th className="py-2 px-4">Make</th>
-                <th className="py-2 px-4">Model</th>
-                <th className="py-2 px-4">Plate Number</th>
-                <th className="py-2 px-4">Wheelchair Accessible</th>
-                <th className="py-2 px-4 flex justify-center">Action</th>
-              </tr>
-            </thead>
+            {filteredVehicles?.length > 0 && (
+              <thead>
+                <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
+                  <th className="py-2 ">Name</th>
+                  <th className="py-2 px-4">Make</th>
+                  <th className="py-2 px-4">Model</th>
+                  <th className="py-2 px-4">Plate Number</th>
+                  <th className="py-2 px-4">Wheelchair Accessible</th>
+                  <th className="py-2 px-4 flex justify-center">Action</th>
+                </tr>
+              </thead>
+            )}
+
             <tbody>
-              {loading
-                ? [...Array(11)].map((_, index) => (
-                    <React.Fragment key={index}>
-                      <tr className=" border-b border-gray-200 text-[10px] text-gray-900">
-                        {/* Name and profile image */}
-                        <td className="py-1 flex items-center">
-                          <div className="w-[26px] h-[26px] bg-gray-300 animate-pulse rounded-full mr-2"></div>
-                          <div className="w-32 h-4 bg-gray-300 animate-pulse rounded"></div>
-                        </td>
-                        <td className="py-1 px-4">
-                          <div className="w-24 h-4 bg-gray-300 animate-pulse rounded"></div>
-                        </td>
-                        <td className="py-1 px-4">
-                          <div className="w-16 h-4 bg-gray-300 animate-pulse rounded"></div>
-                        </td>
-                        <td className="py-1 px-4">
-                          <div className="w-24 h-4 bg-gray-300 animate-pulse rounded"></div>
-                        </td>
-                        <td className="py-1 px-4">
-                          <div className="w-16 h-4 bg-gray-300 animate-pulse rounded"></div>
-                        </td>
-                        <td className="py-1 px-4 flex space-x-2">
-                          <div className="bg-gray-300 w-[26px] h-[26px] rounded-[8px] flex items-center justify-center"></div>
-                          <div className="bg-gray-300 w-[26px] h-[26px] rounded-[8px] flex items-center justify-center"></div>
-                          <div className="bg-gray-300 w-[26px] h-[26px] rounded-[8px] flex items-center justify-center"></div>
-                        </td>
-                      </tr>
-                      {/* Line under each row */}
-                      <tr>
-                        <td
-                          colSpan="6"
-                          className="border-b border-gray-200"
-                        ></td>
-                      </tr>
-                    </React.Fragment>
-                  ))
-                : currentData?.map((vehicle, index) => (
-                    <React.Fragment key={index}>
-                      <tr className=" border-b border-gray-200 text-[10px] text-gray-900 ">
-                        {/* Name and profile image */}
-                        <td className="py-1  flex items-center">
-                          <img
-                            src={
-                              vehicle?.vehicleImageFront
-                                ? vehicle?.vehicleImageFront
-                                : "https://placehold.co/400"
-                            } // Use vehicle image
-                            alt="Vehicle"
-                            className="w-[25px] h-[25px] rounded-full mr-2"
-                          />
-                          {vehicle?.vehicleName ? vehicle?.vehicleName : "N/A"}
-                        </td>
-                        <td className="py-1 px-4">
-                          {vehicle?.vehicleMake ? vehicle?.vehicleMake : "N/A"}
-                        </td>
-                        <td className="py-1 px-4">
-                          {vehicle?.modelYear ? vehicle?.modelYear : "N/A"}
-                        </td>
-                        <td className="py-1 px-4">
-                          {vehicle?.plateNumber ? vehicle?.plateNumber : "N/A"}
-                        </td>
-                        <td className="py-1 px-4">
-                          {vehicle?.isWheelChairAccessible ? "Yes" : "No"}
-                        </td>
-                        <td className="py-1 px-4 flex space-x-1 justify-center">
-                          {/* Reject button */}
-                          <button
-                            onClick={() => {
-                              setCloseOpen(true);
-                              Cookies.set("vehicle", JSON.stringify(vehicle));
-                            }}
-                            className="bg-red-500 text-white w-[25px] h-[25px] flex items-center justify-center  rounded-[8px] hover:bg-red-600"
-                          >
-                            <MdClose className="w-5 h-5" />
-                          </button>
-                          {/* Approve button */}
-                          <button
-                            onClick={() => {
-                              setOpen(true);
-                              Cookies.set("vehicle", JSON.stringify(vehicle));
-                            }}
-                            className="bg-green-500 text-white w-[25px] h-[25px] flex items-center justify-center rounded-[8px] hover:bg-green-600"
-                          >
-                            <MdCheck className="w-5 h-5" />
-                          </button>
-                          {/* View button */}
-                          <div
-                            onClick={() => handleView(vehicle)}
-                            className="text-white w-[26px] h-[26px] bg-[#9F9F9F]  rounded-[8px] flex items-center justify-center hover:bg-blue-600"
-                          >
-                            <FiEye className="h-4 w-5" />
-                          </div>
-                        </td>
-                      </tr>
-                      {/* Line under each row */}
-                      <tr>
-                        <td
-                          colSpan="6"
-                          className="border-b border-gray-200"
-                        ></td>
-                      </tr>
-                    </React.Fragment>
-                  ))}
+              {loading ? (
+                [...Array(11)].map((_, index) => (
+                  <React.Fragment key={index}>
+                    <tr className=" border-b border-gray-200 text-[10px] text-gray-900">
+                      {/* Name and profile image */}
+                      <td className="py-1 flex items-center">
+                        <div className="w-[26px] h-[26px] bg-gray-300 animate-pulse rounded-full mr-2"></div>
+                        <div className="w-32 h-4 bg-gray-300 animate-pulse rounded"></div>
+                      </td>
+                      <td className="py-1 px-4">
+                        <div className="w-24 h-4 bg-gray-300 animate-pulse rounded"></div>
+                      </td>
+                      <td className="py-1 px-4">
+                        <div className="w-16 h-4 bg-gray-300 animate-pulse rounded"></div>
+                      </td>
+                      <td className="py-1 px-4">
+                        <div className="w-24 h-4 bg-gray-300 animate-pulse rounded"></div>
+                      </td>
+                      <td className="py-1 px-4">
+                        <div className="w-16 h-4 bg-gray-300 animate-pulse rounded"></div>
+                      </td>
+                      <td className="py-1 px-4 flex space-x-2">
+                        <div className="bg-gray-300 w-[26px] h-[26px] rounded-[8px] flex items-center justify-center"></div>
+                        <div className="bg-gray-300 w-[26px] h-[26px] rounded-[8px] flex items-center justify-center"></div>
+                        <div className="bg-gray-300 w-[26px] h-[26px] rounded-[8px] flex items-center justify-center"></div>
+                      </td>
+                    </tr>
+                    {/* Line under each row */}
+                    <tr>
+                      <td colSpan="6" className="border-b border-gray-200"></td>
+                    </tr>
+                  </React.Fragment>
+                ))
+              ) : filteredVehicles?.length > 0 ? (
+                currentData?.map((vehicle, index) => (
+                  <React.Fragment key={index}>
+                    <tr className=" border-b border-gray-200 text-[10px] text-gray-900 ">
+                      {/* Name and profile image */}
+                      <td className="py-1  flex items-center">
+                        <img
+                          src={
+                            vehicle?.vehicleImageFront
+                              ? vehicle?.vehicleImageFront
+                              : "https://placehold.co/400"
+                          } // Use vehicle image
+                          alt="Vehicle"
+                          className="w-[25px] h-[25px] rounded-full mr-2"
+                        />
+                        {vehicle?.vehicleName ? vehicle?.vehicleName : "N/A"}
+                      </td>
+                      <td className="py-1 px-4">
+                        {vehicle?.vehicleMake ? vehicle?.vehicleMake : "N/A"}
+                      </td>
+                      <td className="py-1 px-4">
+                        {vehicle?.modelYear ? vehicle?.modelYear : "N/A"}
+                      </td>
+                      <td className="py-1 px-4">
+                        {vehicle?.plateNumber ? vehicle?.plateNumber : "N/A"}
+                      </td>
+                      <td className="py-1 px-4">
+                        {vehicle?.isWheelChairAccessible ? "Yes" : "No"}
+                      </td>
+                      <td className="py-1 px-4 flex space-x-1 justify-center">
+                        {/* Reject button */}
+                        <button
+                          onClick={() => {
+                            setCloseOpen(true);
+                            Cookies.set("vehicle", JSON.stringify(vehicle));
+                          }}
+                          className="bg-red-500 text-white w-[25px] h-[25px] flex items-center justify-center  rounded-[8px] hover:bg-red-600"
+                        >
+                          <MdClose className="w-5 h-5" />
+                        </button>
+                        {/* Approve button */}
+                        <button
+                          onClick={() => {
+                            setOpen(true);
+                            Cookies.set("vehicle", JSON.stringify(vehicle));
+                          }}
+                          className="bg-green-500 text-white w-[25px] h-[25px] flex items-center justify-center rounded-[8px] hover:bg-green-600"
+                        >
+                          <MdCheck className="w-5 h-5" />
+                        </button>
+                        {/* View button */}
+                        <div
+                          onClick={() => handleView(vehicle)}
+                          className="text-white w-[26px] h-[26px] bg-[#9F9F9F]  rounded-[8px] flex items-center justify-center hover:bg-blue-600"
+                        >
+                          <FiEye className="h-4 w-5" />
+                        </div>
+                      </td>
+                    </tr>
+                    {/* Line under each row */}
+                    <tr>
+                      <td colSpan="6" className="border-b border-gray-200"></td>
+                    </tr>
+                  </React.Fragment>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6">
+                    <div className="w-full min-h-[70vh] flex flex-col items-center justify-center">
+                      <img src="/no-data.png" alt="" className="w-[230px]" />
+                      <span className="font-semibold text-center text-[#0e0e10] text-[24px] ">
+                        You don’t have added any <br /> Listing Here
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
 
@@ -276,74 +286,77 @@ const VehicleApprovalTable = ({ data, loading, setUpdate }) => {
           />
         </div>
       </div>
-      <nav
-        class="flex items-center  justify-end mt-2 -space-x-px"
-        aria-label="Pagination"
-      >
-        <button
-          type="button"
-          onClick={() =>
-            goToPage(currentPage > 1 ? currentPage - 1 : currentPage)
-          }
-          class="min-h-[38px] min-w-[38px] py-2 bg-gray-50 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
-          aria-label="Previous"
+
+      {filteredVehicles?.length > 0 && (
+        <nav
+          class="flex items-center  justify-end mt-2 -space-x-px"
+          aria-label="Pagination"
         >
-          <svg
-            class="shrink-0 size-3.5"
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="m15 18-6-6 6-6"></path>
-          </svg>
-          <span class="hidden sm:block">Previous</span>
-        </button>
-        {Array.from({ length: totalPages }, (_, i) => (
           <button
             type="button"
-            key={i}
-            onClick={() => goToPage(i + 1)}
-            class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${
-              currentPage === i + 1
-                ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
-                : "border bg-gray-50"
-            }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
-            aria-current="page"
+            onClick={() =>
+              goToPage(currentPage > 1 ? currentPage - 1 : currentPage)
+            }
+            class="min-h-[38px] min-w-[38px] py-2 bg-gray-50 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
+            aria-label="Previous"
           >
-            {i + 1}
+            <svg
+              class="shrink-0 size-3.5"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m15 18-6-6 6-6"></path>
+            </svg>
+            <span class="hidden sm:block">Previous</span>
           </button>
-        ))}
-        <button
-          type="button"
-          onClick={() =>
-            goToPage(currentPage < totalPages ? currentPage + 1 : currentPage)
-          }
-          class="min-h-[38px] min-w-[38px] py-2 bg-gray-50 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
-          aria-label="Next"
-        >
-          <span class="hidden sm:block">Next</span>
-          <svg
-            class="shrink-0 size-3.5"
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              type="button"
+              key={i}
+              onClick={() => goToPage(i + 1)}
+              class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${
+                currentPage === i + 1
+                  ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
+                  : "border bg-gray-50"
+              }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
+              aria-current="page"
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              goToPage(currentPage < totalPages ? currentPage + 1 : currentPage)
+            }
+            class="min-h-[38px] min-w-[38px] py-2 bg-gray-50 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
+            aria-label="Next"
           >
-            <path d="m9 18 6-6-6-6"></path>
-          </svg>
-        </button>
-      </nav>
+            <span class="hidden sm:block">Next</span>
+            <svg
+              class="shrink-0 size-3.5"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m9 18 6-6-6-6"></path>
+            </svg>
+          </button>
+        </nav>
+      )}
     </div>
   );
 };

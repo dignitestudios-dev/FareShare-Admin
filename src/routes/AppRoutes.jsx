@@ -24,6 +24,7 @@ import RideDetails from "../pages/app/RideDetails";
 import NemtInvoicesCreate from "../pages/app/NemtInvoicesCreate";
 import NemtInvoices from "../pages/app/NemtInvoices";
 import NemtInvoiceDetails from "../pages/app/NemtInvoiceDetails";
+import WithdrawalRequests from "../pages/app/WithdrawalRequests";
 
 export const APP_ROUTES = [
   {
@@ -115,6 +116,11 @@ export const APP_ROUTES = [
     title: "Nemt Invoices Create",
     url: "/invoices/nemt/create",
     page: <GlobalLayout page={<NemtInvoicesCreate />} />,
+  },
+  {
+    title: "Withdrawal Requests",
+    url: "/withdrawal-requests",
+    page: <GlobalLayout page={<WithdrawalRequests />} />,
   },
   {
     title: "Tickets",

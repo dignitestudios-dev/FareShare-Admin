@@ -4,16 +4,13 @@ import { FiSearch } from "react-icons/fi";
 import { TbCaretDownFilled } from "react-icons/tb";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "../../../axios";
-import { ErrorToast } from "../global/Toast";
-const UsersTable = ({ data, loading }) => {
+import { ErrorToast, SuccessToast } from "../global/Toast";
+import ApproveWithdrawModal from "./ApproveWithdrawModal";
+const WithdrawRequestTable = ({ data, loading, setUpdate }) => {
   const [searchQuery, setSearchQuery] = React.useState("");
-  const navigate = useNavigate();
-  const handleView = (user) => {
-    navigate(`/users/${user?._id}`, { state: user }); // Pass the entire driver object as state
-  };
 
   function convertToMMDDYYYY(dateString) {
-    if (dateString == null) return "Invalid Date";
+    if (dateString == null) return `Invalid Date`;
     const date = new Date(dateString);
 
     // Get the month, day, and year
@@ -24,35 +21,18 @@ const UsersTable = ({ data, loading }) => {
     return `${month}-${day}-${year}`;
   }
 
-  const [tab, setTab] = useState("");
-
+  // Filter users based on the search query
   const filteredUsers = data.filter((user) => {
-    const fullName = `${user?.firstName || ""} ${
-      user?.lastName || ""
-    }`.toLowerCase();
-    const email = `${user?.email || ""}`.toLowerCase();
-    const id = `${user?.fareShareId || ""}`.toLowerCase();
-    const userBlock = user?.isBlocked;
+    const fullName = `${user?.name || ""}`.toLowerCase();
+    const email = `${user?.email}`;
+    const searchMatch =
+      fullName.includes(searchQuery.toLowerCase()) ||
+      email.includes(searchQuery.toLowerCase());
+    // const insuranceCareer = user?.insuranceCarrier?.toLowerCase();
+    // const careerMatch =
+    //   insurance == null ? true : user?.insuranceCarrier?._id === insurance?._id;
 
-    // Check if the search query matches the user information
-    const searchMatch = searchQuery
-      ? fullName.includes(searchQuery.toLowerCase()) ||
-        email.includes(searchQuery.toLowerCase()) ||
-        id.includes(searchQuery.toLowerCase())
-      : true; // If no search query, include all users
-
-    // Check if the user matches the tab filter
-    const blockedMatch =
-      tab === ""
-        ? true // Show all users
-        : tab === "blocked"
-        ? userBlock === true // Show only blocked users
-        : tab === "unblocked"
-        ? userBlock === false // Show only unblocked users
-        : true; // Default to all users if tab is unrecognized
-
-    // Both conditions must match
-    return searchMatch && blockedMatch;
+    return searchMatch; // Both conditions must match
   });
 
   // pagination related data:
@@ -70,11 +50,50 @@ const UsersTable = ({ data, loading }) => {
   const goToPage = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
+
+  const [open, setOpen] = useState(false);
+  const [acceptLoading, setAcceptLoading] = useState(false);
+  const [isApproved, setIsApproved] = useState(false);
+
+  const toggleAccept = async (id, isApproved) => {
+    try {
+      setAcceptLoading(true);
+      const { data } = await axios.post("/admin/withdraw", {
+        withdrawId: id,
+        isApproved: isApproved,
+      });
+      if (data?.success) {
+        setOpen(false);
+        setUpdate((prev) => !prev);
+        SuccessToast(
+          `Withdrawal ${isApproved ? "approved" : "rejected"} successfully.`
+        );
+      }
+
+      // Use the data from the API response
+    } catch (error) {
+      ErrorToast(error?.response?.data?.message);
+    } finally {
+      setAcceptLoading(false);
+    }
+  };
+
+  const convertEpochToMMDDYYYY = (epoch) => {
+    if (!epoch) return "Invalid Date"; // Handle invalid input
+    const date = new Date(epoch * 1000); // Convert epoch to milliseconds
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is 0-based
+    const day = String(date.getDate()).padStart(2, "0");
+    const year = date.getFullYear();
+
+    return `${month}-${day}-${year}`;
+  };
+
+  const [selectedUser, setSelectedUser] = useState(null);
   return (
     <div className="w-full  max-h-screen overflow-y-hidden  ">
       <div className="flex justify-between px-1 items-center mb-2">
         <h3 className="text-[24px] font-bold text-black">
-          Users{" "}
+          Withdrawal Requests{" "}
           <span className="text-[16px] text-gray-500">({data?.length})</span>
         </h3>
         <div className="w-auto flex justify-end items-center gap-2">
@@ -88,99 +107,6 @@ const UsersTable = ({ data, loading }) => {
             />
             <FiSearch className="absolute top-1/2 bg-transparent right-3 transform -translate-y-1/2 text-gray-400" />
           </div>
-          <div className="w-80 h-11 bg-gray-50 grid grid-cols-3 gap-1 items-center justify-start border p-1 rounded-2xl">
-            <button
-              onClick={() => {
-                setTab("");
-                setCurrentPage(1);
-              }}
-              className={`w-full transition-all duration-300 ${
-                tab == ""
-                  ? "bg-[#c00000] text-white"
-                  : "bg-gray-200 text-gray-600 hover:bg-[#c00000] hover:text-white"
-              }  h-full rounded-xl flex items-center justify-center  text-xs font-medium`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => {
-                setTab("blocked");
-                setCurrentPage(1);
-              }}
-              className={`w-full transition-all duration-300 ${
-                tab == "blocked"
-                  ? "bg-[#c00000] text-white"
-                  : "bg-gray-200 text-gray-600 hover:bg-[#c00000] hover:text-white"
-              }  h-full rounded-xl flex items-center justify-center  text-xs font-medium`}
-            >
-              Blocked
-            </button>
-            <button
-              onClick={() => {
-                setTab("unblocked");
-                setCurrentPage(1);
-              }}
-              className={`w-full  transition-all duration-300 ${
-                tab == "unblocked"
-                  ? "bg-[#c00000] text-white"
-                  : "bg-gray-200 text-gray-600 hover:bg-[#c00000] hover:text-white"
-              }   h-full rounded-xl flex items-center justify-center  text-xs font-medium`}
-            >
-              Unblocked
-            </button>
-          </div>
-          {/* <div class=" w-44 relative inline-flex">
-            <button
-              onClick={() => setOpenInsurance((prev) => !prev)}
-              type="button"
-              class={`hs-dropdown-toggle h-11 w-full ${
-                openInsurance ? "rounded-2xl border" : "rounded-2xl border"
-              } px-2 text-xs font-medium  bg-gray-50 text-gray-600 inline-flex justify-center items-center gap-x-2`}
-              aria-expanded="false"
-              aria-label="Menu"
-            >
-              <span>
-                {insurance == null ? "Insurrance Carrier" : insurance?.name}
-              </span>
-              <TbCaretDownFilled />
-            </button>
-
-            <div
-              class={`group w-full transition-all rounded-2xl p-2 duration    ${
-                openInsurance
-                  ? "flex flex-col justify-start items-start  opacity-100"
-                  : "hidden opacity-0"
-              } z-10 mt-2  bg-gray-50 divide-y group-last::rounded-b-2xl border shadow absolute top-10 left-0`}
-            >
-              <div className="w-full max-h-56 p-1  overflow-y-auto grid grid-cols-1 gap-1 justify-start items-start">
-                <div className="relative w-full">
-                  <input
-                    type="text"
-                    value={insuranceSearch}
-                    onChange={(e) => {
-                      setInsuranceSearch(e.target.value);
-                    }}
-                    placeholder="Search"
-                    className="border rounded-lg pl-2 pr-10 py-2 text-sm bg-gray-100 text-gray-700 focus:outline-none w-full h-8" // Increased size
-                  />
-                  <FiSearch className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400" />
-                </div>
-                {filteredInsurance?.map((carrier, key) => (
-                  <button
-                    onClick={() => {
-                      setInsurance(carrier);
-                      setOpenInsurance(false);
-                    }}
-                    class={`w-full h-7  hover:bg-gray-200 ${
-                      insurance?.name == carrier?.name && "bg-gray-200"
-                    }  flex items-center justify-start px-2 text-xs rounded-md font-medium text-gray-600`}
-                  >
-                    {carrier?.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div> */}
         </div>
       </div>
       <div className="w-full  bg-gray-50 border p-5 rounded-[18px] ">
@@ -190,10 +116,14 @@ const UsersTable = ({ data, loading }) => {
               <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
                 <th className="">Name</th>
                 <th className="px-4">Email</th>
-                <th className="px-4">Contact No.</th>
-                <th className="px-4">Fareshare ID</th>
-                <th className="px-4">Registered On</th>
-                <th className="pl-4">Action</th>
+                <th className="px-4">Withdrawn On</th>
+                <th className="px-4">Amount</th>
+                <th className="px-4">Status</th>
+                <th className="pl-4">
+                  <span className="w-full flex justify-center items-center">
+                    Action
+                  </span>
+                </th>
               </tr>
             )}
           </thead>
@@ -232,37 +162,79 @@ const UsersTable = ({ data, loading }) => {
                 <React.Fragment key={index}>
                   <tr className=" text-[10px] text-gray-900 ">
                     <td className="flex  items-center gap-3 py-1">
-                      <img
+                      {/* <img
                         src={user?.profilePicture}
-                        alt={user?.firstName}
+                        alt={user?.name}
                         className="w-8 h-8 rounded-full"
-                      />
-                      <span>
-                        {user?.firstName} {user?.lastName}
-                      </span>
+                      /> */}
+                      <span>{user?.name}</span>
                     </td>
                     <td className="py-1 px-4">{user?.email}</td>
-                    <td className="py-1 px-4">{user?.phoneNo}</td>
+                    <td className="py-1 px-4">
+                      {convertEpochToMMDDYYYY(user?.dateRequested)}
+                    </td>
+
                     <td className="py-1 px-4 max-w-sm text-wrap break-words">
-                      {user?.fareShareId || "N/A"}
+                      ${parseFloat(user?.amount).toFixed(2)}
                     </td>
                     <td className="py-1 px-4">
-                      {convertToMMDDYYYY(user?.createdAt)}
-                    </td>
-                    <td className="py-1 px-4">
-                      <button
-                        onClick={() => handleView(user)}
-                        className="    rounded-full justify-center bg-[#c00000] flex  h-[26px] gap-1 w-[75px]  items-center"
-                      >
-                        <img
-                          src={`/eye-icon-white.png`}
-                          alt={user?.firstName}
-                          className="mb-[0.2px]"
-                        />
-                        <span className=" text-white font-medium text-[11px] leading-none">
-                          View
+                      {user?.status == "pending" ? (
+                        <span className="text-[#f7cc3e] border border-[#f7cc3e] bg-[#f7cc3e]/[0.1]  px-2 py-1 rounded-full">
+                          Pending
                         </span>
-                      </button>
+                      ) : user?.status == "approved" ? (
+                        <span className="text-[#7aba26] border border-[#7aba26]  bg-[#7aba26]/[0.1]  px-2 py-1 rounded-full">
+                          Approved
+                        </span>
+                      ) : (
+                        <span className="text-[#ba3226] border border-[#ba3226]  bg-[#ba3226]/[0.1]  px-2 py-1 rounded-full">
+                          Rejected
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-1 px-4">
+                      {user?.status == "approved" ? (
+                        <div className="w-auto flex gap-2 items-center justify-center">
+                          <span className="text-[#7aba26] border border-[#7aba26]  bg-[#7aba26]/[0.1]  px-2 py-1 rounded-full">
+                            Approved on:{" "}
+                            {convertToMMDDYYYY(user?.withdrawCompletionDate)}
+                          </span>
+                        </div>
+                      ) : user?.status == "unapproved" ? (
+                        <div className="w-auto flex gap-2 items-center justify-center">
+                          <span className="text-[#ba2b26] border border-[#ba2b26]  bg-[#ba2b26]/[0.1]  px-2 py-1 rounded-full">
+                            Rejected on:{" "}
+                            {convertToMMDDYYYY(user?.withdrawCompletionDate)}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="w-auto flex gap-2 items-center justify-center">
+                          <button
+                            onClick={() => {
+                              setOpen(true);
+                              setIsApproved(true);
+                              setSelectedUser(user?._id);
+                            }}
+                            className="    rounded-full justify-center bg-[#8bf63e] flex  h-[26px] gap-1 w-[75px]  items-center"
+                          >
+                            <span className=" text-black font-medium text-[11px] leading-none">
+                              Approve
+                            </span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setOpen(true);
+                              setIsApproved(false);
+                              setSelectedUser(user?._id);
+                            }}
+                            className="    rounded-full justify-center bg-[#c00000] flex  h-[26px] gap-1 w-[75px]  items-center"
+                          >
+                            <span className=" text-white font-medium text-[11px] leading-none">
+                              Reject
+                            </span>
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                   {/* Line under each row */}
@@ -286,6 +258,13 @@ const UsersTable = ({ data, loading }) => {
           </tbody>
         </table>
       </div>
+      <ApproveWithdrawModal
+        isOpen={open}
+        onRequestClose={() => setOpen(false)}
+        onConfirm={() => toggleAccept(selectedUser, isApproved)}
+        loading={acceptLoading}
+        isApproved={isApproved}
+      />
 
       {!loading && filteredUsers?.length > 0 && (
         <nav
@@ -361,4 +340,4 @@ const UsersTable = ({ data, loading }) => {
   );
 };
 
-export default UsersTable;
+export default WithdrawRequestTable;

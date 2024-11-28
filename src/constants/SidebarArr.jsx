@@ -8,6 +8,7 @@ import { IoCarSportOutline } from "react-icons/io5";
 import { TbFileInvoice } from "react-icons/tb";
 import { MdOutlineContactSupport } from "react-icons/md";
 import { LiaFileInvoiceSolid } from "react-icons/lia";
+import { PiHandWithdrawBold, PiHandWithdrawLight } from "react-icons/pi";
 
 export const sidebarArr = [
   {
@@ -55,10 +56,15 @@ export const sidebarArr = [
         url: "/invoices/broker",
       },
       {
-        title: "Nemt Invoices",
+        title: "NEMT Invoices",
         url: "/invoices/nemt",
       },
     ],
+  },
+  {
+    title: "Withdrawal Requests",
+    url: "/withdrawal-requests",
+    icon: <PiHandWithdrawBold />,
   },
   {
     title: "Tickets",

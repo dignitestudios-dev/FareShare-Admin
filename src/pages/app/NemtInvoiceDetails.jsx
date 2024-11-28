@@ -47,6 +47,7 @@ const NemtInvoiceDetails = () => {
   console.log(groupRidesByUser(invoice?.rides));
 
   function convertToMMDDYYYY(dateString) {
+    if (dateString == null) return "Invalid Date";
     const date = new Date(dateString);
 
     // Get the month, day, and year
@@ -60,34 +61,39 @@ const NemtInvoiceDetails = () => {
   const handleDownload = async (e, elementId, filename) => {
     e.preventDefault();
     const element = document.getElementById(elementId);
+
     if (!element) {
       console.error("Element not found");
       return;
     }
 
-    const paddingY = 3; // Padding at the top of each page in pixels
-    const paddingX = 6;
-    element.style.backgroundColor = "#fff";
+    // Temporarily hide elements with the class 'pdf-exclude'
+    const excludeElements = document.querySelectorAll(".pdf-exclude");
+    excludeElements.forEach((el) => {
+      el.style.display = "none";
+    });
 
+    // Capture the element as a canvas
     const canvas = await html2canvas(element);
     const imgData = canvas.toDataURL("image/png");
 
     const pdf = new jsPDF();
     const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight() - paddingY * 2; // Adjusted height to account for padding
+    const pdfHeight = pdf.internal.pageSize.getHeight();
 
-    let imgProps = pdf.getImageProperties(imgData);
-    let imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    const imgProps = pdf.getImageProperties(imgData);
+    const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
     let heightLeft = imgHeight;
-    let position = paddingY;
+    let position = 0;
 
-    // Add the first page with top padding
+    // Add the first page
     pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
     heightLeft -= pdfHeight;
 
-    // Add extra pages with consistent padding at the top
+    // Add remaining pages if needed
     while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
       pdf.addPage();
       pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
       heightLeft -= pdfHeight;
@@ -95,11 +101,10 @@ const NemtInvoiceDetails = () => {
 
     pdf.save(filename);
 
-    element.style.backgroundColor = "";
-    element.style.paddingBottom = "";
-    element.style.paddingTop = "";
-    element.style.paddingLeft = ``;
-    element.style.paddingRight = ``;
+    // Restore visibility of the hidden elements
+    excludeElements.forEach((el) => {
+      el.style.display = "";
+    });
   };
   return (
     <div className="h-auto w-full  flex flex-col gap-6 justify-start items-start ">
@@ -121,7 +126,7 @@ const NemtInvoiceDetails = () => {
         </button>
         <div
           id="download-invoice"
-          className="w-full  h-auto px-6 py-8   bg-g flex flex-col gap-8"
+          className="w-full  h-auto px-8 py-8   bg-g flex flex-col gap-8"
         >
           <div className="w-full h-[5%] flex items-center justify-between">
             <span className="text-3xl font-extrabold capitalize text-black">
@@ -140,6 +145,7 @@ const NemtInvoiceDetails = () => {
                 <span className="text-sm text-left  font-medium text-gray-600">
                   Invoice No. {invoice?.invoiceNo}
                 </span>
+
                 <span className="text-sm text-left  font-medium text-gray-600">
                   Generated on: {convertToMMDDYYYY(invoice?.createdAt)}
                 </span>
@@ -180,6 +186,15 @@ const NemtInvoiceDetails = () => {
                                       ? group?.user?.email
                                       : "N/A"}
                                   </span>
+                                  <span className="text-gray-700">
+                                    {" "}
+                                    <span className="text-black">
+                                      Insurance #
+                                    </span>{" "}
+                                    {group?.user?.insuranceNumber
+                                      ? group?.user?.insuranceNumber
+                                      : "N/A"}
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -196,7 +211,7 @@ const NemtInvoiceDetails = () => {
                               <span>Ride Type</span>
                               <span>Registration Date</span>
                               <span>Fare</span>
-                              <span className="w-full flex justify-center items-center">
+                              <span className="w-full pdf-exclude flex justify-center items-center">
                                 Action
                               </span>
                             </div>
@@ -256,7 +271,7 @@ const NemtInvoiceDetails = () => {
                                 </div>
 
                                 {/* Actions */}
-                                <div className="flex justify-center items-center gap-2">
+                                <div className="flex pdf-exclude justify-center items-center gap-2">
                                   <button
                                     onClick={() => handleView(ride)}
                                     className="     justify-center  flex  h-auto gap-1 w-[75px]  items-center"

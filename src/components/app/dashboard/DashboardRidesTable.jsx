@@ -30,6 +30,7 @@ const DashboardRidesTable = () => {
   }, []);
 
   function convertToMMDDYYYY(dateString) {
+    if (dateString == null) return "Invalid Date";
     const date = new Date(dateString);
 
     // Get the month, day, and year
@@ -62,70 +63,83 @@ const DashboardRidesTable = () => {
 
       <div className="overflow-x-auto">
         <table className="min-w-full table-auto">
-          <thead>
-            <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80] ">
-              <th className="">Name</th>
-              <th className="">Email</th>
-              <th className=" ">Status</th>
-              <th className="pl-8">Action</th>
-            </tr>
-          </thead>
-          <tbody className="mt-2">
-            {loading
-              ? Array.from({ length: 6 }).map((_, index) => (
-                  <React.Fragment key={index}>
-                    <tr className=" animate-pulse">
-                      <td className="py-2 px-0">
-                        <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                      </td>
-                      <td className="py-2 px-0">
-                        <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                      </td>
-                      <td className="py-2 px-0 capitalize">
-                        <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-                      </td>
-                      <td className="py-2 px-4">
-                        <div className="h-4 bg-gray-300 rounded w-1/4"></div>
-                      </td>
-                    </tr>
-                    {/* Line under each row */}
-                    <tr>
-                      <td colSpan="6" className="border-b border-gray-200"></td>
-                    </tr>
-                  </React.Fragment>
-                ))
-              : rides?.slice(0, 6)?.map((ride, index) => (
-                  <React.Fragment key={index}>
-                    <tr className=" text-[10px] text-gray-900 ">
-                      <td className="py-2 px-0">{ride?.user?.name}</td>
-                      <td className="py-2 px-0">{ride?.user?.email}</td>
+          {rides?.length > 0 && (
+            <thead>
+              <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80] ">
+                <th className="">Name</th>
+                <th className="">Email</th>
+                <th className=" ">Status</th>
+                <th className="pl-8">Action</th>
+              </tr>
+            </thead>
+          )}
 
-                      <td className="py-2 px-0 capitalize">
-                        {ride?.ride?.status}
-                      </td>
-                      <td className="py-2 px-4">
-                        {ride?.ride?.status !== "cancelled" && (
-                          <Link
-                            to={`/rides/${ride?._id}`}
-                            className="  px-3 py-2 rounded-full flex gap-1 h-6  items-center"
-                          >
-                            <img
-                              src={`/eye-icon.png`}
-                              alt={ride?.ride?.status}
-                            />
-                            <span className=" text-black font-medium text-[10px] leading-[17.42px]">
-                              View
-                            </span>
-                          </Link>
-                        )}
-                      </td>
-                    </tr>
-                    {/* Line under each row */}
-                    <tr>
-                      <td colSpan="6" className="border-b border-gray-200"></td>
-                    </tr>
-                  </React.Fragment>
-                ))}
+          <tbody className="mt-2">
+            {loading ? (
+              Array.from({ length: 6 }).map((_, index) => (
+                <React.Fragment key={index}>
+                  <tr className=" animate-pulse">
+                    <td className="py-2 px-0">
+                      <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                    </td>
+                    <td className="py-2 px-0">
+                      <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                    </td>
+                    <td className="py-2 px-0 capitalize">
+                      <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                    </td>
+                    <td className="py-2 px-4">
+                      <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+                    </td>
+                  </tr>
+                  {/* Line under each row */}
+                  <tr>
+                    <td colSpan="6" className="border-b border-gray-200"></td>
+                  </tr>
+                </React.Fragment>
+              ))
+            ) : rides?.length > 0 ? (
+              rides?.slice(0, 6)?.map((ride, index) => (
+                <React.Fragment key={index}>
+                  <tr className=" text-[10px] text-gray-900 ">
+                    <td className="py-2 px-0">{ride?.user?.name}</td>
+                    <td className="py-2 px-0">{ride?.user?.email}</td>
+
+                    <td className="py-2 px-0 capitalize">
+                      {ride?.ride?.status}
+                    </td>
+                    <td className="py-2 px-4">
+                      {ride?.ride?.status !== "cancelled" && (
+                        <Link
+                          to={`/rides/${ride?._id}`}
+                          className="  px-3 py-2 rounded-full flex gap-1 h-6  items-center"
+                        >
+                          <img src={`/eye-icon.png`} alt={ride?.ride?.status} />
+                          <span className=" text-black font-medium text-[10px] leading-[17.42px]">
+                            View
+                          </span>
+                        </Link>
+                      )}
+                    </td>
+                  </tr>
+                  {/* Line under each row */}
+                  <tr>
+                    <td colSpan="6" className="border-b border-gray-200"></td>
+                  </tr>
+                </React.Fragment>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4">
+                  <div className="w-full min-h-52 flex flex-col items-center justify-center">
+                    <img src="/no-data.png" alt="" className="w-[150px]" />
+                    <span className="font-semibold text-center text-[#0e0e10] text-[20px] ">
+                      You don’t have added any <br /> Listing Here
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

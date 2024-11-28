@@ -13,6 +13,7 @@ import {
   FaSortNumericUp,
   FaSortNumericUpAlt,
 } from "react-icons/fa";
+import { IoMdClose } from "react-icons/io";
 
 const NemtInvoicesCreate = () => {
   const [insurance, setInsurance] = useState(null);
@@ -51,6 +52,7 @@ const NemtInvoicesCreate = () => {
         `/admin/user/insurance/${insurance?._id}`
       );
       setUserData(data?.data); // Use setUserData to set the user data
+      setUsers([]);
     } catch (error) {
       ErrorToast(error?.response?.data?.message);
 
@@ -70,7 +72,6 @@ const NemtInvoicesCreate = () => {
         return [...prevSelected, userId];
       }
     });
-    setOpenUsers(false);
   };
 
   useEffect(() => {
@@ -245,6 +246,7 @@ const NemtInvoicesCreate = () => {
   }, [insurance, users]);
 
   function convertToMMDDYYYY(dateString) {
+    if (dateString == null) return "Invalid Date";
     const date = new Date(dateString);
 
     // Get the month, day, and year
@@ -292,6 +294,14 @@ const NemtInvoicesCreate = () => {
     }
   };
 
+  const toggleSort = () => {
+    if (invoices?.length > 0) {
+      setSort((prev) => !prev);
+    } else {
+      ErrorToast("There is no data available to sort.");
+    }
+  };
+
   return (
     <div className="w-full min-h-screen ">
       {/* Header Section */}
@@ -335,19 +345,28 @@ const NemtInvoicesCreate = () => {
                   />
                   <FiSearch className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400" />
                 </div>
-                {filteredInsurance?.map((carrier, key) => (
-                  <button
-                    onClick={() => {
-                      setInsurance(carrier);
-                      setOpenInsurance(false);
-                    }}
-                    class={`w-full h-7  hover:bg-gray-200 ${
-                      insurance?.name == carrier?.name && "bg-gray-200"
-                    }  flex items-center justify-start px-2 text-xs rounded-md font-medium text-gray-600`}
-                  >
-                    {carrier?.name}
-                  </button>
-                ))}
+                {filteredInsurance?.length > 0 ? (
+                  filteredInsurance?.map((carrier, key) => (
+                    <button
+                      onClick={() => {
+                        setInsurance(carrier);
+                        setOpenInsurance(false);
+                      }}
+                      class={`w-full h-7  hover:bg-gray-200 ${
+                        insurance?.name == carrier?.name && "bg-gray-200"
+                      }  flex items-center justify-start px-2 text-xs rounded-md font-medium text-gray-600`}
+                    >
+                      {carrier?.name}
+                    </button>
+                  ))
+                ) : (
+                  <div className="w-full h-full flex flex-col  items-center justify-center">
+                    <img src="/no-data.png" alt="" className="h-20" />
+                    <span className="font-normal text-center text-[#0e0e10] text-xs ">
+                      You don’t have added any Listing Here
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -373,24 +392,34 @@ const NemtInvoicesCreate = () => {
                   : "hidden opacity-0"
               } z-10 mt-2  bg-gray-50 divide-y group-last::rounded-b-2xl border shadow absolute top-10 -right-14`}
             >
-              <div className="w-full max-h-56 px-2 overflow-y-auto grid grid-cols-1 justify-start items-start">
-                <div className="relative w-full">
-                  <input
-                    type="text"
-                    value={userSearch}
-                    onChange={(e) => {
-                      setUserSearch(e.target.value);
-                    }}
-                    placeholder="Search"
-                    className="border rounded-lg pl-2 pr-10 py-2 text-sm bg-gray-100 text-gray-700 focus:outline-none w-full h-8" // Increased size
-                  />
-                  <FiSearch className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400" />
+              <div className="w-full max-h-72 px-2 overflow-y-auto grid grid-cols-1 justify-start items-start">
+                <div className="w-full flex items-center justify-start gap-1">
+                  <div className="relative w-[90%]">
+                    <input
+                      type="text"
+                      value={userSearch}
+                      onChange={(e) => {
+                        setUserSearch(e.target.value);
+                      }}
+                      placeholder="Search"
+                      className="border rounded-lg pl-2 pr-10 py-2 text-sm bg-gray-100 text-gray-700 focus:outline-none w-full h-8" // Increased size
+                    />
+                    <FiSearch className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400" />
+                  </div>
+
+                  <button
+                    onClick={() => setOpenUsers(false)}
+                    className="w-7 h-7 rounded-lg flex items-center justify-center text-md bg-[#c00000] text-white"
+                  >
+                    <IoMdClose />
+                  </button>
                 </div>
+
                 {filteredUsers?.length > 0 ? (
                   filteredUsers?.map((user, key) => {
                     const fullName = user?.firstName + " " + user?.lastName;
                     return (
-                      <div className="w-full flex justify-start items-center border-b h-12 gap-3">
+                      <div className="w-full flex  justify-start items-center border-b h-12 gap-3">
                         <input
                           type="checkbox"
                           checked={users.includes(user?._id)}
@@ -429,11 +458,14 @@ const NemtInvoicesCreate = () => {
                     );
                   })
                 ) : (
-                  <span className="text-center h-20 px-4 flex items-center justify-center text-xs">
-                    {insurance == null
-                      ? "Please select an insurance carrier to show users."
-                      : "No users available for selected insurance."}
-                  </span>
+                  <div className="w-full h-auto my-2 flex flex-col  items-center justify-center">
+                    <img src="/no-data.png" alt="" className="h-20" />
+                    <span className="font-normal text-center text-[#0e0e10] text-xs ">
+                      {insurance == null
+                        ? "Please select an insurance carrier to show users."
+                        : "No users available for selected insurance."}
+                    </span>
+                  </div>
                 )}
               </div>
             </div>
@@ -452,6 +484,12 @@ const NemtInvoicesCreate = () => {
             />
             <FiSearch className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400" />
           </div>
+          <button
+            className="w-11 h-11 rounded-2xl bg-gray-50 border flex items-center justify-center"
+            onClick={() => toggleSort()}
+          >
+            {sort ? <FaSortNumericDownAlt /> : <FaSortNumericUp />}
+          </button>
 
           {insurance && (
             <button
@@ -468,6 +506,7 @@ const NemtInvoicesCreate = () => {
             onConfirm={generateInvoice}
             loading={generateLoading}
             invoiceData={generatedInvoiceData}
+            count={selectedInvoice?.length}
           />
         </div>
       </div>
@@ -507,7 +546,7 @@ const NemtInvoicesCreate = () => {
                 <div className="h-4 bg-gray-300 rounded w-3/4"></div>
               </div>
             ))
-          ) : invoices?.length > 0 ? (
+          ) : filteredData?.length > 0 ? (
             groupRidesByUser(filteredData)?.map((group, groupIndex) => (
               <React.Fragment key={groupIndex}>
                 {/* User Details */}
@@ -566,9 +605,6 @@ const NemtInvoicesCreate = () => {
                     <span>Registration Date</span>
                     <span className="flex gap-1 justify-start items-center">
                       <span>Fare</span>
-                      <button onClick={() => setSort((prev) => !prev)}>
-                        {sort ? <FaSortNumericDownAlt /> : <FaSortNumericUp />}
-                      </button>
                     </span>
                     <span className="w-full flex justify-center items-center">
                       Action
@@ -639,7 +675,9 @@ const NemtInvoicesCreate = () => {
                               : "text-gray-400 bg-gray-200"
                           }`}
                         >
-                          <MdCheck className="w-5 h-5" />
+                          {selectedRidesByUser[group?.user?.id]?.includes(
+                            ride.id
+                          ) && <MdCheck className="w-5 h-5" />}
                         </button>
                       </div>
                     </div>
@@ -648,16 +686,32 @@ const NemtInvoicesCreate = () => {
               </React.Fragment>
             ))
           ) : insurance == null && users?.length == 0 ? (
-            <div className="w-full h-[70vh] flex items-center justify-center">
-              <p>Please select an insurance carrier to show data</p>
-            </div>
-          ) : insurance !== null && users.length > 0 ? (
-            <div className="w-full h-[70vh] flex items-center justify-center">
-              <p>No data available for selected users.</p>
+            <div className="w-full min-h-[70vh] flex flex-col items-center justify-center">
+              <img src="/no-data.png" alt="" className="w-[230px]" />
+              <span className="font-semibold text-center text-[#0e0e10] text-[24px] ">
+                Please select an insurance <br /> carrier to show data
+              </span>
             </div>
           ) : insurance !== null && users?.length == 0 ? (
-            <div className="w-full h-[70vh] flex items-center justify-center">
-              <p>No data available.</p>
+            <div className="w-full min-h-[70vh] flex flex-col items-center justify-center">
+              <img src="/no-data.png" alt="" className="w-[230px]" />
+              <span className="font-semibold text-center text-[#0e0e10] text-[24px] ">
+                No Data available for selected <br /> insurance carrier.
+              </span>
+            </div>
+          ) : insurance !== null && users.length > 0 ? (
+            <div className="w-full min-h-[70vh] flex flex-col items-center justify-center">
+              <img src="/no-data.png" alt="" className="w-[230px]" />
+              <span className="font-semibold text-center text-[#0e0e10] text-[24px] ">
+                No data available for selected users.
+              </span>
+            </div>
+          ) : insurance !== null && users?.length == 0 ? (
+            <div className="w-full min-h-[70vh] flex flex-col items-center justify-center">
+              <img src="/no-data.png" alt="" className="w-[230px]" />
+              <span className="font-semibold text-center text-[#0e0e10] text-[24px] ">
+                No data available.
+              </span>
             </div>
           ) : null}
         </div>{" "}

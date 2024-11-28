@@ -134,9 +134,7 @@ const UserDetails = () => {
 
             {/* Patient Date of Birth */}
             <div className="flex flex-col bg-gray-100 border p-2 rounded-xl">
-              <span className="text-[12px] text-[#9E9E9E]">
-                Patient Date of Birth
-              </span>
+              <span className="text-[12px] text-[#9E9E9E]">Date of Birth</span>
               <span className="text-[13px] font-medium text-black">
                 {new Date(user?.patientDateofBirth).toLocaleDateString()}
               </span>
