@@ -19,7 +19,7 @@ const RidesList = () => {
   const [date, setDate] = useState(null);
   const [rideType, setRideType] = useState("User");
   const [category, setCategory] = useState("On Demand");
-  const [sub, setSub] = useState("Instant");
+  const [sub, setSub] = useState("");
 
   const [status, setStatus] = useState("All");
   const [search, setSearch] = useState("");
@@ -35,7 +35,7 @@ const RidesList = () => {
       setLoading(true);
       const { data } = await axios.post("/admin/rides/admin", {
         rideType: rideType, //Broker, User
-        // subcategory: sub == "" ? null : sub,
+        subcategory: sub == "" ? null : sub,
         category: category, // medical, corporate, On Demand, scheduled
         status: status == "All" ? null : status, //"InProgress",//"Pending", "InProgress", "Completed"
         search: "",
@@ -182,6 +182,7 @@ const RidesList = () => {
               <option value={"medical"}>Medical</option>
               <option value={"corporate"}>Corporate</option>
               <option value={"On Demand"}>On Demand</option>
+              <option value={"Nemt"}>NEMT</option>
             </select>
             <label
               class="absolute -top-1 start-0 p-4 h-full truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  peer-disabled:opacity-50 peer-disabled:pointer-events-none
