@@ -598,11 +598,19 @@ const NemtInvoicesCreate = () => {
                   <div className="text-[12px] mb-2 font-bold text-black">
                     Rides Info
                   </div>
-                  <div className="w-full grid grid-cols-8 border-b border-gray-200 text-left text-[11px] font-semibold leading-[17.42px] text-[#0A150F80]">
+                  <div className="w-full grid grid-cols-10 border-b border-gray-200 text-left text-[11px] font-semibold leading-[17.42px] text-[#0A150F80]">
                     <span className="col-span-2">User</span>
                     <span className="col-span-2">Driver</span>
-                    <span>Ride Type</span>
                     <span>Registration Date</span>
+                    <span className="flex gap-1 justify-start items-center">
+                      <span>Base Rate</span>
+                    </span>
+                    <span className="flex gap-1 justify-start items-center">
+                      <span>Per Mile</span>
+                    </span>
+                    <span className="flex gap-1 justify-start items-center">
+                      <span>Miles Travelled</span>
+                    </span>
                     <span className="flex gap-1 justify-start items-center">
                       <span>Fare</span>
                     </span>
@@ -614,7 +622,7 @@ const NemtInvoicesCreate = () => {
                   {group?.rides?.map((ride, rideIndex) => (
                     <div
                       key={rideIndex}
-                      className="grid grid-cols-8 py-2 border-b border-gray-200 gap-4 items-center text-[10px] text-gray-900 w-full"
+                      className="grid grid-cols-10 py-2 border-b border-gray-200 gap-4 items-center text-[10px] text-gray-900 w-full"
                     >
                       {/* Rider Info */}
                       <div className="flex col-span-2 items-start gap-2">
@@ -650,15 +658,18 @@ const NemtInvoicesCreate = () => {
                         </div>
                       </div>
 
-                      {/* Ride Type */}
-                      <div>{ride?.ride?.rideType}</div>
-
                       {/* Registration Date */}
                       <div>
                         {convertToMMDDYYYY(ride?.ride?.registrationDate)}
                       </div>
 
                       {/* Status */}
+                      <div className="capitalize">${ride?.ride?.baseRate}</div>
+                      <div className="capitalize">
+                        ${ride?.ride?.costPerMile}
+                      </div>
+                      <div className="capitalize">{ride?.ride?.miles}</div>
+
                       <div className="capitalize">${ride?.ride?.fare}</div>
 
                       {/* Actions */}

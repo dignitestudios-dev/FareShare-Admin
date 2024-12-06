@@ -231,12 +231,38 @@ const RideDetails = () => {
               </div>
             </div>
 
-            {/* Fare Info */}
-            <div className="mt-4 flex justify-between items-center">
-              <p className="text-[17px] text-black font-semibold">Fare</p>
-              <p className="text-[17px]  text-red-500 font-semibold">
-                ${rides?.ride?.fare}
-              </p>
+            <div className="flex w-full flex-col justify-start items-start gap-1 mt-4">
+              <div className=" w-full flex justify-between items-center">
+                <p className="text-[15px] text-black font-semibold">
+                  Base Rate
+                </p>
+                <p className="text-[15px]  text-red-500 font-semibold">
+                  ${rides?.ride?.baseRate}
+                </p>
+              </div>
+              <div className=" w-full flex justify-between items-center">
+                <p className="text-[15px] text-black font-semibold">Per Mile</p>
+                <p className="text-[15px]  text-red-500 font-semibold">
+                  ${rides?.ride?.costPerMile}
+                </p>
+              </div>
+
+              <div className=" w-full flex justify-between items-center">
+                <p className="text-[15px] text-black font-semibold">
+                  Miles Travelled
+                </p>
+                <p className="text-[15px]  text-red-500 font-semibold">
+                  {rides?.ride?.miles}
+                </p>
+              </div>
+
+              {/* Fare Info */}
+              <div className=" w-full flex justify-between items-center">
+                <p className="text-[15px] text-black font-semibold">Fare</p>
+                <p className="text-[15px]  text-red-500 font-semibold">
+                  ${rides?.ride?.fare}
+                </p>
+              </div>
             </div>
           </div>
 

@@ -14,7 +14,6 @@ const BrokerInvoiceDetails = () => {
   const location = useLocation();
 
   const data = location.state;
-  console.log(data);
 
   const formatDate = (isoDateString) => {
     const date = new Date(isoDateString);
@@ -131,7 +130,7 @@ const BrokerInvoiceDetails = () => {
         </button>
         <div
           id="download-invoice"
-          className="w-full  h-auto px-6 py-8   bg-g flex flex-col gap-8"
+          className="w-full  h-auto  py-8   bg-g flex flex-col gap-8"
         >
           <div className="w-full h-[5%] flex items-center justify-between">
             <span className="text-3xl font-extrabold capitalize text-black">
@@ -163,49 +162,67 @@ const BrokerInvoiceDetails = () => {
             </div>
 
             <div className="relative mt-2  w-full h-auto">
-              <div className="w-full grid grid-cols-11  items-center text-sm text-left rtl:text-right border-y border-x border-gray-300 bg-[#eeeeee]  rounded-t-xl text-gray-900">
-                <span className="px-6 w-full my-2 col-span-2 place-content-center text-center self-center place-items-center  flex justify-start items-center ">
+              <div className="w-full grid grid-cols-11  items-center text-xs font-semibold text-left rtl:text-right border-y border-x border-gray-300 bg-[#eeeeee]  rounded-t-xl text-gray-900">
+                <span className="px-2 w-full my-2 col-span-2 place-content-center text-center self-center place-items-center  flex justify-start items-center ">
                   Client
                 </span>
-                <span className="px-6 w-full col-span-2 my-2 place-content-center  self-center place-items-center  flex justify-start items-center ">
-                  Ride Date
+                <span className=" w-full col-span-1 my-2 place-content-center  self-center place-items-center  flex justify-start items-center ">
+                  Date
                 </span>
-                <span className="px-6 w-full my-2 col-span-3 place-content-center self-center place-items-center  flex justify-start items-center ">
+                <span className=" w-full my-2 col-span-2 place-content-center self-center place-items-center  flex justify-start items-center ">
                   Origin
                 </span>
-                <span className="px-6 w-full my-2 col-span-3 place-content-center self-center place-items-center  flex justify-start items-center ">
+                <span className=" w-full my-2 col-span-2 place-content-center self-center place-items-center  flex justify-start items-center ">
                   Destination
                 </span>
-                <span className="px-6 w-full my-2 place-content-center text-center self-center place-items-center  flex justify-start items-center ">
+                <span className=" w-full my-2 col-span-1 place-content-center self-center place-items-center  flex justify-start items-center ">
+                  Base Rate
+                </span>
+                <span className=" w-full my-2 col-span-1 place-content-center self-center place-items-center  flex justify-start items-center ">
+                  Per Mile
+                </span>
+                <span className=" w-full my-2 col-span-1 place-content-center self-center place-items-center  flex justify-start items-center ">
+                  Miles Travelled
+                </span>
+                <span className=" w-full my-2 place-content-center text-center self-center place-items-center  flex justify-start items-center ">
                   Price
                 </span>
               </div>
-              <div className="w-full flex flex-col border-b border-x border-gray-200 rounded-b-xl justify-start items-start">
+              <div className="w-full flex flex-col border-b border-x text-xs font-medium border-gray-200 rounded-b-xl justify-start items-start">
                 {data?.rides?.length > 0 ? (
                   data.rides.map((item, index) => (
                     <div
                       key={index} // Added key prop
-                      className={`w-full grid grid-cols-11  items-center text-sm  bg-gray-50 text-left rtl:text-right ${
+                      className={`w-full grid grid-cols-11  items-center text-xs font-semibold  bg-gray-50 text-left rtl:text-right ${
                         data?.rides?.length == index + 1
                           ? "rounded-b-xl"
                           : " border-b border-gray-300"
                       } text-gray-500`}
                     >
-                      <span className="px-6 my-2 col-span-2 flex justify-start items-center place-content-center  self-center place-items-center  font-medium text-gray-900 whitespace-nowrap">
+                      <span className="px-2 my-2 col-span-2 flex justify-start items-center place-content-center  self-center place-items-center  font-semibold text-gray-900 whitespace-nowrap">
                         {data?.userId
                           ? `${data?.userId?.firstName} ${data?.userId?.lastName}`
                           : data?.brokerId?.accountHandlerName}
                       </span>
-                      <span className="px-6 my-2 flex col-span-2 justify-start items-center place-content-center  self-center place-items-center ">
+                      <span className=" my-2 flex col-span-1 justify-start items-center place-content-center  self-center place-items-center ">
                         {formatDate(item?.rideDate)}
                       </span>
-                      <span className="px-6 my-2 col-span-3 flex justify-start items-center place-content-center  self-center place-items-center ">
+                      <span className=" my-2 col-span-2 flex justify-start items-center place-content-center  self-center place-items-center ">
                         {item?.originAddress?.slice(0, 60)}...
                       </span>
-                      <span className="px-6 my-2 col-span-3 flex justify-start items-center place-content-center  self-center place-items-center ">
+                      <span className=" my-2 col-span-2 flex justify-start items-center place-content-center  self-center place-items-center ">
                         {item?.destinationAddress?.slice(0, 60)}...
                       </span>
-                      <span className="px-6 my-2 flex justify-start items-center place-content-center  self-center place-items-center ">
+                      <span className=" my-2 col-span-1 flex justify-start items-center place-content-center  self-center place-items-center ">
+                        {item?.baseRate}
+                      </span>
+                      <span className=" my-2 col-span-1 flex justify-start items-center place-content-center  self-center place-items-center ">
+                        {item?.costPerMile}
+                      </span>
+                      <span className=" my-2 col-span-1 flex justify-start items-center place-content-center  self-center place-items-center ">
+                        {item?.miles}
+                      </span>
+                      <span className=" my-2 flex justify-start items-center place-content-center  self-center place-items-center ">
                         ${item?.estimatedFare}
                       </span>
                     </div>

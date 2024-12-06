@@ -86,10 +86,7 @@ const BrokerInvoiceRow = ({ invoice, setUpdate }) => {
             </div>
           )}
         </td>
-        <td className="py-1 px-4">
-          {" "}
-          {convertToMMDDYYYY(invoice?.creationDate)}
-        </td>
+
         <td className="py-1 px-4">{convertToMMDDYYYY(invoice?.dueDate)}</td>
         <td className="py-1 px-4">
           {convertToMMDDYYYY(invoice?.completionDate)}
@@ -97,36 +94,44 @@ const BrokerInvoiceRow = ({ invoice, setUpdate }) => {
 
         <td className="py-1 px-4">
           <span className={`py-1 px-2 capitalize  `}>
-            {invoice?.status == "unpaid" ? (
+            {invoice?.daysOver > 0 ? (
               <span className="text-[#f73e3e] border border-[#f73e3e] bg-[#f73e3e]/[0.1]  px-2 py-1 rounded-full">
-                Uncleared
+                Overdue
               </span>
             ) : (
               <span className="text-[#7aba26] border border-[#7aba26]  bg-[#7aba26]/[0.1]  px-2 py-1 rounded-full">
-                Cleared
+                On Time
               </span>
             )}
           </span>
         </td>
+
+        <td className="py-1 px-4"> {invoice?.daysOver}</td>
+        <td className="py-1 px-4"> {invoice?.percentOver}%</td>
         <td className="py-1 px-6">
           {" "}
-          {parseFloat(invoice?.amount)?.toFixed(2) || 0}
+          ${parseFloat(invoice?.amount)?.toFixed(2) || 0}
         </td>
         <td className="py-1 flex space-x-1 justify-center">
           {invoice?.status == "paid" ? (
-            <button
-              onClick={() => handleView(invoice)}
-              className="    rounded-[8px] justify-center bg-[#c00000] flex  h-[25px] gap-1 w-[75px]  items-center"
-            >
-              <img
-                src={`/eye-icon-white.png`}
-                alt={invoice?.dueDate}
-                className="mb-[0.2px]"
-              />
-              <span className=" text-white font-medium text-[10px] leading-none">
-                View
+            <>
+              <span className="text-[#7aba26] border border-[#7aba26]  bg-[#7aba26]/[0.1]  px-2 py-1 rounded-full">
+                Cleared
               </span>
-            </button>
+              <button
+                onClick={() => handleView(invoice)}
+                className="    rounded-[8px] justify-center bg-[#c00000] flex  h-[25px] gap-1 w-[75px]  items-center"
+              >
+                <img
+                  src={`/eye-icon-white.png`}
+                  alt={invoice?.dueDate}
+                  className="mb-[0.2px]"
+                />
+                <span className=" text-white font-medium text-[10px] leading-none">
+                  View
+                </span>
+              </button>
+            </>
           ) : (
             <>
               <button

@@ -270,10 +270,11 @@ const BrokerInvoices = () => {
             <thead>
               <tr className=" text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
                 <th className="py-2 ">Broker Info</th>
-                <th className="py-2 px-4">Generated On</th>
                 <th className="py-2 px-4">Due Date</th>
                 <th className="py-2 px-4">Cleared On</th>
                 <th className="py-2 px-6">Status</th>
+                <th className="py-2 px-4">Days Over</th>
+                <th className="py-2 px-4">Percent Over</th>
                 <th className="py-2 px-6">Amount</th>
 
                 <th className="py-2 px-4 flex justify-center">Action</th>
@@ -294,6 +295,9 @@ const BrokerInvoices = () => {
                     </td>
                     <td className="py-1 px-4">
                       <div className="w-24 h-4 bg-gray-300 animate-pulse rounded"></div>
+                    </td>
+                    <td className="py-1 px-4">
+                      <div className="w-20 h-4 bg-gray-300 animate-pulse rounded"></div>
                     </td>
                     <td className="py-1 px-4">
                       <div className="w-20 h-4 bg-gray-300 animate-pulse rounded"></div>
