@@ -25,6 +25,8 @@ import NemtInvoicesCreate from "../pages/app/NemtInvoicesCreate";
 import NemtInvoices from "../pages/app/NemtInvoices";
 import NemtInvoiceDetails from "../pages/app/NemtInvoiceDetails";
 import WithdrawalRequests from "../pages/app/WithdrawalRequests";
+import Trainingbulletin from "../pages/app/Trainingbulletin";
+import TrainingBulletinDetail from "../pages/app/TrainingBulletinDetail";
 
 export const APP_ROUTES = [
   {
@@ -116,6 +118,16 @@ export const APP_ROUTES = [
     title: "Nemt Invoices Create",
     url: "/invoices/nemt/create",
     page: <GlobalLayout page={<NemtInvoicesCreate />} />,
+  },
+  {
+    title: "Training & bulletin",
+    url: "/training-bulletin",
+    page: <GlobalLayout page={<Trainingbulletin />} />,
+  },
+  {
+    title: "Training & bulletin",
+    url: "/training/:id",
+    page: <GlobalLayout page={<TrainingBulletinDetail  />} />,
   },
   {
     title: "Withdrawal Requests",

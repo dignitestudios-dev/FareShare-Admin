@@ -10,7 +10,7 @@ import { ErrorToast, SuccessToast } from "../global/Toast";
 
 const NimtTable = ({ data, loading, setUpdate }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("");
+  const [activeTab, setActiveTab] = useState("pending");
 
   // Filter data based on search query and active tab
   const filteredData = data.filter((item) => {

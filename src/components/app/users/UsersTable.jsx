@@ -24,7 +24,7 @@ const UsersTable = ({ data, loading }) => {
     return `${month}-${day}-${year}`;
   }
 
-  const [tab, setTab] = useState("");
+  const [tab, setTab] = useState("unblocked");
 
   const filteredUsers = data.filter((user) => {
     const fullName = `${user?.firstName || ""} ${

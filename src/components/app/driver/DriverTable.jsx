@@ -83,7 +83,7 @@ const DriverTable = ({ data, loading, setUpdate }) => {
   };
 
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [tab, setTab] = useState("");
+  const [tab, setTab] = useState("pending");
 
   // Filter drivers based on search query and tab
   const filteredDrivers = data.filter((driver) => {

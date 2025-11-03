@@ -3,11 +3,12 @@ import { FaRegUser } from "react-icons/fa";
 import { FiUser } from "react-icons/fi";
 import { PiUsersThreeBold } from "react-icons/pi";
 import { FaCar } from "react-icons/fa6";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { GlobalContext } from "../../../contexts/GlobalContext";
+import { MdCommute } from "react-icons/md";
 
 const DashboardStats = ({ stats, loading }) => {
-  const { navigate } = useContext(GlobalContext);
+  const navigate = useNavigate();
   if (loading) {
     return (
       <div className="w-full grid grid-cols-2 lg:grid-cols-5 justify-start items-start gap-2 lg:gap-6">
@@ -127,6 +128,27 @@ const DashboardStats = ({ stats, loading }) => {
           </span>
           <span className="text-black text-[14px] font-normal">
             Vehicle Requests
+          </span>
+        </div>
+      </button>
+      <button
+        onClick={() => {
+          navigate("/rides", {
+            state: { inProgressSelected: "InProgress" },
+          });
+          localStorage.setItem("title", "Rides Inprogress");
+        }}
+        className="w-full  h-[88px] rounded-[24px] bg-gray-50 border p-[12px] flex gap-2 items-center justify-start"
+      >
+        <span className="w-[64px] h-[64px] rounded-[18px] bg-blue-100 text-blue-400 text-3xl flex items-center justify-center">
+          <MdCommute />
+        </span>
+        <div className="w-auto flex flex-col justify-start items-start">
+          <span className="text-[18px] font-bold text-black">
+            {stats?.activeRidesCount || 0}
+          </span>
+          <span className="text-black text-[14px] font-normal">
+            Total Rides
           </span>
         </div>
       </button>

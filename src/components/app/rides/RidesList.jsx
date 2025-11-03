@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useContext } from "react";
 import { FiEye } from "react-icons/fi"; // Using the Eye icon for the action
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FiSearch } from "react-icons/fi"; // Importing the Search icon
 import axios from "../../../axios";
 
 const RidesList = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const initialStatus = location?.state?.inProgressSelected || "All";
 
+  const [status, setStatus] = useState(initialStatus);
   const handleView = (ride) => {
     navigate(`/rides/${ride?._id}`, { state: ride }); // Pass the entire driver object as state
   };
@@ -21,7 +24,6 @@ const RidesList = () => {
   const [category, setCategory] = useState("On Demand");
   const [sub, setSub] = useState("");
 
-  const [status, setStatus] = useState("All");
   const [search, setSearch] = useState("");
 
   useEffect(() => {

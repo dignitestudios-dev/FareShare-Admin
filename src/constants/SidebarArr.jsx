@@ -1,4 +1,4 @@
-import { FaRegUser } from "react-icons/fa";
+import { FaChalkboardTeacher, FaRegUser } from "react-icons/fa";
 import { LuHome } from "react-icons/lu";
 import { BiCar } from "react-icons/bi";
 import { GrUserPolice } from "react-icons/gr";
@@ -9,6 +9,7 @@ import { TbFileInvoice } from "react-icons/tb";
 import { MdOutlineContactSupport } from "react-icons/md";
 import { LiaFileInvoiceSolid } from "react-icons/lia";
 import { PiHandWithdrawBold, PiHandWithdrawLight } from "react-icons/pi";
+import { RiGraduationCapLine } from "react-icons/ri";
 
 export const sidebarArr = [
   {
@@ -45,6 +46,11 @@ export const sidebarArr = [
     title: "Vehicle Approval",
     url: "/vehicle-approval",
     icon: <IoCarSportOutline />,
+  },
+  {
+    title: "Training & Bulletin",
+    url: "/training-bulletin",
+    icon: <FaChalkboardTeacher />,
   },
   {
     title: "Invoices",

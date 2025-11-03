@@ -11,8 +11,20 @@ export const GlobalContextProvider = ({ children }) => {
     setActiveLink(active);
   };
   const test = "";
+  const handleLogout = () => {
+    localStorage.clear();
+
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+
+    route("/auth/login");
+  };
+
   return (
-    <GlobalContext.Provider value={{ test, navigate, activeLink }}>
+    <GlobalContext.Provider value={{ test, navigate, activeLink,handleLogout }}>
       {children}
     </GlobalContext.Provider>
   );
