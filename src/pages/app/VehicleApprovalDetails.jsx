@@ -26,7 +26,7 @@ const VehicleApprovalDetails = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setVehicle(JSON.parse(Cookies.get("vehicle")));
+    setVehicle(JSON.parse(localStorage.getItem("vehicle")));
   }, [id]); // Fetch details when ID changes
 
   const [open, setOpen] = useState(false);
@@ -199,7 +199,7 @@ const VehicleApprovalDetails = () => {
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-gray-100 border flex flex-col gap-2 justify-start items-start rounded-lg p-2">
               <p className="text-[14px] font-medium leading-[20px] text-[#9E9E9E]">
-                Make
+                Model
               </p>
               <p className="text-[16px] font-normal leading-[20px] text-black">
                 {vehicle?.vehicleMake}

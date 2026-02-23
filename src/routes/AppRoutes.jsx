@@ -27,6 +27,7 @@ import NemtInvoiceDetails from "../pages/app/NemtInvoiceDetails";
 import WithdrawalRequests from "../pages/app/WithdrawalRequests";
 import Trainingbulletin from "../pages/app/Trainingbulletin";
 import TrainingBulletinDetail from "../pages/app/TrainingBulletinDetail";
+import Reports from "../pages/app/Reports";
 
 export const APP_ROUTES = [
   {
@@ -127,7 +128,7 @@ export const APP_ROUTES = [
   {
     title: "Training & bulletin",
     url: "/training/:id",
-    page: <GlobalLayout page={<TrainingBulletinDetail  />} />,
+    page: <GlobalLayout page={<TrainingBulletinDetail />} />,
   },
   {
     title: "Withdrawal Requests",
@@ -149,5 +150,10 @@ export const APP_ROUTES = [
     title: "Insurance Carriers",
     url: "/insurance-carriers",
     page: <GlobalLayout page={<InsuranceCarriers />} />,
+  },
+  {
+    title: "Reports",
+    url: "/reports",
+    page: <GlobalLayout page={<Reports />} />,
   },
 ];

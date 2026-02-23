@@ -6,6 +6,7 @@ import { ErrorToast } from "../../components/app/global/Toast";
 const Broker = () => {
   const [brokerData, setBrokerData] = useState([]); // Updated variable name to camelCase
   const [loading, setLoading] = useState(false);
+  const [update, setUpdate] = useState(false);
 
   const getBrokers = async () => {
     try {
@@ -23,13 +24,13 @@ const Broker = () => {
 
   useEffect(() => {
     getBrokers();
-  }, []);
+  }, [update]);
 
   return (
     <div className="h-auto w-full ">
       {" "}
       {/* Make the container scrollable */}
-      <BrokerTable data={brokerData} loading={loading} />
+      <BrokerTable data={brokerData} loading={loading} setUpdate={setUpdate} />
     </div>
   );
 };

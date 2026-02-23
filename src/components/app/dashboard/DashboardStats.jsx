@@ -148,7 +148,7 @@ const DashboardStats = ({ stats, loading }) => {
             {stats?.activeRidesCount || 0}
           </span>
           <span className="text-black text-[14px] font-normal">
-            Total Rides
+          Active Rides
           </span>
         </div>
       </button>

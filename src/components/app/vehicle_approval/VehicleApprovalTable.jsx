@@ -139,6 +139,8 @@ const VehicleApprovalTable = ({ data, loading, setUpdate }) => {
               <thead>
                 <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
                   <th className="py-2 ">Name</th>
+                  <th className="py-2 px-4">Driver Name</th>{" "}
+                  {/* 👈 SIM / DRIVER */}
                   <th className="py-2 px-4">Make</th>
                   <th className="py-2 px-4">Model</th>
                   <th className="py-2 px-4">Plate Number</th>
@@ -186,6 +188,7 @@ const VehicleApprovalTable = ({ data, loading, setUpdate }) => {
                 currentData?.map((vehicle, index) => (
                   <React.Fragment key={index}>
                     <tr className=" border-b border-gray-200 text-[10px] text-gray-900 ">
+                      {console.log("🚀 ~ VehicleApprovalTable ~ vehicle:", vehicle)}
                       {/* Name and profile image */}
                       <td className="py-1  flex items-center">
                         <img
@@ -198,6 +201,12 @@ const VehicleApprovalTable = ({ data, loading, setUpdate }) => {
                           className="w-[25px] h-[25px] rounded-full mr-2"
                         />
                         {vehicle?.vehicleName ? vehicle?.vehicleName : "N/A"}
+                      </td>
+                      <td className="py-1 px-4">
+                        {vehicle?.driverId?.firstName &&
+                          vehicle?.driverId?.lastName
+                          ? `${vehicle.driverId.firstName} ${vehicle.driverId.lastName}`
+                          : "N/A"}
                       </td>
                       <td className="py-1 px-4">
                         {vehicle?.vehicleMake ? vehicle?.vehicleMake : "N/A"}
@@ -321,11 +330,10 @@ const VehicleApprovalTable = ({ data, loading, setUpdate }) => {
               type="button"
               key={i}
               onClick={() => goToPage(i + 1)}
-              class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${
-                currentPage === i + 1
-                  ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
-                  : "border bg-gray-50"
-              }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
+              class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${currentPage === i + 1
+                ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
+                : "border bg-gray-50"
+                }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
               aria-current="page"
             >
               {i + 1}

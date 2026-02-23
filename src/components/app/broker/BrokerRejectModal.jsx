@@ -3,48 +3,24 @@ import Modal from "react-modal";
 import { IoMdClose } from "react-icons/io";
 import { FaExclamation } from "react-icons/fa";
 
-const BlockModal = ({
-  isOpen,
-  onRequestClose,
-  onConfirm,
-  loading,
-  isBlocked,
-  isReason,
-  setReason,
-  reason
-}) => {
+const BrokerRejectModal = ({ isOpen, onRequestClose, onConfirm, loading }) => {
   return (
     <Modal
       isOpen={isOpen}
       onRequestClose={onRequestClose}
       className="flex items-center justify-center z-[1000] backdrop-blur-sm"
-      overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-[1000]  flex justify-center items-center"
+      overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-[1000] flex justify-center items-center"
     >
       <div className="bg-white p-8 rounded-[20px] shadow-lg max-w-lg w-[552px] min-h-[289px] text-center">
         <div className="flex justify-center mb-4">
           <img src="/info-icon.png" alt="" />
         </div>
         <h2 className=" font-bold mb-1 leading-[32px] text-[24px]">
-          {isBlocked ? "Block" : "Unblock"} User
+          Reject Broker Request
         </h2>
         <p className="text-[#252525] text-[16px] font-normal leading-[25.34px] mb-6">
-          Are you sure you want to {isBlocked ? "block" : "unblock"} this user.
+          Are you sure you want to reject this request?
         </p>
-        {isReason && (
-           <div className="mb-6 text-left">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Reason
-          </label>
-          <textarea
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder="Enter reason here..."
-            rows={3}
-            className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-          />
-        </div>
-
-        )}
 
         <div className="flex justify-center space-x-4">
           <button
@@ -75,4 +51,4 @@ const BlockModal = ({
   );
 };
 
-export default BlockModal;
+export default BrokerRejectModal;

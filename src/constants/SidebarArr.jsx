@@ -1,4 +1,4 @@
-import { FaChalkboardTeacher, FaRegUser } from "react-icons/fa";
+import { FaChalkboardTeacher, FaChartBar, FaRegUser } from "react-icons/fa";
 import { LuHome } from "react-icons/lu";
 import { BiCar } from "react-icons/bi";
 import { GrUserPolice } from "react-icons/gr";
@@ -51,6 +51,11 @@ export const sidebarArr = [
     title: "Training & Bulletin",
     url: "/training-bulletin",
     icon: <FaChalkboardTeacher />,
+  },
+  {
+    title: "Reports",
+    url: "/reports",
+    icon: <FaChartBar />,
   },
   {
     title: "Invoices",

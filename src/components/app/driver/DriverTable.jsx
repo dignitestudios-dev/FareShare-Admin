@@ -189,6 +189,8 @@ const DriverTable = ({ data, loading, setUpdate }) => {
                 <th className="px-4">Email</th>
                 <th className="px-4">Contact No.</th>
                 <th className="px-4">Address</th>
+                <th className="px-4">City</th>
+                <th className="px-4">State</th>
                 <th className="px-4">Registration Date</th>
                 <th className="pl-4">Action</th>
               </tr>
@@ -243,6 +245,8 @@ const DriverTable = ({ data, loading, setUpdate }) => {
                       <td className="py-1 px-4">{user?.email}</td>
                       <td className="py-1 px-4">{user?.phoneNo}</td>
                       <td className="py-1 px-4">{user?.street}</td>
+                      <td className="py-1 px-4">{user?.city}</td>
+                      <td className="py-1 px-4">{user?.state}</td>
                       <td className="py-1 px-4">
                         {convertToMMDDYYYY(user?.createdAt)}
                       </td>
@@ -295,7 +299,7 @@ const DriverTable = ({ data, loading, setUpdate }) => {
                     </tr>
                     {/* Line under each row */}
                     <tr>
-                      <td colSpan="6" className="border-b border-gray-200"></td>
+                      <td colSpan="8" className="border-b border-gray-200"></td>
                     </tr>
                   </React.Fragment>
                 );

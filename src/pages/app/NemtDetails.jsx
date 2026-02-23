@@ -165,7 +165,11 @@ const NemtDetails = () => {
                 {nemt?.userId?.patientDateofBirth
                   ? new Date(
                       nemt?.userId?.patientDateofBirth
-                    ).toLocaleDateString()
+                    ).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "2-digit",
+                      year: "numeric",
+                    })
                   : "N/A"}
               </span>
             </div>

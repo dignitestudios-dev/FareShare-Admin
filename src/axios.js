@@ -2,6 +2,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 export const baseUrl = "https://backend.faresharellc.com";
+// export const baseUrl = "https://t5cjhp19-5001.asse.devtunnels.ms";
 
 const instance = axios.create({
   baseURL: baseUrl,

@@ -34,7 +34,7 @@ const SidebarLink = ({ link, onCloseDrawer }) => {
               ? toggleSubmenu
               : () => handleNavigation(link?.url, link?.title)
           }
-          className={`w-full  h-[46px] outline-none rounded-full
+          className={`w-full  h-[43px] outline-none rounded-full
         ${
           localStorage.getItem("title") === link?.title
             ? "bg-[#c00000] text-white  relative"

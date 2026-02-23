@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { AiOutlineCalendar } from "react-icons/ai"; // Calendar icon
 import { FaCar, FaRegClock, FaRegUser } from "react-icons/fa6";
-import axios from "../../axios";
+import axios, { baseUrl } from "../../axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { Swiper } from "swiper/react";
 import { SwiperSlide } from "swiper/react";
@@ -16,19 +16,31 @@ import "swiper/css/autoplay";
 import { ErrorToast, SuccessToast } from "../../components/app/global/Toast";
 import { FiDollarSign } from "react-icons/fi";
 import BlockModal from "../../components/app/global/BlockModal";
+import { DirectionsRenderer, GoogleMap, Marker } from "@react-google-maps/api";
+
+import { initSocket } from "../../contexts/SocketContext";
 
 const RideDetails = () => {
+  const { id } = useParams();
+  const socketRef = useRef(null);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [rides, setRides] = useState({});
   const [loading, setLoading] = useState(false);
-  const { id } = useParams();
+  const [open, setOpen] = useState(false);
+  const [amount, setAmount] = useState("");
+  const [fundloading, setFundLoading] = useState(false);
+  const [roleType, setRoleType] = useState('')
+  const [driverLocation, setDriverLocation] = useState(null);
+  const [pickupLocation, setPickupLocation] = useState(null);
+  const [destinationLocation, setDestinationLocation] = useState(null);
+  const [directions, setDirections] = useState(null);
 
   const getRides = async () => {
     try {
       setLoading(true);
       const { data } = await axios.post(`/admin/rides/${id}`);
-      setRides(data?.data); // Use the data from the API response
+      setRides(data?.data);
     } catch (error) {
       console.log("Error:", error);
     } finally {
@@ -39,6 +51,122 @@ const RideDetails = () => {
   useEffect(() => {
     getRides();
   }, []);
+
+  useEffect(() => {
+    const socket = initSocket();
+    if (!socket) return;
+
+    socketRef.current = socket;
+
+
+    socket.emit("adminJoin");
+
+
+    socket.on("updateLocationResponse", (data) => {
+      if (data?.success && data?.data?.rideId === id) {
+        const [lng, lat] = data.data.coordinates;
+        console.log([lng, lat], "lng, lat")
+        setDriverLocation({ lat: Number(lat), lng: Number(lng) });
+
+      }
+    });
+
+    socket.on("reachedLocationResponse", (data) => {
+      console.log("Socket Event: reachedLocationResponse", data);
+      getRides();
+    });
+
+    socket.on("rideAccepted", (data) => {
+      console.log("Socket Event: rideAccepted", data);
+      getRides();
+    });
+
+    socket.on("rideStarted", (data) => {
+      console.log("Socket Event: rideStarted", data);
+      getRides();
+    });
+
+    socket.on("rideCompleted", (data) => {
+      console.log("Socket Event: rideCompleted", data);
+      getRides();
+      setDirections(null);
+    });
+
+    socket.on("rideCancelled", (data) => {
+      console.log("Socket Event: rideCancelled", data);
+      getRides();
+      setDirections(null);
+    });
+
+    socket.on("connect_error", (err) => console.error("Socket connect_error:", err));
+    socket.on("connect_timeout", () => console.warn("Socket connect_timeout"));
+
+    return () => socket.disconnect();
+  }, [id]);
+
+
+  useEffect(() => {
+    if (!rides?.ride) return;
+
+    if (rides.ride.currentLocation?.coordinates) {
+      const [lng, lat] = rides?.ride?.currentLocation?.coordinates;
+      setPickupLocation({ lat: Number(lat), lng: Number(lng) });
+    }
+
+    if (rides.ride.destination?.coordinates) {
+      const [lng, lat] = rides.ride.destination.coordinates;
+      setDestinationLocation({ lat: Number(lat), lng: Number(lng) });
+    }
+  }, [rides]);
+
+
+  useEffect(() => {
+    if (!pickupLocation || !destinationLocation) return;
+
+    const status = rides?.ride?.status;
+
+    let origin = null;
+    let destination = null;
+
+    if (status === "active") {
+      setDirections(null);
+      return;
+    } else if (status === "driverAssigned") {
+      origin = driverLocation || pickupLocation;
+      destination = pickupLocation;
+    } else if (status === "inProgress") {
+      origin = driverLocation || pickupLocation;
+      destination = destinationLocation;
+    } else {
+      setDirections(null);
+      return;
+    }
+
+    if (origin && destination) {
+      const directionsService = new window.google.maps.DirectionsService();
+      directionsService.route(
+        {
+          origin,
+          destination,
+          travelMode: window.google.maps.TravelMode.DRIVING,
+        },
+        (result, status) => {
+          if (status === "OK" && result) setDirections(result);
+          else setDirections(null);
+        }
+      );
+    }
+  }, [driverLocation, pickupLocation, destinationLocation, rides?.ride?.status]);
+
+
+  console.log({
+    driverLocation,
+    pickupLocation,
+    destinationLocation,
+    rideStatus: rides?.ride?.status
+  });
+
+
 
   function formatISODate(isoString) {
     const options = { weekday: "short", month: "short", day: "numeric" };
@@ -160,6 +288,37 @@ const RideDetails = () => {
   const [userOpen, setUserOpen] = useState(false);
   const [driverOpen, setDriverOpen] = useState(false);
 
+  const handleAddFund = async () => {
+    if (!amount) return ErrorToast("Enter Amount");
+
+    setFundLoading(true);
+
+    const payload = {
+      rideId: id,
+      type: roleType,
+      amount,
+    };
+
+    if (roleType === 'user') {
+      payload.userId = rides?.user?.id;
+    } else if (roleType === 'driver') {
+      payload.driverId = rides?.driver?.id;
+    }
+
+    try {
+      const response = await axios.post("admin/funds/add", payload);
+      if (response?.status === 200) {
+        SuccessToast(response?.data?.message);
+        setAmount("");
+        setOpen(false);
+      }
+    } catch (error) {
+      ErrorToast(Error?.response?.data?.message);
+    } finally {
+      setFundLoading(false);
+    }
+  };
+
   return (
     <div className="w-full h-auto  ">
       <div className="grid grid-cols-2 gap-8">
@@ -263,14 +422,99 @@ const RideDetails = () => {
                   ${rides?.ride?.fare}
                 </p>
               </div>
+              {!rides?.ride?.isWalletPay && (
+
+                <>
+                  <div className="w-full flex justify-between items-center">
+                    <p className="text-[15px] text-black font-semibold">
+                      Total Fare (Before Stripe)
+                    </p>
+                    <p className="text-[15px] text-black font-semibold">
+                      $
+                      {(rides?.ride?.stripeNet + rides?.ride?.stripeFee).toFixed(2)}
+                    </p>
+                  </div>
+
+                  <div className="w-full flex justify-between items-center">
+                    <p className="text-[15px] text-black font-semibold">
+                      Stripe Fee
+                    </p>
+                    <p className="text-[15px] text-red-500 font-semibold">
+                      ${rides?.ride?.stripeFee}
+                    </p>
+                  </div>
+
+                  <div className="w-full flex justify-between items-center">
+                    <p className="text-[15px] text-black font-semibold">
+                      Net Fare (After Stripe)
+                    </p>
+                    <p className="text-[15px] text-green-600 font-semibold">
+                      ${rides?.ride?.stripeNet}
+                    </p>
+                  </div>
+                  <div className="w-full flex justify-between items-center">
+                    <p className="text-[15px] tex4t-black font-semibold">
+                      Card Number
+                    </p>
+
+                    <p className="text-[15px] text-blue-900 font-semibold">
+                      {rides?.ride?.cardBrand
+                        ? `${rides?.ride?.cardBrand} •••• ${rides?.ride?.cardLast4}`
+                        : "No card"}
+                    </p>
+                  </div>
+                </>
+              )}
+
+
+              {rides?.ride?.isWalletPay && (
+                <>
+                  <div className="w-full flex justify-between items-center">
+                    <p className="text-[15px] text-black font-semibold">
+                      Used Credits
+                    </p>
+
+                    <p className="text-[15px] text-blue-900 font-semibold">
+                      {rides?.ride?.walletPayAmount
+                        ? `${rides?.ride?.walletPayAmount} `
+                        : "not Found"}
+                    </p>
+                  </div>
+                  <div className="w-full flex justify-between items-center">
+                    <p className="text-[15px] text-black font-semibold">
+                      Available Credits
+                    </p>
+
+                    <p className="text-[15px] text-blue-900 font-semibold">
+                      {rides?.user?.totalFunds
+                        ? `${rides?.user?.totalFunds} `
+                        : "0"}
+                    </p>
+                  </div>
+                </>
+
+              )}
+
+
             </div>
           </div>
 
           <div className="w-full grid grid-cols-1 gap-4 justify-start items-start">
             <div className="w-full flex flex-col justify-start items-start gap-2 bg-gray-50 border rounded-3xl p-4">
-              <h3 className="text-[16px] font-semibold text-black">
-                Driver Info
-              </h3>
+              <div className="flex justify-between  w-full items-center ">
+                <h3 className="text-[16px] font-semibold text-black">
+                  Driver Info
+                </h3>
+                <button
+                  onClick={() => {
+                    setOpen(true)
+                    setRoleType('driver')
+                  }}
+                  className={`w-[120px] h-[39px] rounded-xl text-white font-semibold transition bg-[#c00000] hover:bg-red-700`} >
+                  Add Funds
+                </button>
+              </div>
+
               <div className="w-full flex items-center justify-between  ">
                 <div className="flex items-center">
                   <img
@@ -308,10 +552,22 @@ const RideDetails = () => {
                 </div>
               </>
             </div>
-            <div className="w-full flex flex-col justify-start items-start gap-2 bg-gray-50 border rounded-3xl p-4">
-              <h3 className="text-[16px] font-semibold text-black">
-                User Info
-              </h3>
+            <div className="w-full flexjustify-start items-start gap-2 bg-gray-50 border rounded-3xl p-4">
+              <div className="flex justify-between  w-full items-center ">
+                <h3 className="text-[16px] font-semibold text-black">
+                  User Info
+                </h3>
+                <button
+                  onClick={() => {
+                    setOpen(true)
+                    setRoleType('user')
+                  }}
+                  className={`w-[120px] h-[39px] rounded-xl text-white font-semibold transition bg-[#c00000] hover:bg-red-700`} >
+                  Add Funds
+                </button>
+
+              </div>
+
               <div className="w-full flex items-center justify-between  ">
                 <div className="flex items-center">
                   <img
@@ -350,6 +606,69 @@ const RideDetails = () => {
                     : "N/A"}
                 </div>
               </>
+            </div>
+            <div>
+              {rides?.ride?.status == "cancelled" && (
+                <div className="bg-gray-50 border rounded-3xl p-6 ">
+                  <h3 className="text-[22px] font-semibold mb-6 text-black">
+                    Cancellation Reason
+                  </h3>
+
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="bg-gray-100 border rounded-lg p-2 relative">
+                      {rides?.user?.id && (
+                        <button
+                          onClick={() => setUserOpen(true)}
+                          className="w-24 px-3 h-7 rounded-md absolute top-2 right-2 flex items-center justify-center text-xs font-medium bg-[#1c1c1c] text-white"
+                        >
+                          {"Block User"}
+                        </button>
+                      )}
+                      <p className="text-[14px] text-black">User</p>
+                      <p className="text-[16px] font-medium text-black">
+                        {rides?.ride?.cancelledBy == "user" &&
+                          rides?.ride?.cancellationReason[0]
+                          ? rides?.ride?.cancellationReason[0]
+                          : "Automated Cancellation - No Driver Found."}
+                      </p>
+                    </div>
+
+                    <BlockModal
+                      isOpen={userOpen}
+                      onRequestClose={() => setUserOpen(false)}
+                      onConfirm={() => toggleUserBlock(true, rides?.user?.id)}
+                      loading={userLoading}
+                      isBlocked={true}
+                    />
+                    <div className="bg-gray-100 border rounded-lg p-2 relative">
+                      {rides?.driver?.id && (
+                        <button
+                          onClick={() => setDriverOpen(true)}
+                          className="w-24 px-3 h-7 rounded-md absolute top-2 right-2 flex items-center justify-center text-xs font-medium bg-[#1c1c1c] text-white"
+                        >
+                          {"Block Driver"}
+                        </button>
+                      )}
+
+                      <BlockModal
+                        isOpen={driverOpen}
+                        onRequestClose={() => setDriverOpen(false)}
+                        onConfirm={() => toggleDriverBlock(true, rides?.driver?.id)}
+                        loading={driverLoading}
+                        isBlocked={true}
+                      />
+
+                      <p className="text-[14px] text-black">Driver</p>
+                      <p className="text-[16px] font-medium text-black">
+                        {rides?.ride?.cancelledBy == "driver" &&
+                          rides?.ride?.cancellationReason[0]
+                          ? rides?.ride?.cancellationReason[0]
+                          : "N/A"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -390,6 +709,46 @@ const RideDetails = () => {
             </span>
           </div>
           {/* Vehicle Detail */}
+          {rides?.ride?.status !== "cancelled" && rides?.ride?.status !== "completed" && (
+            <div className="bg-gray-50 border rounded-3xl p-6">
+              <h3 className="text-[22px] font-semibold mb-4 text-black">
+                Ride Route Map
+              </h3>
+
+              {(pickupLocation || destinationLocation) && (
+                <GoogleMap
+                  center={driverLocation || pickupLocation}
+                  zoom={12}
+                  mapContainerStyle={{ width: "100%", height: "400px" }}
+                >
+
+                  {pickupLocation && <Marker position={pickupLocation} label="P" />}
+                  {destinationLocation && <Marker position={destinationLocation} label="D" />}
+
+
+                  {driverLocation && <Marker position={driverLocation} label="🚗" />}
+
+
+                  {directions && (
+                    <DirectionsRenderer
+                      directions={directions}
+                      options={{
+                        suppressMarkers: true,
+                        polylineOptions: {
+                          strokeColor: "#c00000",
+                          strokeWeight: 5,
+                        },
+                      }}
+                    />
+                  )}
+
+                </GoogleMap>
+              )}
+
+            </div>
+
+          )}
+
           <div className="bg-gray-50 border rounded-3xl p-6 ">
             <h3 className="text-[22px] font-semibold mb-6 text-black">
               Vehicle Details
@@ -507,70 +866,104 @@ const RideDetails = () => {
             </div>
           </div>
 
-          {rides?.ride?.status == "cancelled" && (
-            <div className="bg-gray-50 border rounded-3xl p-6 ">
-              <h3 className="text-[22px] font-semibold mb-6 text-black">
-                Cancellation Reason
-              </h3>
 
-              <div className="grid grid-cols-1 gap-4">
-                <div className="bg-gray-100 border rounded-lg p-2 relative">
-                  {rides?.user?.id && (
-                    <button
-                      onClick={() => setUserOpen(true)}
-                      className="w-24 px-3 h-7 rounded-md absolute top-2 right-2 flex items-center justify-center text-xs font-medium bg-[#1c1c1c] text-white"
-                    >
-                      {"Block User"}
-                    </button>
-                  )}
-                  <p className="text-[14px] text-black">User</p>
-                  <p className="text-[16px] font-medium text-black">
-                    {rides?.ride?.cancelledBy == "user" &&
-                    rides?.ride?.cancellationReason[0]
-                      ? rides?.ride?.cancellationReason[0]
-                      : "Automated Cancellation - No Driver Found."}
-                  </p>
-                </div>
 
-                <BlockModal
-                  isOpen={userOpen}
-                  onRequestClose={() => setUserOpen(false)}
-                  onConfirm={() => toggleUserBlock(true, rides?.user?.id)}
-                  loading={userLoading}
-                  isBlocked={true}
-                />
-                <div className="bg-gray-100 border rounded-lg p-2 relative">
-                  {rides?.driver?.id && (
-                    <button
-                      onClick={() => setDriverOpen(true)}
-                      className="w-24 px-3 h-7 rounded-md absolute top-2 right-2 flex items-center justify-center text-xs font-medium bg-[#1c1c1c] text-white"
-                    >
-                      {"Block Driver"}
-                    </button>
+        </div>
+      </div>
+      <div className="bg-gray-50 border rounded-3xl p-6 mt-4">
+        <h3 className="text-[22px] font-semibold mb-4 text-black">
+          Chat History
+        </h3>
+        <div className="flex flex-col gap-4 max-h-[400px] overflow-y-auto p-2">
+          {/* Check if there are any messages at all */}
+          {(!rides?.chatHistories ||
+            rides.chatHistories.every(
+              (chat) => chat?.messages?.length === 0
+            )) && (
+              <p className="text-black text-center">No chat history available.</p>
+            )}
+
+          {rides?.chatHistories?.map((chat) =>
+            chat?.messages?.map((msg) => {
+              const isUser = msg.user.id === rides?.user?.id; // true if message is from rider
+              return (
+                <div
+                  key={msg.id}
+                  className={`flex items-start gap-3 ${isUser ? "justify-start" : "justify-end"
+                    }`}
+                >
+                  {/* Left: show profile for user */}
+                  {isUser && (
+                    <img
+                      src={msg.user.profilePicture || "https://placehold.co/50"}
+                      alt={msg.user.name}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
                   )}
 
-                  <BlockModal
-                    isOpen={driverOpen}
-                    onRequestClose={() => setDriverOpen(false)}
-                    onConfirm={() => toggleDriverBlock(true, rides?.driver?.id)}
-                    loading={driverLoading}
-                    isBlocked={true}
-                  />
+                  {/* Message Bubble */}
+                  <div
+                    className={`p-3 rounded-2xl max-w-xs ${isUser
+                      ? "bg-blue-100 text-black rounded-bl-none"
+                      : "bg-green-100 text-black rounded-tr-none"
+                      }`}
+                  >
+                    <p className="text-sm font-semibold">{msg.user.name}</p>
+                    <p className="text-sm">{msg.msg}</p>
+                  </div>
 
-                  <p className="text-[14px] text-black">Driver</p>
-                  <p className="text-[16px] font-medium text-black">
-                    {rides?.ride?.cancelledBy == "driver" &&
-                    rides?.ride?.cancellationReason[0]
-                      ? rides?.ride?.cancellationReason[0]
-                      : "N/A"}
-                  </p>
+                  {/* Right: show profile for driver */}
+                  {!isUser && (
+                    <img
+                      src={msg.user.profilePicture || "https://placehold.co/50"}
+                      alt={msg.user.name}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  )}
                 </div>
-              </div>
-            </div>
+              );
+            })
           )}
         </div>
       </div>
-    </div>
+
+      {
+        open && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl p-6 w-[350px]">
+              <h3 className="text-lg font-semibold mb-4">
+                Add Ride Amount
+              </h3>
+
+              <input
+                type="number"
+                placeholder="Enter amount"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 mb-4"
+              />
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setOpen(false)}
+                  className="px-4 py-2 rounded-lg border"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={handleAddFund}
+                  disabled={fundloading}
+                  className="px-4 py-2 rounded-lg bg-[#c00000] text-white"
+                >
+                  {fundloading ? "Adding..." : "Submit"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )
+      }
+    </div >
   );
 };
 

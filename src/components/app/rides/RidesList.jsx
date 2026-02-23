@@ -85,10 +85,16 @@ const RidesList = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  // Sort by Date of Service (chronological — old → new)
+  const sortedData = [...filteredData].sort((a, b) => {
+    const dateA = new Date(a?.ride?.registrationDate);
+    const dateB = new Date(b?.ride?.registrationDate);
+    return dateA - dateB; // chronological
+  });
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
 
-  const currentData = filteredData.slice(
+  const currentData = sortedData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -152,7 +158,7 @@ const RidesList = () => {
               <option value={"All"}>All</option>
 
               <option value={"InProgress"}>In Progress</option>
-              <option value={"Pending"}>Pending</option>
+              <option value={"Pending"}>End Ride Monitoring</option>
               <option value={"Completed"}>Completed</option>
               <option value={"Cancelled"}>Cancelled</option>
             </select>
@@ -254,7 +260,7 @@ const RidesList = () => {
                   <th className="py-2 ">User</th>
                   <th className="py-2">Driver</th>
                   <th className="py-2 px-4">Ridetype </th>
-                  <th className="py-2 px-4">Registration Date</th>
+                  <th className="py-2 px-4">Date of Service</th>
                   <th className="py-2 px-4">Status</th>
                   <th className="py-2 px-4">Action</th>
                 </tr>
@@ -346,8 +352,11 @@ const RidesList = () => {
                         {convertToMMDDYYYY(ride?.ride?.registrationDate)}
                       </td>
                       <td className="py-1 px-4 capitalize">
-                        {ride?.ride?.status}
+                        {ride?.ride?.status === "Pending"
+                          ? "End Ride Monitoring"
+                          : ride?.ride?.status}
                       </td>
+
                       <td className="py-1 px-4">
                         <button
                           onClick={() => handleView(ride)}
