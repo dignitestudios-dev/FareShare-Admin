@@ -215,7 +215,29 @@ const UserRidesTable = ({ user }) => {
   const preferabilityPercent =
     total > 0 ? `${Math.round((yes / total) * 100)}%` : "0%";
 
+  const downloadCSV = () => {
+    const rows = user?.fundsHistory?.map(item => ({
+      amount: item.amount,
+      brand: item.brand,
+      last4: item.last4,
+      date: new Date(item.createdAt).toLocaleString(),
+    }));
 
+    const csv = [
+      ["Brand", "Last4", "Amount", "Date"],
+      ...rows.map(r => [r.brand, r.last4, r.amount, r.date])
+    ]
+      .map(e => e.join(","))
+      .join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "fund-transactions.csv";
+    a.click();
+  };
 
   return (
     <div className="w-full flex flex-col gap-4 justify-start items-start">
@@ -285,10 +307,18 @@ const UserRidesTable = ({ user }) => {
 
       </div>
       <div className="w-full bg-gray-50 border rounded-3xl p-4">
-        <h3 className="text-[20px] font-bold text-black mb-4">
-          Fund Transactions
-        </h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-[20px] font-bold text-black">
+            Fund Transactions
+          </h3>
 
+          <button
+            onClick={downloadCSV}
+            className="bg-[#c00000] text-white px-4 py-2 rounded-lg text-sm"
+          >
+            Download / Print
+          </button>
+        </div>
         <div className="flex flex-col gap-3">
           {user?.fundsHistory?.length > 0 ? (
             user?.fundsHistory?.map((item, index) => (
@@ -307,10 +337,13 @@ const UserRidesTable = ({ user }) => {
                       **** **** **** {item.last4}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {new Date(item.createdAt).toLocaleDateString("en-US", {
+                      {new Date(item.createdAt).toLocaleString("en-US", {
                         month: "short",
                         day: "2-digit",
                         year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: true,
                       })}
                     </span>
                   </div>

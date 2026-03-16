@@ -695,7 +695,7 @@ const DriverDetails = () => {
           </span>
           <div className="flex flex-col">
             <span className="text-[18px] font-bold text-black">
-              {driver?.approvedWithdrawAmount}
+              {driver?.approvedWithdrawAmount ? driver?.approvedWithdrawAmount.toFixed(2) : "0.00"}
             </span>
             <span className="text-[14px] text-gray-700">
               Withdraw Amount
@@ -932,7 +932,10 @@ const DriverDetails = () => {
           <div className="w-full min-h-52 col-span-2 flex flex-col items-center justify-center">
             <img src="/no-data.png" alt="" className="w-[150px]" />
             <span className="font-semibold text-center text-[#0e0e10] text-[20px] ">
-              You don’t have added any <br /> Listing Here
+
+
+              No Feedback Available Yet!
+
             </span>
           </div>
         )}
@@ -1021,13 +1024,17 @@ const DriverDetails = () => {
                 className="bg-gray-100 border  relative rounded-2xl p-4"
               >
                 <div className="absolute top-2 left-2 z-10 bg-black/70 text-white text-[12px] px-2 py-1 rounded-md">
-                  {new Date(vehicle?.updatedAt).toLocaleDateString("en-US", {
+                  {new Date(vehicle?.updatedAt).toLocaleString("en-US", {
                     month: "short",
                     day: "2-digit",
                     year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: true, // AM/PM format
                   })}
                 </div>
-                {console.log(vehicle?.updatedAt, "vehicle")}
+
                 <Swiper
                   spaceBetween={10}
                   centeredSlides={true}

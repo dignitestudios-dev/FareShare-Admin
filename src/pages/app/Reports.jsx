@@ -74,7 +74,7 @@ export default function Reports() {
                     "Online Hours": driver?.onlineHours
                         ? `${driver.onlineHours}h`
                         : "0h",
-                    "Limit Status": driver?.exceedsLimit ? "Exceeded" : "OK",
+                    "Limit Status": driver?.exceedsLimit ? "Exceeded" : "Moderate",
                     "Acceptance Rate": driver?.acceptanceRate
                         ? `${driver.acceptanceRate}%`
                         : "0%",
