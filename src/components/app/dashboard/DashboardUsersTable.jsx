@@ -115,7 +115,7 @@ const DashboardUsersTable = () => {
                 <tr className="bg-gray-50 text-[10px] text-gray-900 ">
                   <td className="flex  items-center gap-3 py-1">
                     <img
-                      src={user?.profilePicture}
+                      src={user?.profilePicture||"/person.png"}
                       alt={user?.firstName}
                       className="w-8 h-8 rounded-full"
                     />

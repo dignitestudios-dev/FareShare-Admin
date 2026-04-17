@@ -465,8 +465,6 @@ const RideDetails = () => {
                   </div>
                 </>
               )}
-
-
               {rides?.ride?.isWalletPay && (
                 <>
                   <div className="w-full flex justify-between items-center">

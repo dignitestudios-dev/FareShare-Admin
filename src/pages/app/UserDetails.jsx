@@ -10,17 +10,28 @@ const UserDetails = () => {
   const user = location?.state;
   const navigate = useNavigate();
   const { id } = useParams();
+  function convertToMMDDYYYY(dateString) {
+    if (dateString == null) return "Invalid Date";
+    const date = new Date(dateString);
+    // Get the month, day, and year
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+    const day = String(date.getDate()).padStart(2, "0");
+    const year = date.getFullYear();
+
+    return `${month}-${day}-${year}`;
+  }
 
   const [isBlocked, setIsBlocked] = useState(false);
-  const [editLoading, setEditLoading] = useState(false)
+  const [editLoading, setEditLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [reason, setReason] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+
   const [formData, setFormData] = useState({
     firstName: user?.firstName || "",
     lastName: user?.lastName || "",
-    email: user?.email || "",          // still here
+    email: user?.email || "", // still here
     phoneNo: user?.phoneNo || "",
     MI: user?.MI || "",
     suffix: user?.suffix || "",
@@ -30,7 +41,7 @@ const UserDetails = () => {
     city: user?.city || "",
     state: user?.state || "",
     postalCode: user?.postalCode || "",
-    funds: user?.funds || 0,          // still here
+    funds: user?.funds || 0, // still here
     preview: user?.profilePicture || "",
     file: null,
   });
@@ -49,7 +60,7 @@ const UserDetails = () => {
     }
   };
   const handleSave = async () => {
-    setEditLoading(true)
+    setEditLoading(true);
 
     try {
       setLoading(true);
@@ -57,9 +68,14 @@ const UserDetails = () => {
       Object.keys(formData).forEach((key) => {
         if (key === "file" && formData.file) {
           form.append("profilePicture", formData.file);
-        } else if (key !== "preview" && key !== "file" && key !== "email" && key !== "funds" && key !== "phoneNo") {
+        } else if (
+          key !== "preview" &&
+          key !== "file" &&
+          key !== "email" &&
+          key !== "funds" &&
+          key !== "phoneNo"
+        ) {
           form.append(key, formData[key]);
-
         }
       });
 
@@ -68,7 +84,6 @@ const UserDetails = () => {
       if (data?.success) {
         SuccessToast("User updated successfully!");
         setIsEditing(false);
-
       }
     } catch (error) {
       ErrorToast(error?.response?.data?.message || "Failed to update user.");
@@ -92,11 +107,9 @@ const UserDetails = () => {
         SuccessToast(
           isBlocked
             ? "User blocked Successfully."
-            : "User Unblocked Successfully."
+            : "User Unblocked Successfully.",
         );
       }
-
-
     } catch (error) {
       ErrorToast(error?.response?.data?.message);
       console.log(error);
@@ -104,6 +117,8 @@ const UserDetails = () => {
       setLoading(false);
     }
   };
+
+  console.log(user, "user---detail");
 
   return (
     <div className="w-full h-auto flex flex-col justify-start items-start gap-4">
@@ -151,7 +166,6 @@ const UserDetails = () => {
                   {editLoading ? "Saving..." : "Save"}
                 </button>
                 <button
-
                   onClick={() => setIsEditing(false)}
                   className="w-auto px-3 h-7 rounded-full flex items-center justify-center text-xs font-medium bg-red-600 text-white"
                 >
@@ -202,7 +216,7 @@ const UserDetails = () => {
               />
             ) : (
               <img
-                src={formData.preview}
+                src={formData.preview || "/person.png"}
                 alt="Profile"
                 className="w-full h-full aspect-square object-contain rounded-lg"
               />
@@ -227,13 +241,21 @@ const UserDetails = () => {
                 key={index}
                 className="flex flex-col bg-gray-100 border p-2 rounded-xl"
               >
-                <span className="text-[12px] text-[#9E9E9E]">{field.label}</span>
+                <span className="text-[12px] text-[#9E9E9E]">
+                  {field.label}
+                </span>
                 {isEditing ? (
-
-                  field.name === "email" || field.name === "funds" || field.name === "phoneNo" || field.name === "city" || field.name === "street" || field.name === "state" || field.name === "postalCode" ? (
-
+                  field.name === "email" ||
+                  field.name === "funds" ||
+                  field.name === "phoneNo" ||
+                  field.name === "city" ||
+                  field.name === "street" ||
+                  field.name === "state" ||
+                  field.name === "postalCode" ? (
                     <span className="text-[13px] font-medium text-black">
-                      {field.name === "funds" ? `$${formData[field.name]}` : formData[field.name]}
+                      {field.name === "funds"
+                        ? `$${formData[field.name]}`
+                        : formData[field.name]}
                     </span>
                   ) : field.extra ? (
                     <div className="flex gap-1">
@@ -256,7 +278,11 @@ const UserDetails = () => {
                     <input
                       type="date"
                       name={field.name}
-                      value={new Date(formData[field.name]).toISOString().split("T")[0]}
+                      value={
+                        new Date(formData[field.name])
+                          .toISOString()
+                          .split("T")[0]
+                      }
                       onChange={handleInputChange}
                       className="border rounded p-1 text-[13px]"
                     />
@@ -286,11 +312,119 @@ const UserDetails = () => {
             ))}
           </div>
         </div>
+        {user?.nemtEligibility && (
+          <div className="w-full mt-5 bg-gray-50  rounded-3xl border p-6 h-auto  mb-6">
+            <h3 className="font-bold mb-4 text-black text-[24px]">
+              Eligibility Verification
+            </h3>
+            <div className="w-full grid grid-cols-3 gap-6">
+              {/* Eligibility from date */}
+              <div className="flex flex-col bg-gray-100 border p-4 rounded-lg">
+                <span className="text-[14px] text-[#9E9E9E]">
+                  Eligibility from date
+                </span>
+                <span className="text-[16px] font-medium text-black">
+                  {convertToMMDDYYYY(user?.nemtEligibility?.eligiblityFormDate)}
+                </span>
+              </div>
 
+              {/* Eligibility through Date */}
+              <div className="flex flex-col bg-gray-100 border p-4 rounded-lg">
+                <span className="text-[14px] text-[#9E9E9E]">
+                  Eligibility through Date
+                </span>
+                <span className="text-[16px] font-medium text-black">
+                  {convertToMMDDYYYY(
+                    user?.nemtEligibility?.eligiblityThroughDate,
+                  )}
+                </span>
+              </div>
+
+              {/* Insurance Carrier */}
+              <div className="flex flex-col bg-gray-100 border p-4 rounded-lg">
+                <span className="text-[14px] text-[#9E9E9E]">
+                  Insurance Carrier
+                </span>
+                <span className="text-[16px] font-medium text-black">
+                  {user?.nemtEligibility?.insuranceCarrier}
+                </span>
+              </div>
+
+              {/* Medicaid No./Insurance No. */}
+              <div className="flex flex-col bg-gray-100 border p-4 rounded-lg">
+                <span className="text-[14px] text-[#9E9E9E]">
+                  Medicaid No./Insurance No.
+                </span>
+                <span className="text-[16px] font-medium text-black">
+                  {user?.nemtEligibility?.insuranceNumber}
+                </span>
+              </div>
+
+              {/* Subscriber Number */}
+              <div className="flex flex-col bg-gray-100 border p-4 rounded-lg">
+                <span className="text-[14px] text-[#9E9E9E]">
+                  Subscriber Number
+                </span>
+                <span className="text-[16px] font-medium text-black">
+                  {user?.nemtEligibility?.subscriberNumber}
+                </span>
+              </div>
+
+              {/* Social Security Number */}
+              <div className="flex flex-col bg-gray-100 border p-4 rounded-lg">
+                <span className="text-[14px] text-[#9E9E9E]">
+                  Social Security Number
+                </span>
+                <span className="text-[16px] font-medium text-black">
+                  {user?.nemtEligibility?.socialSecurityNumber}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="w-full flex flex-col gap-5 rounded-xl bg-gray-100 border p-5 mt-5">
+          <h3 className="text-[20px] font-bold text-black">
+            Identity Card Documents
+          </h3>
+          <div className="w-full flex items-center justify-center">
+            {user?.identityCardDocumentFront && (
+              <div className="w-fit h-[320px] flex items-center justify-center">
+                <img
+                  src={user?.identityCardDocumentFront}
+                  alt="Profile"
+                  className="w-full h-full aspect-square object-contain rounded-lg"
+                />
+              </div>
+            )}
+
+            {user?.identityCardDocumentBack && (
+              <div className="w-fit h-[320px] flex items-center justify-center">
+                <img
+                  src={user?.identityCardDocumentBack}
+                  alt="Profile"
+                  className="w-full h-full aspect-square object-contain rounded-lg"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="w-full flex flex-col gap-5 rounded-xl bg-gray-100 border p-5 mt-5">
+          <h3 className="text-[20px] font-bold text-black">
+            Reasons to End the Ride
+          </h3>
+
+          <ul className="list-disc pl-4">
+            <li>Driver being verbally abusive <span className="font-bold">(0)</span></li>
+            <li>Driver being physically abusive <span className="font-bold">(0)</span></li>
+            <li>Other <span className="font-bold">(0)</span></li>
+          </ul>
+        </div>
       </div>
 
       <UserRidesTable user={user} />
-    </div >
+    </div>
   );
 };
 

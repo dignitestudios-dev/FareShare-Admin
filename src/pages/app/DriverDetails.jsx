@@ -3,7 +3,13 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import UserRidesTable from "../../components/app/users/UserRidesTable";
 import { ErrorToast, SuccessToast } from "../../components/app/global/Toast";
 import axios from "../../axios";
-import { FaChartLine, FaFilePdf, FaMoneyBillWave, FaStarHalfAlt, FaWallet } from "react-icons/fa";
+import {
+  FaChartLine,
+  FaFilePdf,
+  FaMoneyBillWave,
+  FaStarHalfAlt,
+  FaWallet,
+} from "react-icons/fa";
 import { Swiper, SwiperSlide } from "swiper/react";
 // Import Swiper styles
 import "swiper/css";
@@ -36,38 +42,40 @@ const DriverDetails = () => {
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [dateFilter, setDateFilter] = useState("");
-  const [criminalRecords, setCriminalRecords] = useState(driver?.criminalRecord || []);
+  const [criminalRecords, setCriminalRecords] = useState(
+    driver?.criminalRecord || [],
+  );
   const [isEditing, setIsEditing] = useState(false);
-  const [editLoading, setEditLoading] = useState(false)
+  const [editLoading, setEditLoading] = useState(false);
   const [documents, setDocuments] = useState({
     socialSecurityCardFront: driver?.socialSecurityCardFront || "",
     socialSecurityCardBack: driver?.socialSecurityCardBack || "",
     driverLicenseCardFront: driver?.driverLicenseCardFront || "",
     driverLicenseCardBack: driver?.driverLicenseCardBack || "",
     criminalRecords: driver?.criminalRecord || [], // <-- move criminal records here
-    files: {} // store actual File objects for upload
+    files: {}, // store actual File objects for upload
   });
   const handleDocumentChange = (e) => {
     const { name, files } = e.target;
     if (!files.length) return;
 
     if (name === "criminalRecords") {
-
-      const newPreviews = Array.from(files).map(file => URL.createObjectURL(file));
-      setDocuments(prev => ({
+      const newPreviews = Array.from(files).map((file) =>
+        URL.createObjectURL(file),
+      );
+      setDocuments((prev) => ({
         ...prev,
         criminalRecords: [...prev.criminalRecords, ...newPreviews],
         files: {
           ...prev.files,
-          [name]: [...(prev.files[name] || []), ...Array.from(files)]
-        }
+          [name]: [...(prev.files[name] || []), ...Array.from(files)],
+        },
       }));
     } else {
-
-      setDocuments(prev => ({
+      setDocuments((prev) => ({
         ...prev,
         [name]: URL.createObjectURL(files[0]),
-        files: { ...prev.files, [name]: files[0] }
+        files: { ...prev.files, [name]: files[0] },
       }));
     }
   };
@@ -102,7 +110,7 @@ const DriverDetails = () => {
         SuccessToast(
           isBlocked
             ? "Driver blocked Successfully."
-            : "Driver Unblocked Successfully."
+            : "Driver Unblocked Successfully.",
         );
       }
 
@@ -122,7 +130,7 @@ const DriverDetails = () => {
     try {
       setFeedLoading(true);
       const { data } = await axios.get(
-        `/feedback/driver/${id}?page=1&limit=1000`
+        `/feedback/driver/${id}?page=1&limit=1000`,
       );
       setFeedback(data?.data); // Use the data from the API response
     } catch (error) {
@@ -138,7 +146,7 @@ const DriverDetails = () => {
     try {
       setVehicleLoading(true);
       const { data } = await axios.get(
-        `/admin/vehicle/driver/${id}?page=1&limit=1000`
+        `/admin/vehicle/driver/${id}?page=1&limit=1000`,
       );
       setVehicles(data?.data); // Use the data from the API response
     } catch (error) {
@@ -174,7 +182,7 @@ const DriverDetails = () => {
 
   const currentData = filteredFeedback.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   const goToPage = (pageNumber) => {
@@ -254,8 +262,6 @@ const DriverDetails = () => {
 
   const [closeDriverOpen, setCloseDriverOpen] = useState(false);
 
-
-
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "profilePicture" && files[0]) {
@@ -276,11 +282,12 @@ const DriverDetails = () => {
   const handleSave = async () => {
     // Validation
 
-
     // If any license file updated → require both + expiry date
     if (isLicenseUpdating) {
-
-      if (!documents.files?.driverLicenseCardFront || !documents.files?.driverLicenseCardBack) {
+      if (
+        !documents.files?.driverLicenseCardFront ||
+        !documents.files?.driverLicenseCardBack
+      ) {
         ErrorToast("Upload both license front and back");
         return;
       }
@@ -296,27 +303,37 @@ const DriverDetails = () => {
       const form = new FormData();
 
       // Append normal driver fields
-      Object.keys(formData).forEach(key => {
-        if (key === "file" && formData.file) form.append("profilePicture", formData.file);
-        else if (!["preview", "file", "email", "funds", "phoneNo", "address"].includes(key)) form.append(key, formData[key]);
+      Object.keys(formData).forEach((key) => {
+        if (key === "file" && formData.file)
+          form.append("profilePicture", formData.file);
+        else if (
+          !["preview", "file", "email", "funds", "phoneNo", "address"].includes(
+            key,
+          )
+        )
+          form.append(key, formData[key]);
       });
 
-
-      Object.keys(documents.files).forEach(key => {
+      Object.keys(documents.files).forEach((key) => {
         if (key === "criminalRecords") {
-          documents.files[key].forEach(file => form.append("criminalRecords", file));
+          documents.files[key].forEach((file) =>
+            form.append("criminalRecords", file),
+          );
         } else {
           form.append(key, documents.files[key]);
         }
       });
       if (criminalRecordsToDelete?.length) {
-        criminalRecordsToDelete.forEach(url => {
+        criminalRecordsToDelete.forEach((url) => {
           form.append("criminalRecordsToDelete[]", url);
         });
       }
 
       if (documents.driverLicenseExpiryDate) {
-        form.append("driverLicenseExpiryDate", documents.driverLicenseExpiryDate);
+        form.append(
+          "driverLicenseExpiryDate",
+          documents.driverLicenseExpiryDate,
+        );
       }
 
       const { data } = await axios.put(`/admin/driver/profile/${id}`, form);
@@ -324,7 +341,6 @@ const DriverDetails = () => {
       if (data?.success) {
         SuccessToast("User updated successfully!");
         setIsEditing(false);
-
       }
     } catch (error) {
       ErrorToast(error?.response?.data?.message || "Failed to update user.");
@@ -340,15 +356,12 @@ const DriverDetails = () => {
         driverId: JSON.parse(Cookies?.get("driver"))?._id,
         isApproved: true,
         vehicleType: "Standard",
-
       });
       if (data?.success) {
         setDriverOpen(false);
         navigate("/drivers");
         SuccessToast("Driver Approved Successfully.");
       }
-
-
     } catch (error) {
       ErrorToast(error?.response?.data?.message);
     } finally {
@@ -372,8 +385,6 @@ const DriverDetails = () => {
         navigate("/drivers");
         SuccessToast("Driver Rejected Successfully.");
       }
-
-
     } catch (error) {
       ErrorToast(error?.response?.data?.message);
     } finally {
@@ -399,17 +410,14 @@ const DriverDetails = () => {
 
     try {
       setUploading(true);
-      const response = await axios.post(
-        "admin/uploadCriminalRecord",
-        formData
-      );
+      const response = await axios.post("admin/uploadCriminalRecord", formData);
 
       if (response.status === 200) {
         SuccessToast("Files uploaded successfully!");
 
-        setCriminalRecords(prev => [
+        setCriminalRecords((prev) => [
           ...prev,
-          ...selectedFile.map(f => URL.createObjectURL(f))
+          ...selectedFile.map((f) => URL.createObjectURL(f)),
         ]);
         setSelectedFiles([]);
       }
@@ -422,7 +430,7 @@ const DriverDetails = () => {
   };
   const handleDeleteCriminalRecord = (recordUrl) => {
     // preview se remove
-    console.log(recordUrl, "recordUrl")
+    console.log(recordUrl, "recordUrl");
     setCriminalRecords((prev) => prev.filter((r) => r !== recordUrl));
 
     // delete list me add
@@ -529,7 +537,6 @@ const DriverDetails = () => {
                   {editLoading ? "Saving..." : "Save"}
                 </button>
                 <button
-
                   onClick={() => setIsEditing(false)}
                   className="w-auto px-3 h-7 rounded-full flex items-center justify-center text-xs font-medium bg-red-600 text-white"
                 >
@@ -553,11 +560,9 @@ const DriverDetails = () => {
               loading={declineDriverLoading}
             />
           </div>
-
         </div>
         {driver?.isBlocked && driver?.blockedReason && (
           <div className="w-full flex items-start gap-3 bg-red-50 border border-red-200 rounded-2xl p-4 mb-4">
-
             {/* Icon */}
             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
               <span className="text-red-600 text-lg">⚠️</span>
@@ -572,7 +577,6 @@ const DriverDetails = () => {
                 {driver.blockedReason}
               </p>
             </div>
-
           </div>
         )}
         <div className="w-full grid grid-cols-4 justify-start items-start gap-4">
@@ -609,12 +613,18 @@ const DriverDetails = () => {
                 key={index}
                 className="flex flex-col bg-gray-100 border p-2 rounded-xl"
               >
-                <span className="text-[12px] text-[#9E9E9E]">{field.label}</span>
+                <span className="text-[12px] text-[#9E9E9E]">
+                  {field.label}
+                </span>
                 {isEditing ? (
-                  field.name === "email" || field.name === "phoneNo" || field.name === "city" || field.name === "address" ? (
-
+                  field.name === "email" ||
+                  field.name === "phoneNo" ||
+                  field.name === "city" ||
+                  field.name === "address" ? (
                     <span className="text-[13px] font-medium text-black">
-                      {field.name === "funds" ? `$${formData[field.name]}` : formData[field.name]}
+                      {field.name === "funds"
+                        ? `$${formData[field.name]}`
+                        : formData[field.name]}
                     </span>
                   ) : field.extra ? (
                     <div className="flex gap-1">
@@ -637,7 +647,11 @@ const DriverDetails = () => {
                     <input
                       type="date"
                       name={field.name}
-                      value={new Date(formData[field.name]).toISOString().split("T")[0]}
+                      value={
+                        new Date(formData[field.name])
+                          .toISOString()
+                          .split("T")[0]
+                      }
                       onChange={handleInputChange}
                       className="border rounded p-1 text-[13px]"
                     />
@@ -669,10 +683,29 @@ const DriverDetails = () => {
             ))}
           </div>
         </div>
-
       </div>
-      <div className="flex justify-between w-full gap-6">
 
+      <div className="w-full flex flex-col gap-5 rounded-xl bg-gray-100 border p-5 mt-5">
+        <h3 className="text-[20px] font-bold text-black">
+          Reasons to End the Ride
+        </h3>
+
+        <ul className="list-disc pl-4">
+          <li>
+            Passenger being verbally abusive{" "}
+            <span className="font-bold">(0)</span>
+          </li>
+          <li>
+            Passenger being physically abusive{" "}
+            <span className="font-bold">(0)</span>
+          </li>
+          <li>
+            Other <span className="font-bold">(0)</span>
+          </li>
+        </ul>
+      </div>
+
+      <div className="flex justify-between w-full gap-6">
         {/* Earning */}
         <span className="w-full h-[88px] rounded-[24px] bg-gray-50 border p-[12px] flex gap-3 items-center">
           <span className="w-[64px] h-[64px] rounded-[18px] bg-[#E6F4EA] text-[#1E7F43] text-3xl flex items-center justify-center">
@@ -682,9 +715,7 @@ const DriverDetails = () => {
             <span className="text-[18px] font-bold text-black">
               {driver?.wallet != null ? driver.wallet.toFixed(2) : "0.00"}
             </span>
-            <span className="text-[14px] text-gray-700">
-              Wallet Balance
-            </span>
+            <span className="text-[14px] text-gray-700">Wallet Balance</span>
           </div>
         </span>
 
@@ -695,11 +726,11 @@ const DriverDetails = () => {
           </span>
           <div className="flex flex-col">
             <span className="text-[18px] font-bold text-black">
-              {driver?.approvedWithdrawAmount ? driver?.approvedWithdrawAmount.toFixed(2) : "0.00"}
+              {driver?.approvedWithdrawAmount
+                ? driver?.approvedWithdrawAmount.toFixed(2)
+                : "0.00"}
             </span>
-            <span className="text-[14px] text-gray-700">
-              Withdraw Amount
-            </span>
+            <span className="text-[14px] text-gray-700">Withdraw Amount</span>
           </div>
         </span>
 
@@ -712,21 +743,22 @@ const DriverDetails = () => {
             <span className="text-[18px] font-bold text-black">
               {driver?.preferrability ? driver.preferrability * 100 : 0}%
             </span>
-            <span className="text-[14px] text-gray-700">
-              Preferability
-            </span>
+            <span className="text-[14px] text-gray-700">Preferability</span>
           </div>
         </span>
-
       </div>
 
       <div className="w-full grid grid-cols-2 gap-4">
-
         <div className="bg-gray-50 border rounded-3xl p-6 ">
-          <h3 className="text-[24px] font-semibold mb-6 text-black">Documents</h3>
+          <h3 className="text-[24px] font-semibold mb-6 text-black">
+            Documents
+          </h3>
           <div className="grid grid-cols-2 gap-4">
             {[
-              { label: "Social Security Front", key: "socialSecurityCardFront" },
+              {
+                label: "Social Security Front",
+                key: "socialSecurityCardFront",
+              },
               { label: "Social Security Back", key: "socialSecurityCardBack" },
               { label: "Driving License Front", key: "driverLicenseCardFront" },
               { label: "Driving License Back", key: "driverLicenseCardBack" },
@@ -735,7 +767,9 @@ const DriverDetails = () => {
                 key={doc.key}
                 className="flex flex-col items-start gap-2 bg-gray-100 border py-6 px-4 rounded-lg"
               >
-                <p className="text-[16px] font-semibold text-black">{doc.label}</p>
+                <p className="text-[16px] font-semibold text-black">
+                  {doc.label}
+                </p>
                 <FaFilePdf className="text-red-600 text-[40px]" />
                 <div className="flex gap-2 items-center">
                   {documents[doc.key] ? (
@@ -764,10 +798,8 @@ const DriverDetails = () => {
             ))}
           </div>
 
-
           {isEditing && isLicenseUpdating && (
             <div className="flex gap-4 mt-4">
-
               <div className="flex flex-col">
                 <span className="text-xs text-gray-500">Expiry Date</span>
                 <input
@@ -783,7 +815,6 @@ const DriverDetails = () => {
                   className="border rounded p-1 text-[13px]"
                 />
               </div>
-
             </div>
           )}
         </div>
@@ -821,8 +852,6 @@ const DriverDetails = () => {
             onChange={handleFileChange}
             multiple // allow multiple files
           />
-
-
 
           {/* File Preview */}
           {criminalRecords?.length > 0 && (
@@ -862,12 +891,8 @@ const DriverDetails = () => {
             </div>
           )}
 
-
           {/* SINGLE BUTTON */}
-
-
         </div>
-
 
         {/* Customer Feedback Section */}
       </div>
@@ -932,10 +957,7 @@ const DriverDetails = () => {
           <div className="w-full min-h-52 col-span-2 flex flex-col items-center justify-center">
             <img src="/no-data.png" alt="" className="w-[150px]" />
             <span className="font-semibold text-center text-[#0e0e10] text-[20px] ">
-
-
               No Feedback Available Yet!
-
             </span>
           </div>
         )}
@@ -974,10 +996,11 @@ const DriverDetails = () => {
                 type="button"
                 key={i}
                 onClick={() => goToPage(i + 1)}
-                class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${currentPage === i + 1
-                  ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
-                  : "border bg-gray-100"
-                  }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
+                class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${
+                  currentPage === i + 1
+                    ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
+                    : "border bg-gray-100"
+                }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
                 aria-current="page"
               >
                 {i + 1}
@@ -987,7 +1010,7 @@ const DriverDetails = () => {
               type="button"
               onClick={() =>
                 goToPage(
-                  currentPage < totalPages ? currentPage + 1 : currentPage
+                  currentPage < totalPages ? currentPage + 1 : currentPage,
                 )
               }
               class="min-h-[38px] min-w-[38px] py-2 bg-gray-100 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
@@ -1196,12 +1219,15 @@ const DriverDetails = () => {
                     {/* View button */}
                     <div
                       onClick={() => {
-                        localStorage.setItem("vehicle", JSON.stringify(vehicle)); // safe for big objects
+                        localStorage.setItem(
+                          "vehicle",
+                          JSON.stringify(vehicle),
+                        ); // safe for big objects
                         localStorage.setItem("title", "Vehicle Approval");
                         navigate(`/vehicle-approval/${vehicle?._id}`, {
                           state: vehicleLoading,
                         });
-                        console.log(vehicle, "Testtt")
+                        console.log(vehicle, "Testtt");
                       }}
                       className="text-white cursor-pointer w-[26px] h-[26px] bg-[#9F9F9F]  rounded-[8px] flex items-center justify-center hover:bg-blue-600"
                     >
