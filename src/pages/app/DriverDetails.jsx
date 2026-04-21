@@ -23,7 +23,7 @@ import { Pagination, Autoplay } from "swiper/modules";
 import VehicleAcceptModal from "../../components/app/vehicle_approval/VehicleAcceptModal";
 import VehicleRejectModal from "../../components/app/vehicle_approval/VehicleRejectModal";
 import { MdCheck, MdClose } from "react-icons/md";
-import { FiEye } from "react-icons/fi";
+import { FiEye, FiSearch } from "react-icons/fi";
 import DriverAcceptModal from "../../components/app/driver/DriverAcceptModal";
 import DriverRejectModal from "../../components/app/driver/DriverRejectModal";
 import BlockModal from "../../components/app/global/BlockModal";
@@ -437,6 +437,19 @@ const DriverDetails = () => {
     setCriminalRecordsToDelete((prev) => [...prev, recordUrl]);
   };
 
+  function convertToMMDDYYYY(dateString) {
+    if (dateString == null) return "Invalid Date";
+    const date = new Date(dateString);
+
+    // Get the month, day, and year
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+    const day = String(date.getDate()).padStart(2, "0");
+    const year = date.getFullYear();
+
+    return `${month}-${day}-${year}`;
+  }
+
+console.log(driver, "driver");
   return (
     <div className="w-full h-auto flex flex-col justify-start items-start gap-4">
       <div className="w-full h-auto bg-gray-50 border rounded-3xl p-4 flex flex-col justify-start items-start ">
@@ -1270,6 +1283,229 @@ const DriverDetails = () => {
           />
         </div>
       </div>
+
+       <div className="w-full h-auto  bg-gray-50 border rounded-3xl p-4">
+              {/* Header Section */}
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-[24px] font-bold text-black">
+                  Referal User
+                  <span className="text-[16px] text-gray-500">
+                    ({driver?.referrals?.length})
+                  </span>
+                </h3>
+                {/* Filters and Search Bar */}
+                <div className="flex gap-2">
+                  {/* Search Input */}
+                  <div className="relative">
+                    <input
+                      type="text"
+                      // value={searchQueryReferral}
+                      // onChange={(e) => {
+                      //   setSearchQueryReferral(e.target.value);
+                      // }}
+                      placeholder="Search"
+                      className="border rounded-2xl pl-4 pr-10 py-4 bg-gray-100 text-sm text-gray-700 focus:outline-none w-[238px] h-[50px]" // Increased size
+                    />
+                    <FiSearch className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400" />
+                  </div>
+                </div>
+              </div>
+      
+              {/* Table Section */}
+              <div className="w-full  px-5 py-4 bg-gray-100 border rounded-[18px] ">
+                {/* Table Section */}
+                <div className="overflow-x-auto   rounded-xl ">
+                  <table className="min-w-full  border-separate">
+                    {driver?.referrals?.length > 0 && (
+                      <thead>
+                        <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
+                          <th className="py-2 ">User Name</th>
+                          <th className="py-2 px-4">Email </th>
+                          <th className="py-2 px-4">Contact </th>
+                          <th className="py-2 px-4">Referall Date</th>
+                          {/* <th className="py-2 px-4">Action</th> */}
+                        </tr>
+                      </thead>
+                    )}
+      
+                    <tbody className="mt-2">
+                      {loading ? (
+                        Array.from({ length: 6 }).map((_, index) => (
+                          <React.Fragment key={index}>
+                            <tr className=" animate-pulse">
+                              <td className="flex items-center gap-3 py-1">
+                                <div className="w-8 h-8 rounded-full bg-gray-300"></div>
+                                <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                              </td>
+                              <td className="py-1 px-4">
+                                <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                              </td>
+                              <td className="py-1 px-4">
+                                <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                              </td>
+                              <td className="py-1 px-4">
+                                <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                              </td>
+                              <td className="py-1 px-4 capitalize">
+                                <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                              </td>
+                              <td className="py-1 px-4">
+                                <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                              </td>
+                            </tr>
+                            {/* Line under each row */}
+                            <tr>
+                              <td
+                                colSpan="6"
+                                className="border-b border-gray-200"
+                              ></td>
+                            </tr>
+                          </React.Fragment>
+                        ))
+                      ) : driver?.referrals?.length > 0 ? (
+                        driver?.referrals?.map((referral, index) => (
+                          <React.Fragment key={index}>
+                            <tr className=" text-[10px] text-gray-900 ">
+                              <td className="flex  items-center gap-3 py-1">
+                                <img
+                                  src={referral?.referredBy?.profilePicture}
+                                  alt={referral?.referredBy?.firstName}
+                                  className="w-8 h-8 rounded-full"
+                                />
+                                <span>{referral?.referredBy?.firstName}</span>
+                              </td>
+                              <td className="py-1 px-4">{referral?.referredBy?.email}</td>
+                              <td className="py-1 px-4">{referral?.referredBy?.phone}</td>
+      
+                              <td className="py-1 px-4">
+                                {convertToMMDDYYYY(referral?.createdAt)}
+                              </td>
+      
+                              {/* <td className="py-1 px-4">
+                                {
+                                  <div
+                                    onClick={() =>
+                                      navigate(`/users/${referral?.referred?._id}`, {
+                                        state: referral?.referred,
+                                      })
+                                    }
+      
+                                    className="  cursor-pointer  rounded-full justify-center bg-[#c00000] flex  h-[26px] gap-1 w-[75px]  items-center"
+                                  >
+                                    <img
+                                      src={`/eye-icon-white.png`}
+                                      alt={referral?.referred?.name}
+                                      className="mb-[0.2px]"
+                                    />
+                                    <span className=" text-white font-medium text-[11px] leading-none">
+                                      View
+                                    </span>
+                                  </div>
+                                }
+                              </td> */}
+                            </tr>
+                            {/* Line under each row */}
+                            <tr>
+                              <td
+                                colSpan="6"
+                                className="border-b border-gray-200"
+                              ></td>
+                            </tr>
+                          </React.Fragment>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="4">
+                            <div className="w-full min-h-52 flex flex-col items-center justify-center">
+                              <img
+                                src="/no-data.png"
+                                alt=""
+                                className="w-[150px]"
+                              />
+                              <span className="font-semibold text-center text-[#0e0e10] text-[20px] ">
+                                You don’t have added any <br /> Listing Here
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>{" "}
+              </div>
+      
+              {!loading && driver.referrals.length > 0 && (
+                <nav
+                  class="flex items-center  justify-end mt-2 -space-x-px"
+                  aria-label="Pagination"
+                >
+                  <button
+                    type="button"
+                    onClick={() =>
+                      goToPage3(currentPage3 > 1 ? currentPage3 - 1 : currentPage3)
+                    }
+                    class="min-h-[38px] min-w-[38px] py-2 bg-gray-100 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
+                    aria-label="Previous"
+                  >
+                    <svg
+                      class="shrink-0 size-3.5"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="m15 18-6-6 6-6"></path>
+                    </svg>
+                    <span class="hidden sm:block">Previous</span>
+                  </button>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      type="button"
+                      key={i}
+                      onClick={() => goToPage3(i + 1)}
+                      class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${currentPage3 === i + 1
+                        ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
+                        : "border bg-gray-100"
+                        }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
+                      aria-current="page"
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      goToPage3(
+                        currentPage3 < totalPages3 ? currentPage3 + 1 : currentPage3
+                      )
+                    }
+                    class="min-h-[38px] min-w-[38px] py-2 bg-gray-100 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
+                    aria-label="Next"
+                  >
+                    <span class="hidden sm:block">Next</span>
+                    <svg
+                      class="shrink-0 size-3.5"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="m9 18 6-6-6-6"></path>
+                    </svg>
+                  </button>
+                </nav>
+              )}
+            </div>
     </div>
   );
 };
