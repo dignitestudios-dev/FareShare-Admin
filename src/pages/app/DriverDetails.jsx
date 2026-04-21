@@ -1288,7 +1288,7 @@ console.log(driver, "driver");
               {/* Header Section */}
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-[24px] font-bold text-black">
-                  Referal User
+                  Referral Driver
                   <span className="text-[16px] text-gray-500">
                     ({driver?.referrals?.length})
                   </span>
@@ -1322,7 +1322,7 @@ console.log(driver, "driver");
                           <th className="py-2 ">User Name</th>
                           <th className="py-2 px-4">Email </th>
                           <th className="py-2 px-4">Contact </th>
-                          <th className="py-2 px-4">Referall Date</th>
+                          <th className="py-2 px-4">Referral Date</th>
                           {/* <th className="py-2 px-4">Action</th> */}
                         </tr>
                       </thead>
