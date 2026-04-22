@@ -31,6 +31,7 @@ import BlockModal from "../../components/app/global/BlockModal";
 const DriverDetails = () => {
   const location = useLocation();
   const driver = location?.state;
+  console.log(driver.referrals, "driver referrals");
   const navigate = useNavigate();
   const { id } = useParams();
   const [selectedFile, setSelectedFiles] = useState([]);
@@ -705,15 +706,15 @@ console.log(driver, "driver");
 
         <ul className="list-disc pl-4">
           <li>
-            Passenger being verbally abusive{" "}
-            <span className="font-bold">(0)</span>
+            Driver being verbally abusive{" "}
+            <span className="font-bold">({driver?.cancellationReasons?.["verbally-abusive"]})</span>
           </li>
           <li>
-            Passenger being physically abusive{" "}
-            <span className="font-bold">(0)</span>
+            Driver being physically abusive{" "}
+            <span className="font-bold">({driver?.cancellationReasons?.["physically-abusive"]})</span>
           </li>
           <li>
-            Other <span className="font-bold">(0)</span>
+            Other <span className="font-bold">({driver?.cancellationReasons?.other})</span>
           </li>
         </ul>
       </div>
@@ -1374,8 +1375,8 @@ console.log(driver, "driver");
                                 />
                                 <span>{referral?.referredBy?.firstName}</span>
                               </td>
-                              <td className="py-1 px-4">{referral?.referredBy?.email}</td>
-                              <td className="py-1 px-4">{referral?.referredBy?.phone}</td>
+                              <td className="py-1 px-4">{referral?.referredBy?.email ?? "--"}</td>
+                              <td className="py-1 px-4">{referral?.referredBy?.phone ?? "--"}</td>
       
                               <td className="py-1 px-4">
                                 {convertToMMDDYYYY(referral?.createdAt)}

@@ -8,6 +8,7 @@ import BlockModal from "../../components/app/global/BlockModal";
 const UserDetails = () => {
   const location = useLocation();
   const user = location?.state;
+  console.log("this is user--> ", user)
   const navigate = useNavigate();
   const { id } = useParams();
   function convertToMMDDYYYY(dateString) {
@@ -118,7 +119,6 @@ const UserDetails = () => {
     }
   };
 
-  console.log(user, "user---detail");
 
   return (
     <div className="w-full h-auto flex flex-col justify-start items-start gap-4">
@@ -416,10 +416,27 @@ const UserDetails = () => {
           </h3>
 
           <ul className="list-disc pl-4">
-            <li>Driver being verbally abusive <span className="font-bold">(0)</span></li>
-            <li>Driver being physically abusive <span className="font-bold">(0)</span></li>
-            <li>Other <span className="font-bold">(0)</span></li>
-          </ul>
+  <li>
+    User being verbally abusive{" "}
+    <span className="font-bold">
+      ({user?.cancellationReasons?.["verbally-abusive"]})
+    </span>
+  </li>
+
+  <li>
+    User being physically abusive{" "}
+    <span className="font-bold">
+      ({user?.cancellationReasons?.["physically-abusive"]})
+    </span>
+  </li>
+
+  <li>
+    Other{" "}
+    <span className="font-bold">
+      ({user?.cancellationReasons?.other})
+    </span>
+  </li>
+</ul>
         </div>
       </div>
 
