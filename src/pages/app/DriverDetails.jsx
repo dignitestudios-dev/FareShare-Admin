@@ -31,7 +31,7 @@ import BlockModal from "../../components/app/global/BlockModal";
 const DriverDetails = () => {
   const location = useLocation();
   const driver = location?.state;
-  console.log(driver.referrals, "driver referrals");
+  
   const navigate = useNavigate();
   const { id } = useParams();
   const [selectedFile, setSelectedFiles] = useState([]);
@@ -1443,7 +1443,7 @@ console.log(driver, "driver");
                   <button
                     type="button"
                     onClick={() =>
-                      goToPage3(currentPage3 > 1 ? currentPage3 - 1 : currentPage3)
+                      goToPage3(currentPage > 1 ? currentPage - 1 : currentPage)
                     }
                     class="min-h-[38px] min-w-[38px] py-2 bg-gray-100 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
                     aria-label="Previous"
@@ -1469,7 +1469,7 @@ console.log(driver, "driver");
                       type="button"
                       key={i}
                       onClick={() => goToPage3(i + 1)}
-                      class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${currentPage3 === i + 1
+                      class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${currentPage === i + 1
                         ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
                         : "border bg-gray-100"
                         }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
@@ -1482,7 +1482,7 @@ console.log(driver, "driver");
                     type="button"
                     onClick={() =>
                       goToPage3(
-                        currentPage3 < totalPages3 ? currentPage3 + 1 : currentPage3
+                        currentPage < totalPages ? currentPage + 1 : currentPage
                       )
                     }
                     class="min-h-[38px] min-w-[38px] py-2 bg-gray-100 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "

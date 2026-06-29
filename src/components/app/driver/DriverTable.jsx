@@ -33,6 +33,7 @@ const DriverTable = ({ data, loading, setUpdate }) => {
   const [declineLoading, setDeclineLoading] = useState(false);
 
   const [closeOpen, setCloseOpen] = useState(false);
+  const [grantLoadingId, setGrantLoadingId] = useState(null);
 
   const toggleAccept = async () => {
     try {
@@ -82,14 +83,35 @@ const DriverTable = ({ data, loading, setUpdate }) => {
     }
   };
 
+  const toggleAdminGrant = async (driver) => {
+    try {
+      setGrantLoadingId(driver?._id);
+      const { data } = await axios.post("/admin/subscriptions/access", {
+        driverId: driver?._id,
+        action: (driver?.isAdminGranted ? "revoke" : "grant"),
+
+
+      });
+      if (data?.success) {
+        setUpdate((prev) => !prev);
+        SuccessToast(
+          `Admin grant ${driver?.isAdminGranted ? "revoked" : "enabled"} successfully.`
+        );
+      }
+    } catch (error) {
+      ErrorToast(error?.response?.data?.message);
+    } finally {
+      setGrantLoadingId(null);
+    }
+  };
+
   const [searchQuery, setSearchQuery] = React.useState("");
   const [tab, setTab] = useState("pending");
 
   // Filter drivers based on search query and tab
   const filteredDrivers = data.filter((driver) => {
-    const fullName = `${driver?.firstName || ""} ${
-      driver?.lastName || ""
-    }`.toLowerCase();
+    const fullName = `${driver?.firstName || ""} ${driver?.lastName || ""
+      }`.toLowerCase();
     const email = `${driver?.email}`;
     const driverStatus = driver?.status?.toLowerCase();
     const searchMatch =
@@ -142,11 +164,10 @@ const DriverTable = ({ data, loading, setUpdate }) => {
                 setTab("");
                 setCurrentPage(1);
               }}
-              className={`w-full transition-all duration-300 ${
-                tab == ""
-                  ? "bg-[#c00000] text-white"
-                  : "bg-gray-200 text-gray-600 hover:bg-[#c00000] hover:text-white"
-              }  h-full rounded-xl flex items-center justify-center  text-xs font-medium`}
+              className={`w-full transition-all duration-300 ${tab == ""
+                ? "bg-[#c00000] text-white"
+                : "bg-gray-200 text-gray-600 hover:bg-[#c00000] hover:text-white"
+                }  h-full rounded-xl flex items-center justify-center  text-xs font-medium`}
             >
               All
             </button>
@@ -155,11 +176,10 @@ const DriverTable = ({ data, loading, setUpdate }) => {
                 setTab("approved");
                 setCurrentPage(1);
               }}
-              className={`w-full transition-all duration-300 ${
-                tab == "approved"
-                  ? "bg-[#c00000] text-white"
-                  : "bg-gray-200 text-gray-600 hover:bg-[#c00000] hover:text-white"
-              }  h-full rounded-xl flex items-center justify-center  text-xs font-medium`}
+              className={`w-full transition-all duration-300 ${tab == "approved"
+                ? "bg-[#c00000] text-white"
+                : "bg-gray-200 text-gray-600 hover:bg-[#c00000] hover:text-white"
+                }  h-full rounded-xl flex items-center justify-center  text-xs font-medium`}
             >
               Approved
             </button>
@@ -168,11 +188,10 @@ const DriverTable = ({ data, loading, setUpdate }) => {
                 setTab("pending");
                 setCurrentPage(1);
               }}
-              className={`w-full  transition-all duration-300 ${
-                tab == "pending"
-                  ? "bg-[#c00000] text-white"
-                  : "bg-gray-200 text-gray-600 hover:bg-[#c00000] hover:text-white"
-              }   h-full rounded-xl flex items-center justify-center  text-xs font-medium`}
+              className={`w-full  transition-all duration-300 ${tab == "pending"
+                ? "bg-[#c00000] text-white"
+                : "bg-gray-200 text-gray-600 hover:bg-[#c00000] hover:text-white"
+                }   h-full rounded-xl flex items-center justify-center  text-xs font-medium`}
             >
               Pending
             </button>
@@ -192,6 +211,8 @@ const DriverTable = ({ data, loading, setUpdate }) => {
                 <th className="px-4">City</th>
                 <th className="px-4">State</th>
                 <th className="px-4">Registration Date</th>
+                <th className="px-4">Subscriptions Paid</th>
+                <th className="px-4">Admin Granted</th>
                 <th className="pl-4">Action</th>
               </tr>
             </thead>
@@ -230,7 +251,7 @@ const DriverTable = ({ data, loading, setUpdate }) => {
             ) : filteredDrivers?.length > 0 ? (
               currentData?.map((user, index) => {
                 return (
-                  <React.Fragment key={index}>
+                  <React.Fragment key={user?._id || index}>
                     <tr className=" text-[10px] text-gray-900 ">
                       <td className="flex  items-center gap-3 py-1">
                         <img
@@ -249,6 +270,25 @@ const DriverTable = ({ data, loading, setUpdate }) => {
                       <td className="py-1 px-4">{user?.state}</td>
                       <td className="py-1 px-4">
                         {convertToMMDDYYYY(user?.createdAt)}
+                      </td>
+                      <td className="py-1 px-4 ">
+                        {user?.isSubscriptionPaid ? "Yes" : "No"}
+                      </td>
+                      <td className="py-1 px-4">
+                        <button
+                          type="button"
+                          onClick={() => toggleAdminGrant(user)}
+                          disabled={grantLoadingId === user?._id}
+                          className={`relative inline-flex h-5 w-10 shrink-0 items-center rounded-full transition ${user?.isAdminGranted
+                            ? "bg-[#c00000]"
+                            : "bg-gray-200"
+                            } ${grantLoadingId === user?._id ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:brightness-95"}`}
+                        >
+                          <span
+                            className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${user?.isAdminGranted ? "translate-x-4" : "translate-x-0"
+                              }`}
+                          />
+                        </button>
                       </td>
                       <td className="py-1 flex space-x-1 justify-center ">
                         {user?.status == "approved" ? (
@@ -299,7 +339,7 @@ const DriverTable = ({ data, loading, setUpdate }) => {
                     </tr>
                     {/* Line under each row */}
                     <tr>
-                      <td colSpan="8" className="border-b border-gray-200"></td>
+                      <td colSpan="10" className="border-b border-gray-200"></td>
                     </tr>
                   </React.Fragment>
                 );
@@ -368,11 +408,10 @@ const DriverTable = ({ data, loading, setUpdate }) => {
             type="button"
             key={i}
             onClick={() => goToPage(i + 1)}
-            class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${
-              currentPage === i + 1
-                ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
-                : "border bg-gray-50"
-            }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
+            class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${currentPage === i + 1
+              ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
+              : "border bg-gray-50"
+              }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
             aria-current="page"
           >
             {i + 1}

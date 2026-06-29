@@ -28,6 +28,7 @@ import WithdrawalRequests from "../pages/app/WithdrawalRequests";
 import Trainingbulletin from "../pages/app/Trainingbulletin";
 import TrainingBulletinDetail from "../pages/app/TrainingBulletinDetail";
 import Reports from "../pages/app/Reports";
+import Subscriptions from "../pages/app/Subscriptions";
 
 export const APP_ROUTES = [
   {
@@ -155,5 +156,10 @@ export const APP_ROUTES = [
     title: "Reports",
     url: "/reports",
     page: <GlobalLayout page={<Reports />} />,
+  },
+  {
+    title: "Subscriptions",
+    url: "/subscriptions",
+    page: <GlobalLayout page={<Subscriptions />} />,
   },
 ];

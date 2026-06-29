@@ -3,7 +3,7 @@ import { LuHome } from "react-icons/lu";
 import { BiCar } from "react-icons/bi";
 import { GrUserPolice } from "react-icons/gr";
 import { LuUser2 } from "react-icons/lu";
-import { MdOutlineDocumentScanner } from "react-icons/md";
+import { MdOutlineDocumentScanner, MdSubscriptions } from "react-icons/md";
 import { IoCarSportOutline } from "react-icons/io5";
 import { TbFileInvoice } from "react-icons/tb";
 import { MdOutlineContactSupport } from "react-icons/md";
@@ -51,6 +51,11 @@ export const sidebarArr = [
     title: "Training & Bulletin",
     url: "/training-bulletin",
     icon: <FaChalkboardTeacher />,
+  },
+  {
+    title: "Subscriptions",
+    url: "/subscriptions",
+    icon: <MdSubscriptions />,
   },
   {
     title: "Reports",

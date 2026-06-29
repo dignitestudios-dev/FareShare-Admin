@@ -2,7 +2,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 export const baseUrl = "https://backend.faresharellc.com";
-// export const baseUrl = "https://t5cjhp19-5001.asse.devtunnels.ms";
+// export const baseUrl = "http://192.168.9.15:5000";
 
 const instance = axios.create({
   baseURL: baseUrl,
@@ -31,7 +31,7 @@ instance.interceptors.response.use(
       window.location.href = "/";
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default instance;
