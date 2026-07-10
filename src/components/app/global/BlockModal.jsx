@@ -31,18 +31,19 @@ const BlockModal = ({
           Are you sure you want to {isBlocked ? "block" : "unblock"} this user.
         </p>
         {isReason && (
-           <div className="mb-6 text-left">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Reason
-          </label>
-          <textarea
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder="Enter reason here..."
-            rows={3}
-            className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-          />
-        </div>
+          <div className="mb-6 text-left">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Reason
+            </label>
+            <textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="Enter reason here..."
+              rows={3}
+              maxLength={200}
+              className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
+          </div>
 
         )}
 
@@ -55,20 +56,24 @@ const BlockModal = ({
           </button>
           <button
             onClick={onConfirm}
-            className="px-6 flex items-center justify-center bg-[#C00000] w-[238px] h-[48px] text-white  rounded-full hover:bg-red-600 transition text-[13px] font-bold "
+            disabled={loading || (isReason && !reason.trim())}
+            className={`px-6 flex items-center justify-center w-[238px] h-[48px] rounded-full text-[13px] font-bold transition ${loading || (isReason && !reason.trim())
+                ? "bg-gray-400 cursor-not-allowed text-white"
+                : "bg-[#C00000] hover:bg-red-600 text-white"
+              }`}
           >
             {loading ? (
               <div
-                class="animate-spin inline-block size-3 border-[3px] border-current border-t-transparent text-white rounded-full"
+                className="animate-spin inline-block size-3 border-[3px] border-current border-t-transparent text-white rounded-full"
                 role="status"
                 aria-label="loading"
               >
-                <span class="sr-only">Loading...</span>
+                <span className="sr-only">Loading...</span>
               </div>
             ) : (
               <span>Yes</span>
             )}
-          </button>
+          </button> 
         </div>
       </div>
     </Modal>

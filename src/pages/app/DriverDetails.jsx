@@ -31,9 +31,10 @@ import BlockModal from "../../components/app/global/BlockModal";
 const DriverDetails = () => {
   const location = useLocation();
   const driver = location?.state;
-  
   const navigate = useNavigate();
   const { id } = useParams();
+  const [driverdata, setDriver] = useState([]);
+
   const [selectedFile, setSelectedFiles] = useState([]);
   const [criminalRecordsToDelete, setCriminalRecordsToDelete] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -56,6 +57,41 @@ const DriverDetails = () => {
     criminalRecords: driver?.criminalRecord || [], // <-- move criminal records here
     files: {}, // store actual File objects for upload
   });
+  // Driver accept decline:
+  const [driverOpen, setDriverOpen] = useState(false);
+  const [acceptDriverLoading, setAcceptDriverLoading] = useState(false);
+  const [declineDriverLoading, setDeclineDriverLoading] = useState(false);
+  const [closeDriverOpen, setCloseDriverOpen] = useState(false);
+  const [feedback, setFeedback] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
+  const [vehicleLoading, setVehicleLoading] = useState(false);
+  const [feedLoading, setFeedLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [open, setOpen] = useState(false);
+  const [acceptLoading, setAcceptLoading] = useState(false);
+  const [declineLoading, setDeclineLoading] = useState(false);
+  const [reason, setReason] = useState("");
+  const [vehicleType, setVehicleType] = useState("");
+  const [closeOpen, setCloseOpen] = useState(false);
+
+  const getDrivers = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axios.get(`/admin/driver/${id}`);
+      setDriver(data?.data?.driver); // Use the data from the API response
+    } catch (error) {
+      ErrorToast(error?.response?.data?.message);
+
+      console.log("Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getDrivers();
+  }, []);
+  console.log(driverdata, "driver");
   const handleDocumentChange = (e) => {
     const { name, files } = e.target;
     if (!files.length) return;
@@ -80,22 +116,23 @@ const DriverDetails = () => {
       }));
     }
   };
-
-  const [formData, setFormData] = useState({
-    firstName: driver?.firstName || "",
-    lastName: driver?.lastName || "",
-    email: driver?.email || "",
-    phoneNo: driver?.phoneNo || "",
-    MI: driver?.MI || "",
-    suffix: driver?.suffix || "",
-    SSN: driver?.SSN || "",
-    gender: driver?.gender || "",
-    dateOfBirth: driver?.dateOfBirth || "",
-    driverLicenseNumber: driver?.driverLicenseNumber || "",
-    address: `${driver?.street || ""}, ${driver?.city || ""}, ${driver?.state || ""}, ${driver?.zipcode || ""}`,
-    preview: driver?.profilePicture || "",
+  const initialFormData = {
+    firstName: driverdata?.firstName || "",
+    lastName: driverdata?.lastName || "",
+    email: driverdata?.email || "",
+    phoneNo: driverdata?.phoneNo || "",
+    MI: driverdata?.MI || "",
+    suffix: driverdata?.suffix || "",
+    SSN: driverdata?.SSN || "",
+    gender: driverdata?.gender || "",
+    dateOfBirth: driverdata?.dateOfBirth || "",
+    driverLicenseNumber: driverdata?.driverLicenseNumber || "",
+    address: `${driverdata?.street || ""}, ${driverdata?.city || ""}, ${driverdata?.state || ""}, ${driverdata?.zipcode || ""}`,
+    preview: driverdata?.profilePicture || "",
     file: null,
-  });
+  };
+  console.log(driverdata?.firstName)
+  const [formData, setFormData] = useState(initialFormData);
 
   const toggleBlock = async (isBlocked) => {
     try {
@@ -124,8 +161,6 @@ const DriverDetails = () => {
     }
   };
 
-  const [feedback, setFeedback] = useState([]);
-  const [feedLoading, setFeedLoading] = useState(false);
 
   const getFeedback = async () => {
     try {
@@ -141,8 +176,7 @@ const DriverDetails = () => {
     }
   };
 
-  const [vehicles, setVehicles] = useState([]);
-  const [vehicleLoading, setVehicleLoading] = useState(false);
+
   const getVehicle = async () => {
     try {
       setVehicleLoading(true);
@@ -176,7 +210,7 @@ const DriverDetails = () => {
     return matchesName && matchesDate;
   });
 
-  const [currentPage, setCurrentPage] = useState(1);
+
   const itemsPerPage = 2;
 
   const totalPages = Math.ceil(filteredFeedback.length / itemsPerPage);
@@ -192,13 +226,6 @@ const DriverDetails = () => {
 
   // VEhcile accept decline
 
-  const [open, setOpen] = useState(false);
-  const [acceptLoading, setAcceptLoading] = useState(false);
-  const [declineLoading, setDeclineLoading] = useState(false);
-  const [reason, setReason] = useState("");
-
-  const [vehicleType, setVehicleType] = useState("");
-  const [closeOpen, setCloseOpen] = useState(false);
 
   const toggleAccept = async () => {
     try {
@@ -256,32 +283,42 @@ const DriverDetails = () => {
     }
   };
 
-  // Driver accept decline:
-  const [driverOpen, setDriverOpen] = useState(false);
-  const [acceptDriverLoading, setAcceptDriverLoading] = useState(false);
-  const [declineDriverLoading, setDeclineDriverLoading] = useState(false);
 
-  const [closeDriverOpen, setCloseDriverOpen] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === "profilePicture" && files[0]) {
-      setFormData({
-        ...formData,
-        preview: URL.createObjectURL(files[0]),
-        file: files[0],
-      });
-    } else if (name === "funds") {
-      setFormData({ ...formData, [name]: Number(value) });
-    } else {
-      setFormData({ ...formData, [name]: value });
+
+    if (name === "SSN") {
+      const numbers = value.replace(/\D/g, "").slice(0, 9);
+
+      let formatted = numbers;
+      if (numbers.length > 3) {
+        formatted = `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+      }
+      if (numbers.length > 5) {
+        formatted = `${numbers.slice(0, 3)}-${numbers.slice(3, 5)}-${numbers.slice(5)}`;
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        SSN: formatted,
+      }));
+      return;
     }
+
+    // existing code...
   };
   const isLicenseUpdating =
     documents.files?.driverLicenseCardFront ||
     documents.files?.driverLicenseCardBack;
   const handleSave = async () => {
     // Validation
+    const ssnRegex = /^\d{3}-\d{2}-\d{4}$/;
+
+    if (!formData.SSN.trim()) {
+      ErrorToast("SSN is required.");
+      return;
+    }
 
     // If any license file updated → require both + expiry date
     if (isLicenseUpdating) {
@@ -342,6 +379,7 @@ const DriverDetails = () => {
       if (data?.success) {
         SuccessToast("User updated successfully!");
         setIsEditing(false);
+        getDrivers()
       }
     } catch (error) {
       ErrorToast(error?.response?.data?.message || "Failed to update user.");
@@ -449,8 +487,26 @@ const DriverDetails = () => {
 
     return `${month}-${day}-${year}`;
   }
+  useEffect(() => {
+    if (driverdata) {
+      setFormData({
+        firstName: driverdata.firstName || "",
+        lastName: driverdata.lastName || "",
+        email: driverdata.email || "",
+        phoneNo: driverdata.phoneNo || "",
+        MI: driverdata.MI || "",
+        suffix: driverdata.suffix || "",
+        SSN: driverdata.SSN || "",
+        gender: driverdata.gender || "",
+        dateOfBirth: driverdata.dateOfBirth || "",
+        driverLicenseNumber: driverdata.driverLicenseNumber || "",
+        address: `${driverdata.street || ""}, ${driverdata.city || ""}, ${driverdata.state || ""}, ${driverdata.zipcode || ""}`,
+        preview: driverdata.profilePicture || "",
+        file: null,
+      });
+    }
+  }, [driverdata]);
 
-console.log(driver, "driver");
   return (
     <div className="w-full h-auto flex flex-col justify-start items-start gap-4">
       <div className="w-full h-auto bg-gray-50 border rounded-3xl p-4 flex flex-col justify-start items-start ">
@@ -468,11 +524,11 @@ console.log(driver, "driver");
               isBlocked={isBlocked}
               setReason={setReason}
               reason={reason}
-              isReason={driver?.isBlocked ? false : true}
+              isReason={driverdata?.isBlocked ? false : true}
             />
-            {driver?.status?.toLowerCase() == "approved" ? (
+            {driverdata?.status?.toLowerCase() == "approved" ? (
               <>
-                {driver?.isBlocked ? (
+                {driverdata?.isBlocked ? (
                   <button
                     onClick={() => {
                       setOpenBlock(true);
@@ -515,7 +571,7 @@ console.log(driver, "driver");
                 >
                   <MdCheck className="w-5 h-5" />
                 </button>
-                {driver?.isBlocked ? (
+                {driverdata?.isBlocked ? (
                   <button
                     disabled={loading}
                     onClick={() => toggleBlock(false)}
@@ -551,7 +607,23 @@ console.log(driver, "driver");
                   {editLoading ? "Saving..." : "Save"}
                 </button>
                 <button
-                  onClick={() => setIsEditing(false)}
+                  onClick={() => {
+                    setFormData(initialFormData);
+
+                    setDocuments({
+                      socialSecurityCardFront: driverdata?.socialSecurityCardFront || "",
+                      socialSecurityCardBack: driverdata?.socialSecurityCardBack || "",
+                      driverLicenseCardFront: driverdata?.driverLicenseCardFront || "",
+                      driverLicenseCardBack: driverdata?.driverLicenseCardBack || "",
+                      criminalRecords: driverdata?.criminalRecord || [],
+                      files: {},
+                    });
+
+                    setCriminalRecords(driver?.criminalRecord || []);
+                    setCriminalRecordsToDelete([]);
+                    setSelectedFiles([]);
+                    setIsEditing(false);
+                  }}
                   className="w-auto px-3 h-7 rounded-full flex items-center justify-center text-xs font-medium bg-red-600 text-white"
                 >
                   Cancel
@@ -575,7 +647,7 @@ console.log(driver, "driver");
             />
           </div>
         </div>
-        {driver?.isBlocked && driver?.blockedReason && (
+        {driverdata?.isBlocked && driverdata?.blockedReason && (
           <div className="w-full flex items-start gap-3 bg-red-50 border border-red-200 rounded-2xl p-4 mb-4">
             {/* Icon */}
             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
@@ -588,28 +660,40 @@ console.log(driver, "driver");
                 User Blocked
               </span>
               <p className="text-sm text-red-600 leading-relaxed mt-1">
-                {driver.blockedReason}
+                {driverdata.blockedReason}
               </p>
             </div>
           </div>
         )}
         <div className="w-full grid grid-cols-4 justify-start items-start gap-4">
-          <div className="w-full h-[198px] rounded-xl bg-gray-100 border p-2 flex items-center justify-center">
-            {isEditing ? (
-              <input
-                type="file"
-                name="profilePicture"
-                onChange={handleInputChange}
-                className="w-full h-full"
-              />
-            ) : (
-              <img
-                src={formData.preview}
-                alt="Profile"
-                className="w-full h-full aspect-square object-contain rounded-lg"
-              />
+          <div className="w-full h-[198px] rounded-xl bg-gray-100 border p-2 relative">
+            <img
+              src={formData.preview}
+              alt="Profile"
+              className="w-full h-full object-cover rounded-lg"
+            />
+
+            {isEditing && (
+              <>
+                <input
+                  id="profilePicture"
+                  type="file"
+                  name="profilePicture"
+                  accept="image/*"
+                  onChange={handleInputChange}
+                  className="hidden"
+                />
+
+                <label
+                  htmlFor="profilePicture"
+                  className="absolute bottom-4 left-1/2 -translate-x-1/2 cursor-pointer bg-[#c00000] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700"
+                >
+                  Choose Profile
+                </label>
+              </>
             )}
           </div>
+
           <div className="w-full col-span-3 grid grid-cols-3 gap-4">
             {[
               { label: "Full Name", name: "firstName", extra: "lastName" },
@@ -632,14 +716,24 @@ console.log(driver, "driver");
                 </span>
                 {isEditing ? (
                   field.name === "email" ||
-                  field.name === "phoneNo" ||
-                  field.name === "city" ||
-                  field.name === "address" ? (
+                    field.name === "phoneNo" ||
+                    field.name === "city" ||
+                    field.name === "address" ? (
                     <span className="text-[13px] font-medium text-black">
                       {field.name === "funds"
                         ? `$${formData[field.name]}`
                         : formData[field.name]}
                     </span>
+                  ) : field.name === "SSN" ? (
+                    <input
+                      type="text"
+                      name="SSN"
+                      value={formData.SSN}
+                      onChange={handleInputChange}
+                      maxLength={11}
+                      placeholder="123-45-6789"
+                      className="border rounded p-1 text-[13px]"
+                    />
                   ) : field.extra ? (
                     <div className="flex gap-1">
                       <input
@@ -661,11 +755,7 @@ console.log(driver, "driver");
                     <input
                       type="date"
                       name={field.name}
-                      value={
-                        new Date(formData[field.name])
-                          .toISOString()
-                          .split("T")[0]
-                      }
+                      value={new Date(formData[field.name]).toISOString().split("T")[0]}
                       onChange={handleInputChange}
                       className="border rounded p-1 text-[13px]"
                     />
@@ -689,7 +779,7 @@ console.log(driver, "driver");
                 ) : field.name === "funds" ? (
                   `$${formData[field.name]}`
                 ) : field.name === "address" ? (
-                  `${driver?.street}, ${driver?.city}, ${driver?.state}, ${driver?.zipcode}, U.S.A.`
+                  `${driverdata?.street}, ${driverdata?.city}, ${driverdata?.state}, ${driverdata?.zipcode}, U.S.A.`
                 ) : (
                   formData[field.name]
                 )}
@@ -1010,11 +1100,10 @@ console.log(driver, "driver");
                 type="button"
                 key={i}
                 onClick={() => goToPage(i + 1)}
-                class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${
-                  currentPage === i + 1
-                    ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
-                    : "border bg-gray-100"
-                }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
+                class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${currentPage === i + 1
+                  ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
+                  : "border bg-gray-100"
+                  }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
                 aria-current="page"
               >
                 {i + 1}
@@ -1239,7 +1328,7 @@ console.log(driver, "driver");
                         ); // safe for big objects
                         localStorage.setItem("title", "Vehicle Approval");
                         navigate(`/vehicle-approval/${vehicle?._id}`, {
-                          state: vehicleLoading,
+                          state: vehicle,
                         });
                         console.log(vehicle, "Testtt");
                       }}
@@ -1285,104 +1374,104 @@ console.log(driver, "driver");
         </div>
       </div>
 
-       <div className="w-full h-auto  bg-gray-50 border rounded-3xl p-4">
-              {/* Header Section */}
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-[24px] font-bold text-black">
-                  Referral Driver
-                  <span className="text-[16px] text-gray-500">
-                    ({driver?.referrals?.length})
-                  </span>
-                </h3>
-                {/* Filters and Search Bar */}
-                <div className="flex gap-2">
-                  {/* Search Input */}
-                  <div className="relative">
-                    <input
-                      type="text"
-                      // value={searchQueryReferral}
-                      // onChange={(e) => {
-                      //   setSearchQueryReferral(e.target.value);
-                      // }}
-                      placeholder="Search"
-                      className="border rounded-2xl pl-4 pr-10 py-4 bg-gray-100 text-sm text-gray-700 focus:outline-none w-[238px] h-[50px]" // Increased size
-                    />
-                    <FiSearch className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400" />
-                  </div>
-                </div>
-              </div>
-      
-              {/* Table Section */}
-              <div className="w-full  px-5 py-4 bg-gray-100 border rounded-[18px] ">
-                {/* Table Section */}
-                <div className="overflow-x-auto   rounded-xl ">
-                  <table className="min-w-full  border-separate">
-                    {driver?.referrals?.length > 0 && (
-                      <thead>
-                        <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
-                          <th className="py-2 ">User Name</th>
-                          <th className="py-2 px-4">Email </th>
-                          <th className="py-2 px-4">Contact </th>
-                          <th className="py-2 px-4">Referral Date</th>
-                          {/* <th className="py-2 px-4">Action</th> */}
-                        </tr>
-                      </thead>
-                    )}
-      
-                    <tbody className="mt-2">
-                      {loading ? (
-                        Array.from({ length: 6 }).map((_, index) => (
-                          <React.Fragment key={index}>
-                            <tr className=" animate-pulse">
-                              <td className="flex items-center gap-3 py-1">
-                                <div className="w-8 h-8 rounded-full bg-gray-300"></div>
-                                <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                              </td>
-                              <td className="py-1 px-4">
-                                <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                              </td>
-                              <td className="py-1 px-4">
-                                <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-                              </td>
-                              <td className="py-1 px-4">
-                                <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-                              </td>
-                              <td className="py-1 px-4 capitalize">
-                                <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-                              </td>
-                              <td className="py-1 px-4">
-                                <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                              </td>
-                            </tr>
-                            {/* Line under each row */}
-                            <tr>
-                              <td
-                                colSpan="6"
-                                className="border-b border-gray-200"
-                              ></td>
-                            </tr>
-                          </React.Fragment>
-                        ))
-                      ) : driver?.referrals?.length > 0 ? (
-                        driver?.referrals?.map((referral, index) => (
-                          <React.Fragment key={index}>
-                            <tr className=" text-[10px] text-gray-900 ">
-                              <td className="flex  items-center gap-3 py-1">
-                                <img
-                                  src={referral?.referredBy?.profilePicture}
-                                  alt={referral?.referredBy?.firstName}
-                                  className="w-8 h-8 rounded-full"
-                                />
-                                <span>{referral?.referredBy?.firstName}</span>
-                              </td>
-                              <td className="py-1 px-4">{referral?.referredBy?.email ?? "--"}</td>
-                              <td className="py-1 px-4">{referral?.referredBy?.phone ?? "--"}</td>
-      
-                              <td className="py-1 px-4">
-                                {convertToMMDDYYYY(referral?.createdAt)}
-                              </td>
-      
-                              {/* <td className="py-1 px-4">
+      <div className="w-full h-auto  bg-gray-50 border rounded-3xl p-4">
+        {/* Header Section */}
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-[24px] font-bold text-black">
+            Referral Driver
+            <span className="text-[16px] text-gray-500">
+              ({driver?.referrals?.length})
+            </span>
+          </h3>
+          {/* Filters and Search Bar */}
+          <div className="flex gap-2">
+            {/* Search Input */}
+            <div className="relative">
+              <input
+                type="text"
+                // value={searchQueryReferral}
+                // onChange={(e) => {
+                //   setSearchQueryReferral(e.target.value);
+                // }}
+                placeholder="Search"
+                className="border rounded-2xl pl-4 pr-10 py-4 bg-gray-100 text-sm text-gray-700 focus:outline-none w-[238px] h-[50px]" // Increased size
+              />
+              <FiSearch className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400" />
+            </div>
+          </div>
+        </div>
+
+        {/* Table Section */}
+        <div className="w-full  px-5 py-4 bg-gray-100 border rounded-[18px] ">
+          {/* Table Section */}
+          <div className="overflow-x-auto   rounded-xl ">
+            <table className="min-w-full  border-separate">
+              {driver?.referrals?.length > 0 && (
+                <thead>
+                  <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
+                    <th className="py-2 ">User Name</th>
+                    <th className="py-2 px-4">Email </th>
+                    <th className="py-2 px-4">Contact </th>
+                    <th className="py-2 px-4">Referral Date</th>
+                    {/* <th className="py-2 px-4">Action</th> */}
+                  </tr>
+                </thead>
+              )}
+
+              <tbody className="mt-2">
+                {loading ? (
+                  Array.from({ length: 6 }).map((_, index) => (
+                    <React.Fragment key={index}>
+                      <tr className=" animate-pulse">
+                        <td className="flex items-center gap-3 py-1">
+                          <div className="w-8 h-8 rounded-full bg-gray-300"></div>
+                          <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                        </td>
+                        <td className="py-1 px-4">
+                          <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                        </td>
+                        <td className="py-1 px-4">
+                          <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                        </td>
+                        <td className="py-1 px-4">
+                          <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                        </td>
+                        <td className="py-1 px-4 capitalize">
+                          <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                        </td>
+                        <td className="py-1 px-4">
+                          <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                        </td>
+                      </tr>
+                      {/* Line under each row */}
+                      <tr>
+                        <td
+                          colSpan="6"
+                          className="border-b border-gray-200"
+                        ></td>
+                      </tr>
+                    </React.Fragment>
+                  ))
+                ) : driver?.referrals?.length > 0 ? (
+                  driver?.referrals?.map((referral, index) => (
+                    <React.Fragment key={index}>
+                      <tr className=" text-[10px] text-gray-900 ">
+                        <td className="flex  items-center gap-3 py-1">
+                          <img
+                            src={referral?.referredBy?.profilePicture}
+                            alt={referral?.referredBy?.firstName}
+                            className="w-8 h-8 rounded-full"
+                          />
+                          <span>{referral?.referredBy?.firstName}</span>
+                        </td>
+                        <td className="py-1 px-4">{referral?.referredBy?.email ?? "--"}</td>
+                        <td className="py-1 px-4">{referral?.referredBy?.phone ?? "--"}</td>
+
+                        <td className="py-1 px-4">
+                          {convertToMMDDYYYY(referral?.createdAt)}
+                        </td>
+
+                        {/* <td className="py-1 px-4">
                                 {
                                   <div
                                     onClick={() =>
@@ -1404,109 +1493,109 @@ console.log(driver, "driver");
                                   </div>
                                 }
                               </td> */}
-                            </tr>
-                            {/* Line under each row */}
-                            <tr>
-                              <td
-                                colSpan="6"
-                                className="border-b border-gray-200"
-                              ></td>
-                            </tr>
-                          </React.Fragment>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan="4">
-                            <div className="w-full min-h-52 flex flex-col items-center justify-center">
-                              <img
-                                src="/no-data.png"
-                                alt=""
-                                className="w-[150px]"
-                              />
-                              <span className="font-semibold text-center text-[#0e0e10] text-[20px] ">
-                                You don’t have added any <br /> Listing Here
-                              </span>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>{" "}
-              </div>
-      
-              {!loading && driver.referrals.length > 0 && (
-                <nav
-                  class="flex items-center  justify-end mt-2 -space-x-px"
-                  aria-label="Pagination"
-                >
-                  <button
-                    type="button"
-                    onClick={() =>
-                      goToPage3(currentPage > 1 ? currentPage - 1 : currentPage)
-                    }
-                    class="min-h-[38px] min-w-[38px] py-2 bg-gray-100 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
-                    aria-label="Previous"
-                  >
-                    <svg
-                      class="shrink-0 size-3.5"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <path d="m15 18-6-6 6-6"></path>
-                    </svg>
-                    <span class="hidden sm:block">Previous</span>
-                  </button>
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <button
-                      type="button"
-                      key={i}
-                      onClick={() => goToPage3(i + 1)}
-                      class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${currentPage === i + 1
-                        ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
-                        : "border bg-gray-100"
-                        }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
-                      aria-current="page"
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() =>
-                      goToPage3(
-                        currentPage < totalPages ? currentPage + 1 : currentPage
-                      )
-                    }
-                    class="min-h-[38px] min-w-[38px] py-2 bg-gray-100 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
-                    aria-label="Next"
-                  >
-                    <span class="hidden sm:block">Next</span>
-                    <svg
-                      class="shrink-0 size-3.5"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <path d="m9 18 6-6-6-6"></path>
-                    </svg>
-                  </button>
-                </nav>
-              )}
-            </div>
+                      </tr>
+                      {/* Line under each row */}
+                      <tr>
+                        <td
+                          colSpan="6"
+                          className="border-b border-gray-200"
+                        ></td>
+                      </tr>
+                    </React.Fragment>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4">
+                      <div className="w-full min-h-52 flex flex-col items-center justify-center">
+                        <img
+                          src="/no-data.png"
+                          alt=""
+                          className="w-[150px]"
+                        />
+                        <span className="font-semibold text-center text-[#0e0e10] text-[20px] ">
+                          You don’t have added any <br /> Listing Here
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>{" "}
+        </div>
+
+        {!loading && driver.referrals.length > 0 && (
+          <nav
+            class="flex items-center  justify-end mt-2 -space-x-px"
+            aria-label="Pagination"
+          >
+            <button
+              type="button"
+              onClick={() =>
+                goToPage3(currentPage > 1 ? currentPage - 1 : currentPage)
+              }
+              class="min-h-[38px] min-w-[38px] py-2 bg-gray-100 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
+              aria-label="Previous"
+            >
+              <svg
+                class="shrink-0 size-3.5"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="m15 18-6-6 6-6"></path>
+              </svg>
+              <span class="hidden sm:block">Previous</span>
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                type="button"
+                key={i}
+                onClick={() => goToPage3(i + 1)}
+                class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${currentPage === i + 1
+                  ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
+                  : "border bg-gray-100"
+                  }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
+                aria-current="page"
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() =>
+                goToPage3(
+                  currentPage < totalPages ? currentPage + 1 : currentPage
+                )
+              }
+              class="min-h-[38px] min-w-[38px] py-2 bg-gray-100 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
+              aria-label="Next"
+            >
+              <span class="hidden sm:block">Next</span>
+              <svg
+                class="shrink-0 size-3.5"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="m9 18 6-6-6-6"></path>
+              </svg>
+            </button>
+          </nav>
+        )}
+      </div>
     </div>
   );
 };

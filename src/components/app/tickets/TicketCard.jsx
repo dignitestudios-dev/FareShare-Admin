@@ -46,9 +46,9 @@ const TicketCard = ({ ticket, number, setUpdate }) => {
         <span className="text-[#2E2C34] text-[14px] font-medium">
           {ticket?.subject}
         </span>
-        <span className="text-[#84818A] text-[12px] font-medium">
-          {ticket?.description}
-        </span>
+       <div className="max-h-40 overflow-y-auto break-words whitespace-pre-wrap text-[#84818A] text-[12px] font-medium pr-2">
+  {ticket?.description}
+</div>
       </div>
 
       <div className="w-full h-10 flex justify-between items-end">

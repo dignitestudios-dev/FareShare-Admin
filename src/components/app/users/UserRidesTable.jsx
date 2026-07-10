@@ -183,12 +183,12 @@ const UserRidesTable = ({ user }) => {
   const totalPages2 = Math.ceil(filteredData2.length / itemsPerPage);
 
   const currentData2 = filteredData2.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    (currentPage2 - 1) * itemsPerPage2,
+    currentPage2 * itemsPerPage2
   );
 
   const goToPage2 = (pageNumber) => {
-    setCurrentPage(pageNumber);
+    setCurrentPage2(pageNumber);
   };
 
 
@@ -199,12 +199,12 @@ const UserRidesTable = ({ user }) => {
   const totalPages3 = Math.ceil(filteredData2.length / itemsPerPage);
 
   const currentData3 = filteredData2.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    (currentPage3 - 1) * itemsPerPage3,
+    currentPage3 * itemsPerPage3
   );
 
   const goToPage3 = (pageNumber) => {
-    setCurrentPage(pageNumber);
+    setCurrentPage3(pageNumber);
   };
 
 
@@ -328,8 +328,8 @@ const UserRidesTable = ({ user }) => {
               >
                 {/* LEFT */}
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-green-50 text-green-600 flex items-center justify-center font-bold uppercase">
-                    {item.brand}
+                  <div className="w-12 h-12 min-w-12 rounded-xl bg-green-50 text-green-600 flex items-center justify-center font-bold uppercase text-xs overflow-hidden">
+                    {(item.brand || "NA").slice(0, 2)}
                   </div>
 
                   <div className="flex flex-col">
@@ -980,7 +980,7 @@ const UserRidesTable = ({ user }) => {
               </svg>
               <span class="hidden sm:block">Previous</span>
             </button>
-            {Array.from({ length: totalPages }, (_, i) => (
+            {Array.from({ length: totalPages3 }, (_, i) => (
               <button
                 type="button"
                 key={i}

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { AiOutlineCalendar } from "react-icons/ai"; // Calendar icon
 import { FaCar, FaRegClock, FaRegUser } from "react-icons/fa6";
 import axios, { baseUrl } from "../../axios";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Swiper } from "swiper/react";
 import { SwiperSlide } from "swiper/react";
 import { FaStarHalfAlt } from "react-icons/fa";
@@ -24,6 +24,9 @@ const RideDetails = () => {
   const { id } = useParams();
   const socketRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const rideDetail = location?.state;
+  console.log("this is ride detail--> ", rideDetail)
   const [searchQuery, setSearchQuery] = useState("");
   const [rides, setRides] = useState({});
   const [loading, setLoading] = useState(false);
@@ -159,12 +162,7 @@ const RideDetails = () => {
   }, [driverLocation, pickupLocation, destinationLocation, rides?.ride?.status]);
 
 
-  console.log({
-    driverLocation,
-    pickupLocation,
-    destinationLocation,
-    rideStatus: rides?.ride?.status
-  });
+
 
 
 
@@ -296,7 +294,7 @@ const RideDetails = () => {
     const payload = {
       rideId: id,
       type: roleType,
-      amount,
+      amount: Number(amount),
     };
 
     if (roleType === 'user') {
@@ -313,7 +311,7 @@ const RideDetails = () => {
         setOpen(false);
       }
     } catch (error) {
-      ErrorToast(Error?.response?.data?.message);
+      ErrorToast(error?.response?.data?.message);
     } finally {
       setFundLoading(false);
     }
@@ -747,122 +745,100 @@ const RideDetails = () => {
 
           )}
 
-          <div className="bg-gray-50 border rounded-3xl p-6 ">
-            <h3 className="text-[22px] font-semibold mb-6 text-black">
-              Vehicle Details
-            </h3>
-            <Swiper
-              spaceBetween={10}
-              modules={[Pagination, Autoplay]}
-              autoplay={{
-                delay: 2500,
-                disableOnInteraction: false,
-              }}
-              pagination={{
-                clickable: true,
-              }}
-              className="mySwiper"
-            >
-              <SwiperSlide>
-                <img
-                  src={
-                    rides?.vehicle?.vehicleImageFront ||
-                    "https://via.placeholder.com/300"
-                  }
-                  alt="Vehicle"
-                  className="w-full h-[259px] rounded-[16px] object-cover mb-4"
-                />
-              </SwiperSlide>
-              <SwiperSlide>
-                <img
-                  src={
-                    rides?.vehicle?.vehicleImageRear ||
-                    "https://via.placeholder.com/300"
-                  }
-                  alt="Vehicle"
-                  className="w-full h-[259px] rounded-[16px] object-cover mb-4"
-                />
-              </SwiperSlide>
-              <SwiperSlide>
-                <img
-                  src={
-                    rides?.vehicle?.vehicleImagePassengerSide ||
-                    "https://via.placeholder.com/300"
-                  }
-                  alt="Vehicle"
-                  className="w-full h-[259px] rounded-[16px] object-cover mb-4"
-                />
-              </SwiperSlide>
-              <SwiperSlide>
-                <img
-                  src={
-                    rides?.vehicle?.vehicleImageDriverSide ||
-                    "https://via.placeholder.com/300"
-                  }
-                  alt="Vehicle"
-                  className="w-full h-[259px] rounded-[16px] object-cover mb-4"
-                />
-              </SwiperSlide>
-              <SwiperSlide>
-                <img
-                  src={
-                    rides?.vehicle?.vehicleImageInteriorFront ||
-                    "https://via.placeholder.com/300"
-                  }
-                  alt="Vehicle"
-                  className="w-full h-[259px] rounded-[16px] object-cover mb-4"
-                />
-              </SwiperSlide>
-              <SwiperSlide>
-                <img
-                  src={
-                    rides?.vehicle?.vehicleImageInteriorBack ||
-                    "https://via.placeholder.com/300"
-                  }
-                  alt="Vehicle"
-                  className="w-full h-[259px] rounded-[16px] object-cover mb-4"
-                />
-              </SwiperSlide>
-            </Swiper>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-100 border rounded-lg p-2">
-                <p className="text-[14px] text-black">Make</p>
-                <p className="text-[16px] font-medium text-black">
-                  {rides?.vehicle?.vehicleMake || "N/A"}
-                </p>
-              </div>
-              <div className="bg-gray-100 border rounded-lg p-2">
-                <p className="text-[14px] text-black">Vehicle Type</p>
-                <p className="text-[16px] font-medium text-black">
-                  {rides?.vehicle?.vehicleType || "N/A"}
-                </p>
-              </div>
-              <div className="bg-gray-100 border rounded-lg p-2">
-                <p className="text-[14px] text-black">Name</p>
-                <p className="text-[16px] font-medium text-black">
-                  {rides?.vehicle?.vehicleName || "N/A"}
-                </p>
-              </div>
-              <div className="bg-gray-100 border rounded-lg p-2">
-                <p className="text-[14px] text-black">Model Year</p>
-                <p className="text-[16px] font-medium text-black">
-                  {rides?.vehicle?.modelYear || "N/A"}
-                </p>
-              </div>
-              <div className="bg-gray-100 border rounded-lg p-2">
-                <p className="text-[14px] text-black">Plate Number</p>
-                <p className="text-[16px] font-medium text-black">
-                  {rides?.vehicle?.plateNumber || "N/A"}
-                </p>
-              </div>
-              <div className="bg-gray-100 border rounded-lg p-2">
-                <p className="text-[14px] text-black">Wheelchair Accessible</p>
-                <p className="text-[16px] font-medium text-black">
-                  {rides?.vehicle?.isWheelchairAccessible ? "Yes" : "No"}
-                </p>
+          {Object.keys(rideDetail?.vehicle || {}).length > 0 ? (
+            <div className="bg-gray-50 border rounded-3xl p-6">
+              <h3 className="text-[22px] font-semibold mb-6 text-black">
+                Vehicle Details
+              </h3>
+
+              <Swiper
+                spaceBetween={10}
+                modules={[Pagination, Autoplay]}
+                autoplay={{
+                  delay: 2500,
+                  disableOnInteraction: false,
+                }}
+                pagination={{
+                  clickable: true,
+                }}
+                className="mySwiper"
+              >
+                <SwiperSlide>
+                  <img
+                    src={
+                      rideDetail.vehicle.vehicleImageFront ||
+                      "https://via.placeholder.com/300"
+                    }
+                    alt="Vehicle"
+                    className="w-full h-[259px] rounded-[16px] object-cover mb-4"
+                  />
+                </SwiperSlide>
+
+                <SwiperSlide>
+                  <img
+                    src={
+                      rideDetail.vehicle.vehicleImageRear ||
+                      "https://via.placeholder.com/300"
+                    }
+                    alt="Vehicle"
+                    className="w-full h-[259px] rounded-[16px] object-cover mb-4"
+                  />
+                </SwiperSlide>
+
+                {/* Remaining SwiperSlides */}
+              </Swiper>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-gray-100 border rounded-lg p-2">
+                  <p className="text-[14px] text-black">Make</p>
+                  <p className="text-[16px] font-medium text-black">
+                    {rideDetail.vehicle.vehicleMake || "N/A"}
+                  </p>
+                </div>
+
+                <div className="bg-gray-100 border rounded-lg p-2">
+                  <p className="text-[14px] text-black">Vehicle Type</p>
+                  <p className="text-[16px] font-medium text-black">
+                    {rideDetail.vehicle.vehicleType || "N/A"}
+                  </p>
+                </div>
+
+                <div className="bg-gray-100 border rounded-lg p-2">
+                  <p className="text-[14px] text-black">Name</p>
+                  <p className="text-[16px] font-medium text-black">
+                    {rideDetail.vehicle.vehicleName || "N/A"}
+                  </p>
+                </div>
+
+                <div className="bg-gray-100 border rounded-lg p-2">
+                  <p className="text-[14px] text-black">Model Year</p>
+                  <p className="text-[16px] font-medium text-black">
+                    {rideDetail.vehicle.modelYear || "N/A"}
+                  </p>
+                </div>
+
+                <div className="bg-gray-100 border rounded-lg p-2">
+                  <p className="text-[14px] text-black">Plate Number</p>
+                  <p className="text-[16px] font-medium text-black">
+                    {rideDetail.vehicle.plateNumber || "N/A"}
+                  </p>
+                </div>
+
+                <div className="bg-gray-100 border rounded-lg p-2">
+                  <p className="text-[14px] text-black">Wheelchair Accessible</p>
+                  <p className="text-[16px] font-medium text-black">
+                    {rideDetail.vehicle.isWheelchairAccessible ? "Yes" : "No"}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="bg-gray-50 border rounded-3xl p-6 flex items-center justify-center h-[400px]">
+              <p className="text-gray-500 text-lg font-medium">
+                Vehicle details not available.
+              </p>
+            </div>
+          )}
 
 
 
@@ -937,7 +913,14 @@ const RideDetails = () => {
                 type="number"
                 placeholder="Enter amount"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  // Allow only positive values
+                  if (value === "" || Number(value) >= 0) {
+                    setAmount(value);
+                  }
+                }}
                 className="w-full border rounded-lg px-3 py-2 mb-4"
               />
 

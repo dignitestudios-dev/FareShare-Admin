@@ -5,7 +5,14 @@ import { TbCaretDownFilled } from "react-icons/tb";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "../../../axios";
 import { ErrorToast } from "../global/Toast";
-const UsersTable = ({ data, loading }) => {
+const UsersTable = ({
+  data,
+  loading,
+  currentPage,
+  setCurrentPage,
+  totalUsers,
+  itemsPerPage,
+}) => {
   const [searchQuery, setSearchQuery] = React.useState("");
   const navigate = useNavigate();
   const handleView = (user) => {
@@ -27,9 +34,8 @@ const UsersTable = ({ data, loading }) => {
   const [tab, setTab] = useState("unblocked");
 
   const filteredUsers = data.filter((user) => {
-    const fullName = `${user?.firstName || ""} ${
-      user?.lastName || ""
-    }`.toLowerCase();
+    const fullName = `${user?.firstName || ""} ${user?.lastName || ""
+      }`.toLowerCase();
     const email = `${user?.email || ""}`.toLowerCase();
     const id = `${user?.fareShareId || ""}`.toLowerCase();
     const userBlock = user?.isBlocked;
@@ -37,8 +43,8 @@ const UsersTable = ({ data, loading }) => {
     // Check if the search query matches the user information
     const searchMatch = searchQuery
       ? fullName.includes(searchQuery.toLowerCase()) ||
-        email.includes(searchQuery.toLowerCase()) ||
-        id.includes(searchQuery.toLowerCase())
+      email.includes(searchQuery.toLowerCase()) ||
+      id.includes(searchQuery.toLowerCase())
       : true; // If no search query, include all users
 
     // Check if the user matches the tab filter
@@ -46,10 +52,10 @@ const UsersTable = ({ data, loading }) => {
       tab === ""
         ? true // Show all users
         : tab === "blocked"
-        ? userBlock === true // Show only blocked users
-        : tab === "unblocked"
-        ? userBlock === false // Show only unblocked users
-        : true; // Default to all users if tab is unrecognized
+          ? userBlock === true // Show only blocked users
+          : tab === "unblocked"
+            ? userBlock === false // Show only unblocked users
+            : true; // Default to all users if tab is unrecognized
 
     // Both conditions must match
     return searchMatch && blockedMatch;
@@ -57,16 +63,16 @@ const UsersTable = ({ data, loading }) => {
 
   // pagination related data:
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  // const [currentPage, setCurrentPage] = useState(1);
+  // const itemsPerPage = 10;
 
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  // const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
-  const currentData = filteredUsers.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
+  // const currentData = filteredUsers.slice(
+  //   (currentPage - 1) * itemsPerPage,
+  //   currentPage * itemsPerPage
+  // );
+  const totalPages = Math.ceil(totalUsers / itemsPerPage);
   const goToPage = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -94,11 +100,10 @@ const UsersTable = ({ data, loading }) => {
                 setTab("");
                 setCurrentPage(1);
               }}
-              className={`w-full transition-all duration-300 ${
-                tab == ""
-                  ? "bg-[#c00000] text-white"
-                  : "bg-gray-200 text-gray-600 hover:bg-[#c00000] hover:text-white"
-              }  h-full rounded-xl flex items-center justify-center  text-xs font-medium`}
+              className={`w-full transition-all duration-300 ${tab == ""
+                ? "bg-[#c00000] text-white"
+                : "bg-gray-200 text-gray-600 hover:bg-[#c00000] hover:text-white"
+                }  h-full rounded-xl flex items-center justify-center  text-xs font-medium`}
             >
               All
             </button>
@@ -107,11 +112,10 @@ const UsersTable = ({ data, loading }) => {
                 setTab("blocked");
                 setCurrentPage(1);
               }}
-              className={`w-full transition-all duration-300 ${
-                tab == "blocked"
-                  ? "bg-[#c00000] text-white"
-                  : "bg-gray-200 text-gray-600 hover:bg-[#c00000] hover:text-white"
-              }  h-full rounded-xl flex items-center justify-center  text-xs font-medium`}
+              className={`w-full transition-all duration-300 ${tab == "blocked"
+                ? "bg-[#c00000] text-white"
+                : "bg-gray-200 text-gray-600 hover:bg-[#c00000] hover:text-white"
+                }  h-full rounded-xl flex items-center justify-center  text-xs font-medium`}
             >
               Blocked
             </button>
@@ -120,11 +124,10 @@ const UsersTable = ({ data, loading }) => {
                 setTab("unblocked");
                 setCurrentPage(1);
               }}
-              className={`w-full  transition-all duration-300 ${
-                tab == "unblocked"
-                  ? "bg-[#c00000] text-white"
-                  : "bg-gray-200 text-gray-600 hover:bg-[#c00000] hover:text-white"
-              }   h-full rounded-xl flex items-center justify-center  text-xs font-medium`}
+              className={`w-full  transition-all duration-300 ${tab == "unblocked"
+                ? "bg-[#c00000] text-white"
+                : "bg-gray-200 text-gray-600 hover:bg-[#c00000] hover:text-white"
+                }   h-full rounded-xl flex items-center justify-center  text-xs font-medium`}
             >
               Unblocked
             </button>
@@ -228,12 +231,12 @@ const UsersTable = ({ data, loading }) => {
                 </React.Fragment>
               ))
             ) : filteredUsers?.length > 0 ? (
-              currentData?.map((user, index) => (
+              filteredUsers?.map((user, index) => (
                 <React.Fragment key={index}>
                   <tr className=" text-[10px] text-gray-900 ">
                     <td className="flex  items-center gap-3 py-1">
                       <img
-                        src={user?.profilePicture||"/person.png"}
+                        src={user?.profilePicture || "/person.png"}
                         alt={user?.firstName}
                         className="w-8 h-8 rounded-full"
                       />
@@ -321,11 +324,10 @@ const UsersTable = ({ data, loading }) => {
               type="button"
               key={i}
               onClick={() => goToPage(i + 1)}
-              class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${
-                currentPage === i + 1
-                  ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
-                  : "border bg-gray-50"
-              }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
+              class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${currentPage === i + 1
+                ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
+                : "border bg-gray-50"
+                }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
               aria-current="page"
             >
               {i + 1}

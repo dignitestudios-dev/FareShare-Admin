@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import { notificationCreate } from "../../../schema/notificationCreate";
 import { ErrorToast, SuccessToast } from "../global/Toast";
 import { notification } from "../../../data/notification";
+import { MdClose } from "react-icons/md";
 
 const NotificationCreateModal = ({ isOpen, setIsOpen, setReload }) => {
   const modalRef = useRef();
@@ -49,16 +50,24 @@ const NotificationCreateModal = ({ isOpen, setIsOpen, setReload }) => {
   return (
     <div
       onClick={toggleModal}
-      className={`w-screen h-screen   z-50 transition-all duration-200 flex justify-center items-center pr-7  fixed bottom-0  backdrop-blur-sm left-0 ${
-        isOpen ? "scale-100" : "scale-0"
-      }`}
+      className={`w-screen h-screen   z-50 transition-all duration-200 flex justify-center items-center pr-7  fixed bottom-0  backdrop-blur-sm left-0 ${isOpen ? "scale-100" : "scale-0"
+        }`}
     >
+
       <form
         onSubmit={handleSubmit}
-        ref={modalRef}
+        // ref={modalRef}
         className="bg-gray-50 w-96 h-auto p-6 flex flex-col gap-2 justify-start items-start rounded-3xl shadow border"
       >
+
         <div className="w-auto flex flex-col justify-start items-start mb-2">
+          <button
+            type="button"
+            onClick={() => setIsOpen(false)}
+            className=" ms-auto rounded-full hover:bg-gray-200 transition"
+          >
+            <MdClose className="text-xl text-gray-600" />
+          </button>
           <span className="text-xl font-bold text-gray-900">
             Send Notification
           </span>
@@ -81,10 +90,10 @@ const NotificationCreateModal = ({ isOpen, setIsOpen, setReload }) => {
             value={values.title}
             onChange={handleChange}
             onBlur={handleBlur}
+            maxlength={20}
             placeholder="e.g. New Feature Update"
-            className={`mt-1 px-3 h-12 placeholder:text-sm w-full border rounded-md bg-gray-100 focus:border-gray-200 focus:outline-none  focus:ring-offset-2 focus:ring-gray-300 transition-colors duration ${
-              errors.title && touched.title ? "border-red-600 shake" : null
-            }`}
+            className={`mt-1 px-3 h-12 placeholder:text-sm w-full border rounded-md bg-gray-100 focus:border-gray-200 focus:outline-none  focus:ring-offset-2 focus:ring-gray-300 transition-colors duration ${errors.title && touched.title ? "border-red-600 shake" : null
+              }`}
           />
           {errors.title && touched.title ? (
             <p className="text-red-700 text-sm font-medium">{errors.title}</p>
@@ -104,10 +113,10 @@ const NotificationCreateModal = ({ isOpen, setIsOpen, setReload }) => {
             value={values.message}
             onChange={handleChange}
             onBlur={handleBlur}
+            maxlength={200}
             placeholder="e.g. Our app is getting a new feature"
-            className={`mt-1 p-3 h-32 resize-none bg-gray-100 w-full placeholder:text-sm border rounded-md focus:border-gray-200 focus:outline-none  focus:ring-offset-2 focus:ring-gray-300 transition-colors duration ${
-              errors.message && touched.message ? "border-red-600 shake" : null
-            }`}
+            className={`mt-1 p-3 h-32 resize-none bg-gray-100 w-full placeholder:text-sm border rounded-md focus:border-gray-200 focus:outline-none  focus:ring-offset-2 focus:ring-gray-300 transition-colors duration ${errors.message && touched.message ? "border-red-600 shake" : null
+              }`}
           ></textarea>
           {errors.message && touched.message ? (
             <p className="text-red-700 text-sm font-medium">{errors.message}</p>

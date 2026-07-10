@@ -4,6 +4,7 @@ import { ReportTable } from "../../components/app/reports/ReportTable";
 import { TimeTabs } from "../../components/app/reports/TimeTabs";
 import axios from '../../axios'
 import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export default function Reports() {
     const [activeTab, setActiveTab] = useState("Drivers");
@@ -15,7 +16,10 @@ export default function Reports() {
         setActiveTab(tab);
         setCurrentPage(1);
     };
-
+    const formatAmount = (value) => {
+        const amount = Number(value ?? 0);
+        return amount.toFixed(2);
+    };
     function formatDate(dateString) {
         if (dateString == null) return "Invalid Date";
         const date = new Date(dateString);
@@ -70,7 +74,7 @@ export default function Reports() {
                     "Driver Name": driver?.driverName || "N/A",
                     "Driver Email": driver?.email || "N/A",
                     City: driver?.city || "N/A",
-                    Status: driver?.isActive ? "Active" : "Inactive",
+                    Status: driver?.status === "pending" ? "Pending" : "Approved",
                     "Online Hours": driver?.onlineHours
                         ? `${driver.onlineHours}h`
                         : "0h",
@@ -118,12 +122,12 @@ export default function Reports() {
             data:
                 reports?.earnings?.map((earnings) => ({
                     "Driver Name": earnings?.driverName || "N/A",
-                    "Driver Earnings": earnings?.driverEarnings || 0,
-                    "Admin Fees": earnings?.platformRevenue || 0,
-                    "Referral Bonuses": earnings?.referralBonus || 0,
-                    "Ride Credits": earnings?.cashback || 0,
-                    "Alternate Payments": earnings?.walletRevenue || 0,
-                    "Net Revenue": earnings?.totalRevenue || 0,
+                    "Driver Earnings": formatAmount(earnings?.driverEarnings),
+                    "Admin Fees": formatAmount(earnings?.platformRevenue),
+                    "Referral Bonuses": formatAmount(earnings?.referralBonus),
+                    "Ride Credits": formatAmount(earnings?.cashback),
+                    "Alternate Payments": formatAmount(earnings?.walletRevenue),
+                    "Net Revenue": formatAmount(earnings?.totalRevenue),
 
                 })) || [],
         },
@@ -135,7 +139,7 @@ export default function Reports() {
                 "Document Type",
                 "Reported On",
                 "Expiry Date",
-                "Status",
+                "Document Status",
             ],
             data:
                 reports?.compliance?.map((compliance) => ({
@@ -143,7 +147,7 @@ export default function Reports() {
                     "Reported On": formatDate(compliance?.documentUploadDate) || "N/A",
                     "Expiry Date": formatDate(compliance?.documentExpiryDate) || "N/A",
                     "Document Type": formatType(compliance?.documentType) || "N/A",
-                    "Status": compliance?.documentStatus || 'N/A',
+                    "Document Status": compliance?.documentStatus || 'N/A',
 
 
                 })) || [],
@@ -166,7 +170,7 @@ export default function Reports() {
                     "Active Users": systems?.activeUser || 0,
                     "Completed Rides": systems?.completeRidesCount || 0,
                     "Blocked Accounts": systems?.blockUser || 0,
-                    "Revenue": systems?.revenue || 'N/A',
+                    "Revenue": formatAmount(systems?.revenue) || 'N/A',
 
 
                 })) || [],
@@ -196,25 +200,43 @@ export default function Reports() {
         }
 
         if (type === "pdf") {
-            const doc = new jsPDF();
-            doc.setFontSize(12);
+            const doc = new jsPDF("landscape");
 
-            // add header
-            doc.text(`${activeTab} - ${activeTime} Report`, 10, 10);
+            doc.setFontSize(16);
+            doc.text(`${activeTab} - ${activeTime} Report`, 14, 15);
 
-            // add table content
-            let startY = 20;
-            doc.setFontSize(10);
+            autoTable(doc, {
+                startY: 25,
+                head: [columns],
+                body: data.map((row) => columns.map((col) => row[col] ?? "N/A")),
 
-            // add columns
-            doc.text(columns.join(" | "), 10, startY);
-            startY += 8;
+                theme: "grid",
 
-            // add rows
-            data.forEach((row) => {
-                const rowText = columns.map((col) => row[col] ?? "").join(" | ");
-                doc.text(rowText, 10, startY);
-                startY += 8;
+                styles: {
+                    fontSize: 8,
+                    cellPadding: 3,
+                    overflow: "linebreak",
+                    valign: "middle",
+                    halign: "center",
+                },
+
+                headStyles: {
+                    fillColor: [192, 0, 0],
+                    textColor: 255,
+                    fontStyle: "bold",
+                    halign: "center",
+                },
+
+                alternateRowStyles: {
+                    fillColor: [245, 245, 245],
+                },
+
+                tableWidth: "auto",
+
+                margin: {
+                    left: 10,
+                    right: 10,
+                },
             });
 
             doc.save(`${activeTab}-${activeTime}-report.pdf`);

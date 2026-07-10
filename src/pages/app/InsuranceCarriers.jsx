@@ -105,9 +105,8 @@ const InsuranceCarriers = () => {
         </div>
         <button
           onClick={() => setIsCreateOpen((prev) => !prev)}
-          className={`active:scale-95  flex justify-center items-center w-10 h-10 rounded-full bg shadow-md border border-red-500 text-white  font-medium text-xl  outline-none   hover:opacity-90 transition-all duration-500 ${
-            isCreateOpen ? "rotate-45" : "rotate-0"
-          }`}
+          className={`active:scale-95  flex justify-center items-center w-10 h-10 rounded-full bg shadow-md border border-red-500 text-white  font-medium text-xl  outline-none   hover:opacity-90 transition-all duration-500 ${isCreateOpen ? "rotate-45" : "rotate-0"
+            }`}
         >
           <span className="leading-3">
             <FiPlus />
@@ -115,39 +114,50 @@ const InsuranceCarriers = () => {
         </button>
       </div>
 
-      <div className="w-full h-auto grid grid-cols-3 bg-gray-50 border p-4 rounded-3xl gap-2 justify-start items-start">
-        {!loading && filteredData?.length > 0
-          ? currentData?.map((carrier, index) => {
-              return (
-                <div
-                  key={index}
-                  class=" px-4 py-4 bg-gray-100 border rounded-3xl h-auto  w-full"
-                >
-                  <div class=" inline-flex items-center justify-between w-full">
-                    <div class="inline-flex gap-2 items-center">
-                      <div className="w-10 h-10 rounded-full bg-[#c00000]/10 flex items-center justify-center">
-                        <PiSubtitlesBold className="text-[#c00000] text-2xl" />
-                      </div>
-                      <h3 class="font-bold text-base text-gray-800">
-                        {carrier?.name}
-                      </h3>
-                    </div>
-                    <p class="text-xs text-gray-500">
-                      {timeAgo(carrier?.createdAt)}
-                    </p>
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {!loading && filteredData?.length > 0 ? (
+          currentData?.map((carrier, index) => (
+            <div
+              key={index}
+              className="bg-gray-50 border rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-12 h-12 rounded-full bg-[#c00000]/10 flex items-center justify-center shrink-0">
+                    <PiSubtitlesBold className="text-[#c00000] text-2xl" />
+                  </div>
+
+                  <div className="min-w-0">
+                    <h3 className="text-base font-semibold text-gray-800 break-words">
+                      {carrier?.name || "N/A"}
+                    </h3>
                   </div>
                 </div>
-              );
-            })
-          : !loading && (
-              <div className="w-full min-h-[70vh] flex col-span-3 flex-col items-center justify-center">
-                <img src="/no-data.png" alt="" className="w-[230px]" />
-                <span className="font-semibold text-center text-[#0e0e10] text-[24px] ">
-                  You don’t have added any <br /> Listing Here
-                </span>
+
+                <p className="text-xs text-gray-500 whitespace-nowrap">
+                  {timeAgo(carrier?.createdAt)}
+                </p>
               </div>
-            )}
-      </div>
+            </div>
+          ))
+        ) : (
+          !loading && (
+            <div className="col-span-full min-h-[60vh] flex flex-col items-center justify-center">
+              <img
+                src="/no-data.png"
+                alt="No Data"
+                className="w-56 object-contain"
+              />
+              <h2 className="mt-4 text-2xl font-semibold text-gray-900 text-center">
+                No Listings Found
+              </h2>
+              <p className="mt-2 text-gray-500 text-center">
+                You haven't added any listings yet.
+              </p>
+            </div>
+          )
+        )}
+      </div>  
       {!loading && filteredData?.length > 0 && (
         <nav
           class="flex w-full items-center  justify-end mt-2 -space-x-px"
@@ -182,11 +192,10 @@ const InsuranceCarriers = () => {
               type="button"
               key={i}
               onClick={() => goToPage(i + 1)}
-              class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${
-                currentPage === i + 1
+              class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${currentPage === i + 1
                   ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
                   : "border bg-gray-50"
-              }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
+                }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
               aria-current="page"
             >
               {i + 1}

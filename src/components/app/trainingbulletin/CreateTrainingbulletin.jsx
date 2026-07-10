@@ -9,11 +9,15 @@ import { ErrorToast, SuccessToast } from "../global/Toast";
 const CreateTrainingbulletin = ({ handleback, setCreateTrainingbulletin }) => {
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  const MAX_FILE_SIZE = 5 * 1024 * 1024;
   const formik = useFormik({
     initialValues: trainingBulletinInitialValues,
     validationSchema: trainingBulletinSchema,
     onSubmit: async (values, { resetForm }) => {
+      if (values.bannerImage && values.bannerImage.size > MAX_FILE_SIZE) {
+        ErrorToast("Image size must not exceed 5MB.");
+        return;
+      }
       try {
         setLoading(true);
 
@@ -21,7 +25,7 @@ const CreateTrainingbulletin = ({ handleback, setCreateTrainingbulletin }) => {
         formData.append("title", values.title);
         formData.append("description", values.description);
         formData.append("bannerLink", values.bannerLink);
-        // formData.append("image", values.bannerImage);
+        formData.append("image", values.bannerImage);
         // formData.append("image", null);
 
         const response = await axios.post(
@@ -44,15 +48,24 @@ const CreateTrainingbulletin = ({ handleback, setCreateTrainingbulletin }) => {
     },
   });
 
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreview(previewUrl);
-      formik.setFieldValue("bannerImage", file);
-    }
-  };
 
+    if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE) {
+      ErrorToast("Image size must not exceed 5MB.");
+      e.target.value = "";
+      setImagePreview(null);
+      formik.setFieldValue("bannerImage", null);
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(file);
+    setImagePreview(previewUrl);
+    formik.setFieldValue("bannerImage", file);
+  };
   return (
     <div className="w-full bg-white rounded-[18px] p-6 mx-auto">
       <div className="flex gap-2 items-center mb-6">
@@ -72,11 +85,10 @@ const CreateTrainingbulletin = ({ handleback, setCreateTrainingbulletin }) => {
           <div className="flex items-center justify-center w-full">
             <label
               htmlFor="imageUpload"
-              className={`flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl cursor-pointer ${
-                formik.errors.bannerImage && formik.touched.bannerImage
-                  ? "border-red-500"
-                  : "border-[#c00000]"
-              } bg-[#f9f9f9] hover:bg-[#f1f1f1] transition-all`}
+              className={`flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl cursor-pointer ${formik.errors.bannerImage && formik.touched.bannerImage
+                ? "border-red-500"
+                : "border-[#c00000]"
+                } bg-[#f9f9f9] hover:bg-[#f1f1f1] transition-all`}
             >
               {imagePreview ? (
                 <img
@@ -95,7 +107,8 @@ const CreateTrainingbulletin = ({ handleback, setCreateTrainingbulletin }) => {
               <input
                 id="imageUpload"
                 type="file"
-                accept="image/*"
+                accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+
                 onChange={handleImageChange}
                 className="hidden"
               />
@@ -114,12 +127,12 @@ const CreateTrainingbulletin = ({ handleback, setCreateTrainingbulletin }) => {
             value={formik.values.title}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
+            maxLength={50}
             placeholder="Enter training or bulletin title"
-            className={`w-full p-3 rounded-xl bg-[#f8f8f8] text-[#333] outline-none border ${
-              formik.errors.title && formik.touched.title
-                ? "border-red-500 focus:ring-red-500"
-                : "border-gray-200 focus:ring-[#c00000]"
-            } placeholder-gray-400 focus:ring-2`}
+            className={`w-full p-3 rounded-xl bg-[#f8f8f8] text-[#333] outline-none border ${formik.errors.title && formik.touched.title
+              ? "border-red-500 focus:ring-red-500"
+              : "border-gray-200 focus:ring-[#c00000]"
+              } placeholder-gray-400 focus:ring-2`}
           />
           {formik.touched.title && formik.errors.title && (
             <p className="text-red-500 text-sm">{formik.errors.title}</p>
@@ -137,11 +150,11 @@ const CreateTrainingbulletin = ({ handleback, setCreateTrainingbulletin }) => {
             onBlur={formik.handleBlur}
             placeholder="Write short description..."
             rows={5}
-            className={`w-full p-3 rounded-xl bg-[#f8f8f8] text-[#333] outline-none border resize-none ${
-              formik.errors.description && formik.touched.description
-                ? "border-red-500 focus:ring-red-500"
-                : "border-gray-200 focus:ring-[#c00000]"
-            } placeholder-gray-400 focus:ring-2`}
+            maxLength={350}
+            className={`w-full p-3 rounded-xl bg-[#f8f8f8] text-[#333] outline-none border resize-none ${formik.errors.description && formik.touched.description
+              ? "border-red-500 focus:ring-red-500"
+              : "border-gray-200 focus:ring-[#c00000]"
+              } placeholder-gray-400 focus:ring-2`}
           ></textarea>
           {formik.touched.description && formik.errors.description && (
             <p className="text-red-500 text-sm">{formik.errors.description}</p>
@@ -159,11 +172,10 @@ const CreateTrainingbulletin = ({ handleback, setCreateTrainingbulletin }) => {
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             placeholder="https://example.com"
-            className={`w-full p-3 rounded-xl bg-[#f8f8f8] text-[#333] outline-none border ${
-              formik.errors.bannerLink && formik.touched.bannerLink
-                ? "border-red-500 focus:ring-red-500"
-                : "border-gray-200 focus:ring-[#c00000]"
-            } placeholder-gray-400 focus:ring-2`}
+            className={`w-full p-3 rounded-xl bg-[#f8f8f8] text-[#333] outline-none border ${formik.errors.bannerLink && formik.touched.bannerLink
+              ? "border-red-500 focus:ring-red-500"
+              : "border-gray-200 focus:ring-[#c00000]"
+              } placeholder-gray-400 focus:ring-2`}
           />
           {formik.touched.bannerLink && formik.errors.bannerLink && (
             <p className="text-red-500 text-sm">{formik.errors.bannerLink}</p>
@@ -174,11 +186,10 @@ const CreateTrainingbulletin = ({ handleback, setCreateTrainingbulletin }) => {
           <button
             type="submit"
             disabled={loading}
-            className={`px-6 py-2 rounded-full text-white font-semibold transition-all duration-300 ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-[#c00000] hover:bg-[#a00000]"
-            }`}
+            className={`px-6 py-2 rounded-full text-white font-semibold transition-all duration-300 ${loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-[#c00000] hover:bg-[#a00000]"
+              }`}
           >
             {loading ? "Submitting..." : "Submit"}
           </button>

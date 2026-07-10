@@ -78,6 +78,7 @@ const InsuranceCarrierCrate = ({ isOpen, setIsOpen, setReload }) => {
             id="name"
             name="name"
             value={values.name}
+            maxlength={50}
             onChange={handleChange}
             onBlur={handleBlur}
             className={`mt-1 px-3 h-12 placeholder:text-sm w-full border rounded-md bg-gray-100 focus:border-gray-200 focus:outline-none  focus:ring-offset-2 focus:ring-gray-300 transition-colors duration ${

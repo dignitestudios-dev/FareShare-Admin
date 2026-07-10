@@ -109,18 +109,21 @@ const DriverTable = ({ data, loading, setUpdate }) => {
   const [tab, setTab] = useState("pending");
 
   // Filter drivers based on search query and tab
-  const filteredDrivers = data.filter((driver) => {
-    const fullName = `${driver?.firstName || ""} ${driver?.lastName || ""
-      }`.toLowerCase();
-    const email = `${driver?.email}`;
-    const driverStatus = driver?.status?.toLowerCase();
-    const searchMatch =
-      fullName.includes(searchQuery.toLowerCase()) ||
-      email.includes(searchQuery?.toLowerCase());
-    const statusMatch = tab == "" ? true : driverStatus === tab;
+  const filteredDrivers = data
+    .filter((driver) => {
+      const fullName = `${driver?.firstName || ""} ${driver?.lastName || ""}`.toLowerCase();
+      const email = `${driver?.email || ""}`.toLowerCase();
+      const driverStatus = driver?.status?.toLowerCase();
 
-    return searchMatch && statusMatch; // Both conditions must match
-  });
+      const searchMatch =
+        fullName.includes(searchQuery.toLowerCase()) ||
+        email.includes(searchQuery.toLowerCase());
+
+      const statusMatch = tab === "" ? true : driverStatus === tab;
+
+      return searchMatch && statusMatch;
+    })
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // New → Old
 
   // pagination related data:
 
@@ -248,7 +251,7 @@ const DriverTable = ({ data, loading, setUpdate }) => {
                   </tr>
                 </React.Fragment>
               ))
-            ) : filteredDrivers?.length > 0 ? (
+            ) : currentData?.length > 0 ? (
               currentData?.map((user, index) => {
                 return (
                   <React.Fragment key={user?._id || index}>

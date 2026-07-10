@@ -93,6 +93,11 @@ const UserDetails = () => {
     }
   };
   const toggleBlock = async (isBlocked) => {
+    if (isBlocked && !reason.trim()) {
+      ErrorToast("Please enter a reason.");
+      return;
+    }
+
     try {
       setLoading(true);
       const { data } = await axios.post("/admin/block", {
@@ -126,7 +131,7 @@ const UserDetails = () => {
         <div className="w-full flex items-center  mb-4 justify-between h-8 ">
           <div className="flex gap-2 justify-end ms-auto">
             {/* Block/Unblock Button */}
-            {isBlocked ? (
+            {user?.isBlocked ? (
               <button
                 onClick={() => {
                   setOpen(true);
@@ -195,7 +200,10 @@ const UserDetails = () => {
 
         <BlockModal
           isOpen={open}
-          onRequestClose={() => setOpen(false)}
+          onRequestClose={() => {
+            setOpen(false);
+            setReason("");
+          }}
           onConfirm={() => toggleBlock(isBlocked)}
           loading={loading}
           isBlocked={isBlocked}
@@ -246,12 +254,12 @@ const UserDetails = () => {
                 </span>
                 {isEditing ? (
                   field.name === "email" ||
-                  field.name === "funds" ||
-                  field.name === "phoneNo" ||
-                  field.name === "city" ||
-                  field.name === "street" ||
-                  field.name === "state" ||
-                  field.name === "postalCode" ? (
+                    field.name === "funds" ||
+                    field.name === "phoneNo" ||
+                    field.name === "city" ||
+                    field.name === "street" ||
+                    field.name === "state" ||
+                    field.name === "postalCode" ? (
                     <span className="text-[13px] font-medium text-black">
                       {field.name === "funds"
                         ? `$${formData[field.name]}`
@@ -341,25 +349,24 @@ const UserDetails = () => {
               </div>
 
               {/* Insurance Carrier */}
-              <div className="flex flex-col bg-gray-100 border p-4 rounded-lg">
+              <div className="flex flex-col bg-gray-100 border p-4 rounded-lg min-w-0">
                 <span className="text-[14px] text-[#9E9E9E]">
                   Insurance Carrier
                 </span>
-                <span className="text-[16px] font-medium text-black">
-                  {user?.nemtEligibility?.insuranceCarrier}
+                <span className="text-[16px] font-medium text-black break-words">
+                  {user?.nemtEligibility?.insuranceCarrier || "N/A"}
                 </span>
               </div>
 
               {/* Medicaid No./Insurance No. */}
-              <div className="flex flex-col bg-gray-100 border p-4 rounded-lg">
+              <div className="flex flex-col bg-gray-100 border p-4 rounded-lg min-w-0">
                 <span className="text-[14px] text-[#9E9E9E]">
                   Medicaid No./Insurance No.
                 </span>
-                <span className="text-[16px] font-medium text-black">
-                  {user?.nemtEligibility?.insuranceNumber}
+                <span className="text-[16px] font-medium text-black break-all">
+                  {user?.nemtEligibility?.insuranceNumber || "N/A"}
                 </span>
               </div>
-
               {/* Subscriber Number */}
               <div className="flex flex-col bg-gray-100 border p-4 rounded-lg">
                 <span className="text-[14px] text-[#9E9E9E]">
@@ -416,27 +423,27 @@ const UserDetails = () => {
           </h3>
 
           <ul className="list-disc pl-4">
-  <li>
-    User being verbally abusive{" "}
-    <span className="font-bold">
-      ({user?.cancellationReasons?.["verbally-abusive"]})
-    </span>
-  </li>
+            <li>
+              User being verbally abusive{" "}
+              <span className="font-bold">
+                ({user?.cancellationReasons?.["verbally-abusive"]})
+              </span>
+            </li>
 
-  <li>
-    User being physically abusive{" "}
-    <span className="font-bold">
-      ({user?.cancellationReasons?.["physically-abusive"]})
-    </span>
-  </li>
+            <li>
+              User being physically abusive{" "}
+              <span className="font-bold">
+                ({user?.cancellationReasons?.["physically-abusive"]})
+              </span>
+            </li>
 
-  <li>
-    Other{" "}
-    <span className="font-bold">
-      ({user?.cancellationReasons?.other})
-    </span>
-  </li>
-</ul>
+            <li>
+              Other{" "}
+              <span className="font-bold">
+                ({user?.cancellationReasons?.other})
+              </span>
+            </li>
+          </ul>
         </div>
       </div>
 

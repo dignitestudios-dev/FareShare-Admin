@@ -51,7 +51,7 @@ const DashboardUsersTable = () => {
         <h3 className="text-[18px] font-bold leading-[24.3px] text-black">
           Users{" "}
           <span className="text-[12px] font-normal text-black">
-            ({users?.length})
+            ({Math.min(users?.length || 0, 5)})
           </span>
         </h3>
         <button
@@ -115,7 +115,7 @@ const DashboardUsersTable = () => {
                 <tr className="bg-gray-50 text-[10px] text-gray-900 ">
                   <td className="flex  items-center gap-3 py-1">
                     <img
-                      src={user?.profilePicture||"/person.png"}
+                      src={user?.profilePicture || "/person.png"}
                       alt={user?.firstName}
                       className="w-8 h-8 rounded-full"
                     />

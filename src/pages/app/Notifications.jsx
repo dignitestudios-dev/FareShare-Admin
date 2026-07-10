@@ -135,7 +135,7 @@ const Notifications = () => {
                       {timeAgo(notification?.createdAt)}
                     </p>
                   </div>
-                  <p class="mt-2 text-sm">
+                  <p class="mt-2 text-sm break-all">
                     {notification?.message?.length > 80
                       ? notification?.message?.slice(0, 80) + "..."
                       : notification?.message}

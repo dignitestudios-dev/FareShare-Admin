@@ -4,20 +4,26 @@ import axios from "../../axios";
 import { ErrorToast } from "../../components/app/global/Toast";
 
 const Users = () => {
-  const [UserData, setUserData] = useState([]);
-
+  const [userData, setUserData] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
+
+  const limit = 10;
 
   const getUsers = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get("/admin/allUsers");
-      console.log("🚀 ~ getUsers ~ data:", data);
-      setUserData(data?.data); // Use setUserData to set the user data
+
+      const { data } = await axios.get(
+        `/admin/allUsers?page=${currentPage}&limit=${limit}`
+      );
+
+      setUserData(data?.data);
+      setTotalUsers(data?.totalUsers);
     } catch (error) {
       ErrorToast(error?.response?.data?.message);
-
-      console.log("Error:", error);
     } finally {
       setLoading(false);
     }
@@ -25,9 +31,18 @@ const Users = () => {
 
   useEffect(() => {
     getUsers();
-  }, []);
+  }, [currentPage]);
 
-  return <UsersTable data={UserData} loading={loading} />;
+  return (
+    <UsersTable
+      data={userData}
+      loading={loading}
+      currentPage={currentPage}
+      setCurrentPage={setCurrentPage}
+      totalUsers={totalUsers}
+      itemsPerPage={limit}
+    />
+  );
 };
 
 export default Users;

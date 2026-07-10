@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 
 export const baseUrl = "https://backend.faresharellc.com";
 // export const baseUrl = "http://192.168.9.15:5000";
+// export const baseUrl = "https://0hw8tf6g-5000.inc1.devtunnels.ms/";
 
 const instance = axios.create({
   baseURL: baseUrl,

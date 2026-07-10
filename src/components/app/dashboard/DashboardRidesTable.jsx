@@ -44,12 +44,12 @@ const DashboardRidesTable = () => {
   return (
     <div className="w-full h-auto p-6 rounded-[18px]  ">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-[18px] font-bold leading-[24.3px] text-black">
-          Rides{" "}
-          <span className="text-[12px] font-normal text-black ">
-            ({rides?.length})
-          </span>
-        </h3>
+       <h3 className="text-[18px] font-bold leading-[24.3px] text-black">
+  Rides{" "}
+  <span className="text-[12px] font-normal text-black">
+    ({Math.min(rides?.length || 0, 6)})
+  </span>
+</h3>
         <button
           onClick={() => {
             navigate("/rides");

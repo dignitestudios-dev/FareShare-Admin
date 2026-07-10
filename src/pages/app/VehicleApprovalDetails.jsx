@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom"; // Import useParams
+import { useLocation, useNavigate, useParams } from "react-router-dom"; // Import useParams
 import { IoCheckmark } from "react-icons/io5";
 import { IoMdClose } from "react-icons/io";
 import axios from "../../axios";
@@ -21,13 +21,13 @@ import { FaFilePdf } from "react-icons/fa";
 
 const VehicleApprovalDetails = () => {
   const { id } = useParams(); // Get vehicle ID from URL parameters
-  const [vehicle, setVehicle] = useState(null); // State to hold vehicle details
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  useEffect(() => {
-    setVehicle(JSON.parse(localStorage.getItem("vehicle")));
-  }, [id]); // Fetch details when ID changes
+  const [vehicle, setVehicle] = useState(location.state || null);
+
+  console.log("🚀 ~ file: VehicleApprovalDetails.jsx:30 ~ VehicleApprovalDetails ~ vehicle:", vehicle);
 
   const [open, setOpen] = useState(false);
   const [acceptLoading, setAcceptLoading] = useState(false);
@@ -98,13 +98,12 @@ const VehicleApprovalDetails = () => {
               Vehicle Details
             </h3>
             <div className="w-auto flex justify-start items-center gap-1">
-              {vehicle?.status?.toLowerCase() == "approved" ? (
-                <button
-                  onClick={() => setCloseOpen(true)}
-                  className="w-auto px-3 h-7 rounded-full flex items-center justify-center text-xs font-medium bg-[#c00000] text-white"
+              {vehicle?.status === "Unapproved" ? (
+                <span
+                  className="inline-flex cursor-not-allowed items-center rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700"
                 >
-                  {"Decline"}
-                </button>
+                  Declined
+                </span>
               ) : (
                 <>
                   <button

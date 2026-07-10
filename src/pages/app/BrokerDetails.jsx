@@ -15,6 +15,8 @@ const BrokerDetails = () => {
   const [loading, setLoading] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
   const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("");
+
   const getBrokerDetails = async () => {
     try {
       setLoading(true);
@@ -33,6 +35,7 @@ const BrokerDetails = () => {
       const { data } = await axios.post("/admin/block", {
         brokerId: id,
         isBlocked: isBlocked,
+        blockedReason: reason,
       });
       if (data?.success) {
         setLoading(false);
@@ -155,6 +158,9 @@ const BrokerDetails = () => {
         onConfirm={() => toggleBlock(isBlocked)}
         loading={loading}
         isBlocked={isBlocked}
+        setReason={setReason}
+        reason={reason}
+        isReason={brokerData?.broker?.isBlocked ? false : true}
       />
     </div>
   );

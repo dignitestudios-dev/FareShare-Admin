@@ -12,11 +12,15 @@ const VehicleApprovalTable = ({ data, loading, setUpdate }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
+  // const handleView = (vehicle) => {
+  //   Cookies.set("vehicle", JSON.stringify(vehicle));
+  //   navigate(`/vehicle-approval/${vehicle?._id}`); // Pass the entire driver object as state
+  // };
   const handleView = (vehicle) => {
-    Cookies.set("vehicle", JSON.stringify(vehicle));
-    navigate(`/vehicle-approval/${vehicle?._id}`); // Pass the entire driver object as state
+    navigate(`/vehicle-approval/${vehicle._id}`, {
+      state: { vehicle },
+    });
   };
-
   // Filter vehicles based on search query
   const filteredVehicles = data?.filter((vehicle) => {
     const vehicleName = vehicle?.vehicleName

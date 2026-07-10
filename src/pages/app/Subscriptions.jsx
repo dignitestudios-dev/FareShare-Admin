@@ -162,10 +162,11 @@ const Subscriptions = () => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     {[
                         { title: "Total Subscriptions", value: stats?.totalSubscriptions },
                         { title: "Active Subscriptions", value: stats?.activeSubscriptions },
+                        { title: "Total Subscription Revenue", value: stats?.totalSubscriptionRevenue ? `\$${stats.totalSubscriptionRevenue.toFixed(2)}` : `$0.00` },
                     ].map((card, index) => (
                         <div key={index} className="rounded-[24px] bg-gray-50 border p-5 shadow-sm">
                             <span className="block text-sm text-gray-500">{card.title}</span>

@@ -54,7 +54,7 @@ const DashboardDriverTable = () => {
         <h3 className="text-[18px] font-bold leading-[24.3px] text-black">
           Drivers{" "}
           <span className="text-[12px] font-normal text-black ">
-            ({driverData?.length})
+             ({Math.min(driverData?.length || 0, 5)})
           </span>
         </h3>
         <button

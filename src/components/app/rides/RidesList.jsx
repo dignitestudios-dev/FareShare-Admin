@@ -11,9 +11,9 @@ const RidesList = () => {
 
   const [status, setStatus] = useState(initialStatus);
   const handleView = (ride) => {
-    navigate(`/rides/${ride?._id}`, { state: ride }); // Pass the entire driver object as state
+    navigate(`/rides/${ride?._id}`, { state: ride }); 
   };
-  const [searchQuery, setSearchQuery] = useState(""); // Search query state
+  const [searchQuery, setSearchQuery] = useState(""); 
   const [showUsers, setShowUsers] = useState(true);
 
   const [rides, setRides] = useState([]);
@@ -86,12 +86,11 @@ const RidesList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   // Sort by Date of Service (chronological — old → new)
-  const sortedData = [...filteredData].sort((a, b) => {
-    const dateA = new Date(a?.ride?.registrationDate);
-    const dateB = new Date(b?.ride?.registrationDate);
-    return dateA - dateB; // chronological
-  });
-
+ const sortedData = [...filteredData].sort((a, b) => {
+  const dateA = new Date(a?.ride?.createdAt);
+  const dateB = new Date(b?.ride?.createdAt);
+  return dateA - dateB;
+});
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
 
   const currentData = sortedData.slice(
