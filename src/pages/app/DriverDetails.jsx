@@ -817,7 +817,7 @@ const DriverDetails = () => {
           </span>
           <div className="flex flex-col">
             <span className="text-[18px] font-bold text-black">
-              {driver?.wallet != null ? driver.wallet.toFixed(2) : "0.00"}
+              {driverdata?.wallet != null ? driverdata.wallet.toFixed(2) : "0.00"}
             </span>
             <span className="text-[14px] text-gray-700">Wallet Balance</span>
           </div>
