@@ -25,7 +25,21 @@ const VehicleApprovalDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [vehicle, setVehicle] = useState(location.state || null);
+  const getInitialVehicle = () => {
+    if (location.state?.vehicle) return location.state.vehicle;
+    if (location.state && location.state._id) return location.state;
+    const cookieVehicle = Cookies.get("vehicle");
+    if (cookieVehicle) {
+      try {
+        return JSON.parse(cookieVehicle);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  };
+
+  const [vehicle, setVehicle] = useState(getInitialVehicle);
 
   console.log("🚀 ~ file: VehicleApprovalDetails.jsx:30 ~ VehicleApprovalDetails ~ vehicle:", vehicle);
 
@@ -43,7 +57,7 @@ const VehicleApprovalDetails = () => {
         ErrorToast("Please select a vehicle type");
       } else {
         const { data } = await axios.post("/admin/vehicle", {
-          vehicleId: JSON.parse(Cookies?.get("vehicle"))?._id,
+          vehicleId: vehicle?._id || (Cookies?.get("vehicle") ? JSON.parse(Cookies.get("vehicle"))?._id : undefined),
           isApproved: true,
           vehicleType: vehicleType, //"Standard", "XL Vehicle", "Lux Vehicle", "Black Lux Vehicle", "Black Lux XL Vehicle", "Wheelchair Accessible Vehicle"
           //"reason": "Poorly maintained" //Send when isApproved is false => for email
@@ -68,7 +82,7 @@ const VehicleApprovalDetails = () => {
       setDeclineLoading(true);
 
       const { data } = await axios.post("/admin/vehicle", {
-        vehicleId: JSON.parse(Cookies?.get("vehicle"))?._id,
+        vehicleId: vehicle?._id || (Cookies?.get("vehicle") ? JSON.parse(Cookies.get("vehicle"))?._id : undefined),
         isApproved: false,
         // vehicleType: vehicleType, //"Standard", "XL Vehicle", "Lux Vehicle", "Black Lux Vehicle", "Black Lux XL Vehicle", "Wheelchair Accessible Vehicle"
         reason:
@@ -98,10 +112,12 @@ const VehicleApprovalDetails = () => {
               Vehicle Details
             </h3>
             <div className="w-auto flex justify-start items-center gap-1">
-              {vehicle?.status === "Unapproved" ? (
-                <span
-                  className="inline-flex cursor-not-allowed items-center rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700"
-                >
+              {vehicle?.status?.toLowerCase() === "approved" || vehicle?.status?.toLowerCase() === "accepted" ? (
+                <span className="inline-flex cursor-not-allowed items-center rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                  Approved
+                </span>
+              ) : vehicle?.status?.toLowerCase() === "unapproved" || vehicle?.status?.toLowerCase() === "declined" || vehicle?.status?.toLowerCase() === "rejected" ? (
+                <span className="inline-flex cursor-not-allowed items-center rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
                   Declined
                 </span>
               ) : (
@@ -196,52 +212,52 @@ const VehicleApprovalDetails = () => {
             </SwiperSlide>
           </Swiper>
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-100 border flex flex-col gap-2 justify-start items-start rounded-lg p-2">
-              <p className="text-[14px] font-medium leading-[20px] text-[#9E9E9E]">
+            <div className="bg-gray-100 border flex flex-col gap-2 justify-start items-start rounded-lg p-2 min-w-0 w-full">
+              <p className="text-[14px] font-medium leading-[20px] text-[#9E9E9E] w-full break-words">
                 Model
               </p>
-              <p className="text-[16px] font-normal leading-[20px] text-black">
+              <p className="text-[16px] font-normal leading-[20px] text-black w-full break-words break-all">
                 {vehicle?.vehicleMake}
               </p>
             </div>
-            <div className="bg-gray-100 border flex flex-col gap-2 justify-start items-start rounded-lg p-2">
-              <p className="text-[14px] font-medium leading-[20px] text-[#9E9E9E]">
+            <div className="bg-gray-100 border flex flex-col gap-2 justify-start items-start rounded-lg p-2 min-w-0 w-full">
+              <p className="text-[14px] font-medium leading-[20px] text-[#9E9E9E] w-full break-words">
                 Name
               </p>
-              <p className="text-[16px] font-normal leading-[20px] text-black">
+              <p className="text-[16px] font-normal leading-[20px] text-black w-full break-words break-all">
                 {vehicle?.vehicleName}
               </p>
             </div>
-            <div className="bg-gray-100 border flex flex-col gap-2 justify-start items-start rounded-lg p-2">
-              <p className="text-[14px] font-medium leading-[20px] text-[#9E9E9E]">
+            <div className="bg-gray-100 border flex flex-col gap-2 justify-start items-start rounded-lg p-2 min-w-0 w-full">
+              <p className="text-[14px] font-medium leading-[20px] text-[#9E9E9E] w-full break-words">
                 Vehicle Type
               </p>
-              <p className="text-[16px] font-normal leading-[20px] text-black">
+              <p className="text-[16px] font-normal leading-[20px] text-black w-full break-words break-all">
                 {vehicle?.vehicleType || "N/A"}
               </p>
             </div>
-            <div className="bg-gray-100 border flex flex-col gap-2 justify-start items-start rounded-lg p-2">
-              <p className="text-[14px] font-medium leading-[20px] text-[#9E9E9E]">
+            <div className="bg-gray-100 border flex flex-col gap-2 justify-start items-start rounded-lg p-2 min-w-0 w-full">
+              <p className="text-[14px] font-medium leading-[20px] text-[#9E9E9E] w-full break-words">
                 Model Year
               </p>
-              <p className="text-[16px] font-normal leading-[20px] text-black">
+              <p className="text-[16px] font-normal leading-[20px] text-black w-full break-words break-all">
                 {vehicle?.modelYear}
               </p>
             </div>
-            <div className="bg-gray-100 border flex flex-col gap-2 justify-start items-start rounded-lg p-2">
-              <p className="text-[14px] font-medium leading-[20px] text-[#9E9E9E]">
+            <div className="bg-gray-100 border flex flex-col gap-2 justify-start items-start rounded-lg p-2 min-w-0 w-full">
+              <p className="text-[14px] font-medium leading-[20px] text-[#9E9E9E] w-full break-words">
                 Plate Number
               </p>
-              <p className="text-[16px] font-normal leading-[20px] text-black">
+              <p className="text-[16px] font-normal leading-[20px] text-black w-full break-words break-all">
                 {vehicle?.plateNumber}
               </p>
             </div>
-            <div className="bg-gray-100 border flex flex-col gap-2 justify-start items-start rounded-lg p-2">
-              <p className="text-[14px] font-medium leading-[20px] text-[#9E9E9E]">
+            <div className="bg-gray-100 border flex flex-col gap-2 justify-start items-start rounded-lg p-2 min-w-0 w-full">
+              <p className="text-[14px] font-medium leading-[20px] text-[#9E9E9E] w-full break-words">
                 Wheelchair Accessible
               </p>
-              <p className="text-[16px] font-normal leading-[20px] text-black">
-                {vehicle?.isWheelChairAccessible ? "Yes" : "No"}
+              <p className="text-[16px] font-normal leading-[20px] text-black w-full break-words break-all">
+                {(vehicle?.isWheelChairAccessible ?? vehicle?.isWheelchairAccessible) ? "Yes" : "No"}
               </p>
             </div>
           </div>

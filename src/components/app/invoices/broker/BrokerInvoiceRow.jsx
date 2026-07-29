@@ -110,7 +110,7 @@ const BrokerInvoiceRow = ({ invoice, setUpdate }) => {
         <td className="py-1 px-4"> {invoice?.percentOver}%</td>
         <td className="py-1 px-6">
           {" "}
-          ${parseFloat(invoice?.amount)?.toFixed(2) || 0}
+          ${invoice?.amount != null && !isNaN(Number(invoice.amount)) ? Number(invoice.amount).toFixed(2) : "0.00"}
         </td>
         <td className="py-1 flex space-x-1 justify-center">
           {invoice?.status == "paid" ? (

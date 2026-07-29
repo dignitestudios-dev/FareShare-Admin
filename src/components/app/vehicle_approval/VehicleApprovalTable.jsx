@@ -17,6 +17,7 @@ const VehicleApprovalTable = ({ data, loading, setUpdate }) => {
   //   navigate(`/vehicle-approval/${vehicle?._id}`); // Pass the entire driver object as state
   // };
   const handleView = (vehicle) => {
+    Cookies.set("vehicle", JSON.stringify(vehicle));
     navigate(`/vehicle-approval/${vehicle._id}`, {
       state: { vehicle },
     });
@@ -141,7 +142,7 @@ const VehicleApprovalTable = ({ data, loading, setUpdate }) => {
           <table className="min-w-full table-auto border-separate rounded-[18px]">
             {filteredVehicles?.length > 0 && (
               <thead>
-                <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
+                <tr className="text-left text-[12px] font-bold leading-[17.42px] text-black">
                   <th className="py-2 ">Name</th>
                   <th className="py-2 px-4">Driver Name</th>{" "}
                   {/* 👈 SIM / DRIVER */}
@@ -222,7 +223,7 @@ const VehicleApprovalTable = ({ data, loading, setUpdate }) => {
                         {vehicle?.plateNumber ? vehicle?.plateNumber : "N/A"}
                       </td>
                       <td className="py-1 px-4">
-                        {vehicle?.isWheelChairAccessible ? "Yes" : "No"}
+                        {(vehicle?.isWheelChairAccessible ?? vehicle?.isWheelchairAccessible) ? "Yes" : "No"}
                       </td>
                       <td className="py-1 px-4 flex space-x-1 justify-center">
                         {/* Reject button */}

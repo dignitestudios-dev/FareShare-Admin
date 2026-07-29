@@ -179,28 +179,29 @@ const RideDetails = () => {
   }
 
   function formatISOTime(isoString) {
-    const date = new Date(isoString);
+    if (!isoString) return null;
 
-    // Check if the date is valid
-    if (isNaN(date)) {
-      return null; // or handle the error as needed
+    // Direct time extraction from string (e.g., "2026-07-29T15:16:36.348Z" -> 15:16 -> 3:16 PM)
+    const timeMatch = String(isoString).match(/T?(\d{1,2}):(\d{2})/);
+    if (timeMatch) {
+      let hours = parseInt(timeMatch[1], 10);
+      const minutes = timeMatch[2];
+      const ampm = hours >= 12 ? "PM" : "AM";
+      hours = hours % 12 || 12;
+      return `${hours}:${minutes} ${ampm}`;
     }
 
-    // Get hours and minutes
-    let hours = date.getHours();
-    const minutes = date.getMinutes();
+    const date = new Date(isoString);
+    if (isNaN(date)) {
+      return null;
+    }
 
-    // Determine AM or PM
+    let hours = date.getUTCHours();
+    const minutes = date.getUTCMinutes();
     const ampm = hours >= 12 ? "PM" : "AM";
-
-    // Convert hours from 24-hour to 12-hour format
-    hours = hours % 12;
-    hours = hours ? hours : 12; // the hour '0' should be '12'
-
-    // Format minutes to always be two digits
+    hours = hours % 12 || 12;
     const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
 
-    // Return the formatted time
     return `${hours}:${formattedMinutes} ${ampm}`;
   }
   const getStatusStyles = (status) => {
@@ -336,39 +337,33 @@ const RideDetails = () => {
               </span>
             </div>
 
-            <div className="flex justify-between items-center mb-4">
-              <p className="text-[17px] text-black font-semibold">ID Number</p>
-              <p className="text-[17px] text-black font-semibold">
+            <div className="flex justify-between items-center mb-4 gap-2">
+              <p className="text-[15px] text-gray-500 font-semibold shrink-0">ID Number</p>
+              <p className="text-[15px] text-black font-semibold text-right break-all">
                 {rides?.id}
               </p>
             </div>
 
             {/* Location Info */}
-            <div className="flex items-center">
-              <div className="flex flex-col items-center space-y-2">
-                <div className="bg-red-500 mb-3 w-[8px] h-[8px] rounded-full"></div>
-                <div className="bg-gray-300 w-[6px] h-[6px] rounded-full"></div>
+            <div className="flex items-start gap-3 mb-3">
+              <div className="flex flex-col items-center justify-center mt-1.5 shrink-0">
+                <div className="bg-red-500 w-[10px] h-[10px] rounded-full"></div>
+                <div className="bg-gray-300 w-[2px] h-[24px] my-1"></div>
+                <div className="bg-green-600 w-[10px] h-[10px] rounded-full"></div>
               </div>
-              <div className="ml-4">
-                <p className="text-[14px] text-gray-500">Start Location</p>
-                <p className="text-black font-semibold">
-                  {rides?.ride?.originAddress}
-                </p>
-              </div>
-            </div>
-
-            {/* End Location */}
-            <div className="flex items-center">
-              <div className="flex flex-col items-center space-y-2">
-                <div className="bg-gray-300 mb-3 w-[6px] h-[6px] rounded-full"></div>
-                <div className="bg-red-500 w-[8px] h-[8px] rounded-full"></div>
-              </div>
-              <div className="ml-4">
-                <p className="text-[14px] text-gray-500">End Location</p>
-                <p className="text-black font-semibold">
-                  {" "}
-                  {rides?.ride?.destinationAddress}
-                </p>
+              <div className="flex flex-col gap-2 w-full min-w-0">
+                <div>
+                  <p className="text-[13px] text-gray-400 font-medium">Start Location</p>
+                  <p className="text-black font-semibold text-[14px] leading-tight break-words">
+                    {rides?.ride?.originAddress || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[13px] text-gray-400 font-medium">End Location</p>
+                  <p className="text-black font-semibold text-[14px] leading-tight break-words">
+                    {rides?.ride?.destinationAddress || "N/A"}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -394,13 +389,13 @@ const RideDetails = () => {
                   Base Rate
                 </p>
                 <p className="text-[15px]  text-red-500 font-semibold">
-                  ${rides?.ride?.baseRate}
+                  ${rides?.ride?.baseRate != null && !isNaN(Number(rides.ride.baseRate)) ? Number(rides.ride.baseRate).toFixed(2) : "0.00"}
                 </p>
               </div>
               <div className=" w-full flex justify-between items-center">
                 <p className="text-[15px] text-black font-semibold">Per Mile</p>
                 <p className="text-[15px]  text-red-500 font-semibold">
-                  ${rides?.ride?.costPerMile}
+                  ${rides?.ride?.costPerMile != null && !isNaN(Number(rides.ride.costPerMile)) ? Number(rides.ride.costPerMile).toFixed(2) : "0.00"}
                 </p>
               </div>
 
@@ -417,7 +412,7 @@ const RideDetails = () => {
               <div className=" w-full flex justify-between items-center">
                 <p className="text-[15px] text-black font-semibold">Fare</p>
                 <p className="text-[15px]  text-red-500 font-semibold">
-                  ${rides?.ride?.fare}
+                  ${rides?.ride?.fare != null && !isNaN(Number(rides.ride.fare)) ? Number(rides.ride.fare).toFixed(2) : "0.00"}
                 </p>
               </div>
               {!rides?.ride?.isWalletPay && (
@@ -438,7 +433,7 @@ const RideDetails = () => {
                       Stripe Fee
                     </p>
                     <p className="text-[15px] text-red-500 font-semibold">
-                      ${rides?.ride?.stripeFee}
+                      ${rides?.ride?.stripeFee != null && !isNaN(Number(rides.ride.stripeFee)) ? Number(rides.ride.stripeFee).toFixed(2) : "0.00"}
                     </p>
                   </div>
 
@@ -447,11 +442,11 @@ const RideDetails = () => {
                       Net Fare (After Stripe)
                     </p>
                     <p className="text-[15px] text-green-600 font-semibold">
-                      ${rides?.ride?.stripeNet}
+                      ${rides?.ride?.stripeNet != null && !isNaN(Number(rides.ride.stripeNet)) ? Number(rides.ride.stripeNet).toFixed(2) : "0.00"}
                     </p>
                   </div>
                   <div className="w-full flex justify-between items-center">
-                    <p className="text-[15px] tex4t-black font-semibold">
+                    <p className="text-[15px] text-black font-semibold">
                       Card Number
                     </p>
 
@@ -471,8 +466,8 @@ const RideDetails = () => {
                     </p>
 
                     <p className="text-[15px] text-blue-900 font-semibold">
-                      {rides?.ride?.walletPayAmount
-                        ? `${rides?.ride?.walletPayAmount} `
+                      {rides?.ride?.walletPayAmount != null && !isNaN(Number(rides.ride.walletPayAmount))
+                        ? `$${Number(rides.ride.walletPayAmount).toFixed(2)}`
                         : "not Found"}
                     </p>
                   </div>
@@ -482,9 +477,9 @@ const RideDetails = () => {
                     </p>
 
                     <p className="text-[15px] text-blue-900 font-semibold">
-                      {rides?.user?.totalFunds
-                        ? `${rides?.user?.totalFunds} `
-                        : "0"}
+                      {rides?.user?.totalFunds != null && !isNaN(Number(rides.user.totalFunds))
+                        ? `$${Number(rides.user.totalFunds).toFixed(2)}`
+                        : "$0.00"}
                     </p>
                   </div>
                 </>
@@ -496,112 +491,107 @@ const RideDetails = () => {
           </div>
 
           <div className="w-full grid grid-cols-1 gap-4 justify-start items-start">
-            <div className="w-full flex flex-col justify-start items-start gap-2 bg-gray-50 border rounded-3xl p-4">
-              <div className="flex justify-between  w-full items-center ">
-                <h3 className="text-[16px] font-semibold text-black">
+            {/* Driver Info Card */}
+            <div className="w-full flex flex-col justify-start items-start gap-3 bg-gray-50 border rounded-3xl p-5 shadow-sm">
+              <div className="flex justify-between w-full items-center border-b pb-3">
+                <h3 className="text-[16px] font-bold text-black">
                   Driver Info
                 </h3>
                 <button
                   onClick={() => {
-                    setOpen(true)
-                    setRoleType('driver')
+                    setOpen(true);
+                    setRoleType('driver');
                   }}
-                  className={`w-[120px] h-[39px] rounded-xl text-white font-semibold transition bg-[#c00000] hover:bg-red-700`} >
+                  className="px-4 py-1.5 rounded-xl text-white text-xs font-semibold transition bg-[#c00000] hover:bg-red-700 shadow-sm"
+                >
                   Add Funds
                 </button>
               </div>
 
-              <div className="w-full flex items-center justify-between  ">
-                <div className="flex items-center">
+              <div className="w-full flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
                   <img
                     src={
                       rides?.driver?.profilePicture ||
                       "https://placehold.co/400"
                     }
-                    alt="profile"
-                    className="w-[70px] h-[70px] rounded-full"
+                    alt="driver profile"
+                    className="w-14 h-14 rounded-full object-cover shrink-0 border"
                   />
-                  <div className="ml-4">
-                    <h2 className="text-[18px] font-semibold text-black">
+                  <div className="min-w-0 flex flex-col">
+                    <h2 className="text-[16px] font-bold text-black truncate">
                       {rides?.driver?.name || "N/A"}
                     </h2>
-                    <p className="text-[16px] text-black">
+                    <p className="text-[14px] text-gray-600 truncate">
                       {rides?.driver?.email || "N/A"}
                     </p>
                   </div>
                 </div>
-                {/* <div>
-              <h3 className="text-[14px] capitalize font-semibold text-[#A2A2A2]">
-                {rides?.ride?.rideType}
-              </h3>
-            </div> */}
               </div>
 
-              <>
-                <h3 className="text-[16px] font-semibold text-black">
+              <div className="w-full bg-white border rounded-xl p-3 mt-1">
+                <h4 className="text-[13px] font-semibold text-gray-500 mb-1">
                   Driver Feedback
-                </h3>
-                <div className="w-full flex items-center text-sm text-gray-700 justify-between  ">
+                </h4>
+                <p className="text-sm text-gray-800 break-words">
                   {rides?.feedback?.driverReview?.review?.trim()
                     ? rides.feedback.driverReview.review
                     : "N/A"}
-                </div>
-              </>
+                </p>
+              </div>
             </div>
-            <div className="w-full flexjustify-start items-start gap-2 bg-gray-50 border rounded-3xl p-4">
-              <div className="flex justify-between  w-full items-center ">
-                <h3 className="text-[16px] font-semibold text-black">
+
+            {/* User Info Card */}
+            <div className="w-full flex flex-col justify-start items-start gap-3 bg-gray-50 border rounded-3xl p-5 shadow-sm">
+              <div className="flex justify-between w-full items-center border-b pb-3">
+                <h3 className="text-[16px] font-bold text-black">
                   User Info
                 </h3>
                 <button
                   onClick={() => {
-                    setOpen(true)
-                    setRoleType('user')
+                    setOpen(true);
+                    setRoleType('user');
                   }}
-                  className={`w-[120px] h-[39px] rounded-xl text-white font-semibold transition bg-[#c00000] hover:bg-red-700`} >
+                  className="px-4 py-1.5 rounded-xl text-white text-xs font-semibold transition bg-[#c00000] hover:bg-red-700 shadow-sm"
+                >
                   Add Funds
                 </button>
-
               </div>
 
-              <div className="w-full flex items-center justify-between  ">
-                <div className="flex items-center">
+              <div className="w-full flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
                   <img
                     src={
                       rides?.user?.profilePicture || "https://placehold.co/400"
                     }
-                    alt="profile"
-                    className="w-[70px] h-[70px] rounded-full"
+                    alt="user profile"
+                    className="w-14 h-14 rounded-full object-cover shrink-0 border"
                   />
-                  <div className="ml-4">
-                    <h2 className="text-[18px] font-semibold text-black">
-                      {rides?.user?.name}
+                  <div className="min-w-0 flex flex-col">
+                    <h2 className="text-[16px] font-bold text-black truncate">
+                      {rides?.user?.name || "N/A"}
                     </h2>
-                    <p className="text-[16px] text-black">
-                      {rides?.user?.email}
+                    <p className="text-[14px] text-gray-600 truncate">
+                      {rides?.user?.email || "N/A"}
                     </p>
-                    <p className="text-[16px] text-black">
-                      <span className="text-[#c00000]">Insurance #</span>{" "}
+                    <p className="text-[13px] text-gray-800 truncate">
+                      <span className="text-[#c00000] font-semibold">Insurance #</span>{" "}
                       {rides?.user?.insuranceNumber || "N/A"}
                     </p>
                   </div>
                 </div>
-                {/* <div>
-              <h3 className="text-[14px] capitalize font-semibold text-[#A2A2A2]">
-                {rides?.ride?.rideType}
-              </h3>
-            </div> */}
               </div>
-              <>
-                <h3 className="text-[16px] font-semibold text-black">
+
+              <div className="w-full bg-white border rounded-xl p-3 mt-1">
+                <h4 className="text-[13px] font-semibold text-gray-500 mb-1">
                   User Feedback
-                </h3>
-                <div className="w-full flex items-center text-sm text-gray-700 justify-between  ">
+                </h4>
+                <p className="text-sm text-gray-800 break-words">
                   {rides?.feedback?.userReview?.review?.trim()
                     ? rides.feedback.userReview.review
                     : "N/A"}
-                </div>
-              </>
+                </p>
+              </div>
             </div>
             <div>
               {rides?.ride?.status == "cancelled" && (
@@ -789,45 +779,45 @@ const RideDetails = () => {
               </Swiper>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gray-100 border rounded-lg p-2">
-                  <p className="text-[14px] text-black">Make</p>
-                  <p className="text-[16px] font-medium text-black">
+                <div className="bg-gray-100 border rounded-lg p-2 min-w-0 w-full">
+                  <p className="text-[14px] text-gray-500 font-medium w-full break-words">Make</p>
+                  <p className="text-[16px] font-medium text-black w-full break-words break-all">
                     {rideDetail.vehicle.vehicleMake || "N/A"}
                   </p>
                 </div>
 
-                <div className="bg-gray-100 border rounded-lg p-2">
-                  <p className="text-[14px] text-black">Vehicle Type</p>
-                  <p className="text-[16px] font-medium text-black">
+                <div className="bg-gray-100 border rounded-lg p-2 min-w-0 w-full">
+                  <p className="text-[14px] text-gray-500 font-medium w-full break-words">Vehicle Type</p>
+                  <p className="text-[16px] font-medium text-black w-full break-words break-all">
                     {rideDetail.vehicle.vehicleType || "N/A"}
                   </p>
                 </div>
 
-                <div className="bg-gray-100 border rounded-lg p-2">
-                  <p className="text-[14px] text-black">Name</p>
-                  <p className="text-[16px] font-medium text-black">
+                <div className="bg-gray-100 border rounded-lg p-2 min-w-0 w-full">
+                  <p className="text-[14px] text-gray-500 font-medium w-full break-words">Name</p>
+                  <p className="text-[16px] font-medium text-black w-full break-words break-all">
                     {rideDetail.vehicle.vehicleName || "N/A"}
                   </p>
                 </div>
 
-                <div className="bg-gray-100 border rounded-lg p-2">
-                  <p className="text-[14px] text-black">Model Year</p>
-                  <p className="text-[16px] font-medium text-black">
+                <div className="bg-gray-100 border rounded-lg p-2 min-w-0 w-full">
+                  <p className="text-[14px] text-gray-500 font-medium w-full break-words">Model Year</p>
+                  <p className="text-[16px] font-medium text-black w-full break-words break-all">
                     {rideDetail.vehicle.modelYear || "N/A"}
                   </p>
                 </div>
 
-                <div className="bg-gray-100 border rounded-lg p-2">
-                  <p className="text-[14px] text-black">Plate Number</p>
-                  <p className="text-[16px] font-medium text-black">
+                <div className="bg-gray-100 border rounded-lg p-2 min-w-0 w-full">
+                  <p className="text-[14px] text-gray-500 font-medium w-full break-words">Plate Number</p>
+                  <p className="text-[16px] font-medium text-black w-full break-words break-all">
                     {rideDetail.vehicle.plateNumber || "N/A"}
                   </p>
                 </div>
 
-                <div className="bg-gray-100 border rounded-lg p-2">
-                  <p className="text-[14px] text-black">Wheelchair Accessible</p>
-                  <p className="text-[16px] font-medium text-black">
-                    {rideDetail.vehicle.isWheelchairAccessible ? "Yes" : "No"}
+                <div className="bg-gray-100 border rounded-lg p-2 min-w-0 w-full">
+                  <p className="text-[14px] text-gray-500 font-medium w-full break-words">Wheelchair Accessible</p>
+                  <p className="text-[16px] font-medium text-black w-full break-words break-all">
+                    {(rideDetail?.vehicle?.isWheelChairAccessible ?? rideDetail?.vehicle?.isWheelchairAccessible) ? "Yes" : "No"}
                   </p>
                 </div>
               </div>

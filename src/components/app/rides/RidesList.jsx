@@ -255,7 +255,7 @@ const RidesList = () => {
           <table className="min-w-full  border-separate">
             {filteredData?.length > 0 && (
               <thead>
-                <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
+                <tr className="text-left text-[12px] font-bold leading-[17.42px] text-black">
                   <th className="py-2 ">User</th>
                   <th className="py-2">Driver</th>
                   <th className="py-2 px-4">Ridetype </th>

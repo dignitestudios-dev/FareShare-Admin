@@ -44,12 +44,12 @@ const DashboardRidesTable = () => {
   return (
     <div className="w-full h-auto p-6 rounded-[18px]  ">
       <div className="flex justify-between items-center mb-4">
-       <h3 className="text-[18px] font-bold leading-[24.3px] text-black">
-  Rides{" "}
-  <span className="text-[12px] font-normal text-black">
-    ({Math.min(rides?.length || 0, 6)})
-  </span>
-</h3>
+        <h3 className="text-[18px] font-bold leading-[24.3px] text-black">
+          Rides{" "}
+          <span className="text-[12px] font-normal text-black">
+            ({Math.min(rides?.length || 0, 6)})
+          </span>
+        </h3>
         <button
           onClick={() => {
             navigate("/rides");
@@ -65,7 +65,7 @@ const DashboardRidesTable = () => {
         <table className="min-w-full table-auto">
           {rides?.length > 0 && (
             <thead>
-              <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80] ">
+              <tr className="text-left text-[12px] font-bold leading-[17.42px] text-black">
                 <th className="">Name</th>
                 <th className="">Email</th>
                 <th className=" ">Status</th>

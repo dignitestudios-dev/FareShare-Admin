@@ -598,7 +598,7 @@ const NemtInvoicesCreate = () => {
                   <div className="text-[12px] mb-2 font-bold text-black">
                     Rides Info
                   </div>
-                  <div className="w-full grid grid-cols-10 border-b border-gray-200 text-left text-[11px] font-semibold leading-[17.42px] text-[#0A150F80]">
+                  <div className="w-full grid grid-cols-10 border-b border-gray-200 text-left text-[12px] font-bold leading-[17.42px] text-black">
                     <span className="col-span-2">User</span>
                     <span className="col-span-2">Driver</span>
                     <span>Registration Date</span>
@@ -664,13 +664,13 @@ const NemtInvoicesCreate = () => {
                       </div>
 
                       {/* Status */}
-                      <div className="capitalize">${ride?.ride?.baseRate}</div>
+                      <div className="capitalize">${ride?.ride?.baseRate != null && !isNaN(Number(ride.ride.baseRate)) ? Number(ride.ride.baseRate).toFixed(2) : "0.00"}</div>
                       <div className="capitalize">
-                        ${ride?.ride?.costPerMile}
+                        ${ride?.ride?.costPerMile != null && !isNaN(Number(ride.ride.costPerMile)) ? Number(ride.ride.costPerMile).toFixed(2) : "0.00"}
                       </div>
                       <div className="capitalize">{ride?.ride?.miles}</div>
 
-                      <div className="capitalize">${ride?.ride?.fare}</div>
+                      <div className="capitalize">${ride?.ride?.fare != null && !isNaN(Number(ride.ride.fare)) ? Number(ride.ride.fare).toFixed(2) : "0.00"}</div>
 
                       {/* Actions */}
                       <div className="flex justify-center items-center gap-2">

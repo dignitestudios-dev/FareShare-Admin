@@ -214,16 +214,16 @@ const BrokerInvoiceDetails = () => {
                         {item?.destinationAddress?.slice(0, 60)}...
                       </span>
                       <span className=" my-2 col-span-1 flex justify-start items-center place-content-center  self-center place-items-center ">
-                        {item?.baseRate}
+                        ${item?.baseRate != null && !isNaN(Number(item.baseRate)) ? Number(item.baseRate).toFixed(2) : "0.00"}
                       </span>
                       <span className=" my-2 col-span-1 flex justify-start items-center place-content-center  self-center place-items-center ">
-                        {item?.costPerMile}
+                        ${item?.costPerMile != null && !isNaN(Number(item.costPerMile)) ? Number(item.costPerMile).toFixed(2) : "0.00"}
                       </span>
                       <span className=" my-2 col-span-1 flex justify-start items-center place-content-center  self-center place-items-center ">
                         {item?.miles}
                       </span>
                       <span className=" my-2 flex justify-start items-center place-content-center  self-center place-items-center ">
-                        ${item?.estimatedFare}
+                        ${item?.estimatedFare != null && !isNaN(Number(item.estimatedFare)) ? Number(item.estimatedFare).toFixed(2) : "0.00"}
                       </span>
                     </div>
                   ))
@@ -241,7 +241,7 @@ const BrokerInvoiceDetails = () => {
               </span>
 
               <span className="text-xl lg:text-3xl text-[#c00000] font-semibold">
-                ${data?.amount ? Number(data?.amount.toFixed(2)) : 0}
+                ${data?.amount != null && !isNaN(Number(data.amount)) ? Number(data.amount).toFixed(2) : "0.00"}
               </span>
             </div>
           </div>

@@ -67,18 +67,23 @@ const InsuranceCarrierCrate = ({ isOpen, setIsOpen, setReload }) => {
         </div>
 
         <div className="w-full flex flex-col mb-2 justify-start items-start">
-          <label
-            htmlFor="name"
-            className="block ml-1 text-sm font-medium text-gray-700"
-          >
-            Insurace Carrier Name
-          </label>
+          <div className="flex justify-between items-center w-full">
+            <label
+              htmlFor="name"
+              className="block ml-1 text-sm font-medium text-gray-700"
+            >
+              Insurance Carrier Name
+            </label>
+            <span className="text-xs text-gray-400 font-medium">
+              {(values.name || "").length}/50
+            </span>
+          </div>
           <input
             type="text"
             id="name"
             name="name"
             value={values.name}
-            maxlength={50}
+            maxLength={50}
             onChange={handleChange}
             onBlur={handleBlur}
             className={`mt-1 px-3 h-12 placeholder:text-sm w-full border rounded-md bg-gray-100 focus:border-gray-200 focus:outline-none  focus:ring-offset-2 focus:ring-gray-300 transition-colors duration ${

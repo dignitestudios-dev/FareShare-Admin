@@ -206,7 +206,7 @@ const DriverTable = ({ data, loading, setUpdate }) => {
         <table className="min-w-full  border-separate">
           {filteredDrivers?.length > 0 && (
             <thead>
-              <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
+              <tr className="text-left text-[12px] font-bold leading-[17.42px] text-black">
                 <th className="">Name</th>
                 <th className="px-4">Email</th>
                 <th className="px-4">Contact No.</th>

@@ -114,7 +114,7 @@ const BrokerInvoiceCard = ({ invoice, setUpdate }) => {
       <div className="w-full h-auto flex justify-end items-center">
         <div className="w-auto text-md font-bold text-gray-700  flex gap-1 justify-start items-center">
           <span>Total Amount: </span>
-          <span className="text-[#c00000]  text-lg">${invoice?.amount}</span>
+          <span className="text-[#c00000]  text-lg">${invoice?.amount != null && !isNaN(Number(invoice.amount)) ? Number(invoice.amount).toFixed(2) : "0.00"}</span>
         </div>
       </div>
 

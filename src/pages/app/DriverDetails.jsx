@@ -96,6 +96,28 @@ const DriverDetails = () => {
     const { name, files } = e.target;
     if (!files.length) return;
 
+    const file = files[0];
+    const MAX_FILE_SIZE_MB = 10;
+    const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+    const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
+    const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".pdf"];
+
+    const fileNameLower = file.name.toLowerCase();
+    const hasValidExt = ALLOWED_EXTENSIONS.some((ext) => fileNameLower.endsWith(ext));
+    const hasValidType = ALLOWED_TYPES.includes(file.type.toLowerCase()) || hasValidExt;
+
+    if (!hasValidType) {
+      ErrorToast("Invalid file format. Only JPG, PNG, and PDF files are allowed.");
+      e.target.value = "";
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      ErrorToast("File size exceeds 10MB limit. Please select a smaller file.");
+      e.target.value = "";
+      return;
+    }
+
     if (name === "criminalRecords") {
       const newPreviews = Array.from(files).map((file) =>
         URL.createObjectURL(file),
@@ -430,8 +452,46 @@ const DriverDetails = () => {
       setDeclineLoading(false);
     }
   };
+  const MAX_FILE_SIZE_MB = 10;
+  const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+  const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
+  const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".pdf"];
+
   const handleFileChange = (e) => {
-    setSelectedFiles(Array.from(e.target.files));
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    const invalidTypeFiles = [];
+    const oversizeFiles = [];
+    const validFiles = [];
+
+    files.forEach((file) => {
+      const fileNameLower = file.name.toLowerCase();
+      const hasValidExt = ALLOWED_EXTENSIONS.some((ext) => fileNameLower.endsWith(ext));
+      const hasValidType = ALLOWED_TYPES.includes(file.type.toLowerCase()) || hasValidExt;
+
+      if (!hasValidType) {
+        invalidTypeFiles.push(file.name);
+      } else if (file.size > MAX_FILE_SIZE_BYTES) {
+        oversizeFiles.push(file.name);
+      } else {
+        validFiles.push(file);
+      }
+    });
+
+    if (invalidTypeFiles.length > 0) {
+      ErrorToast("Invalid file format. Only JPG, PNG, and PDF files are allowed.");
+      e.target.value = "";
+      return;
+    }
+
+    if (oversizeFiles.length > 0) {
+      ErrorToast("File size exceeds 10MB limit. Please select files under 10MB.");
+      e.target.value = "";
+      return;
+    }
+
+    setSelectedFiles(validFiles);
     setError("");
   };
 
@@ -439,6 +499,20 @@ const DriverDetails = () => {
     if (!selectedFile.length) {
       ErrorToast("Please select at least one file.");
       return;
+    }
+
+    for (const file of selectedFile) {
+      const fileNameLower = file.name.toLowerCase();
+      const hasValidExt = ALLOWED_EXTENSIONS.some((ext) => fileNameLower.endsWith(ext));
+      const hasValidType = ALLOWED_TYPES.includes(file.type.toLowerCase()) || hasValidExt;
+      if (!hasValidType) {
+        ErrorToast(`Invalid file format for "${file.name}". Only JPG, PNG, and PDF files are allowed.`);
+        return;
+      }
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        ErrorToast(`File "${file.name}" exceeds 10MB limit. Please upload a smaller file.`);
+        return;
+      }
     }
 
     const formData = new FormData();
@@ -449,7 +523,11 @@ const DriverDetails = () => {
 
     try {
       setUploading(true);
-      const response = await axios.post("admin/uploadCriminalRecord", formData);
+      const response = await axios.post("admin/uploadCriminalRecord", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       if (response.status === 200) {
         SuccessToast("Files uploaded successfully!");
@@ -459,6 +537,8 @@ const DriverDetails = () => {
           ...selectedFile.map((f) => URL.createObjectURL(f)),
         ]);
         setSelectedFiles([]);
+        const fileInput = document.getElementById("fileUpload");
+        if (fileInput) fileInput.value = "";
       }
     } catch (err) {
       console.error("Upload error:", err);
@@ -659,7 +739,7 @@ const DriverDetails = () => {
               <span className="text-sm font-semibold text-red-700">
                 User Blocked
               </span>
-              <p className="text-sm text-red-600 leading-relaxed mt-1">
+              <p className="text-sm text-red-600 leading-relaxed mt-1 break-all">
                 {driverdata.blockedReason}
               </p>
             </div>
@@ -810,14 +890,14 @@ const DriverDetails = () => {
       </div>
 
       <div className="flex justify-between w-full gap-6">
-        {/* Earning */}
+        {/* Wallet Balance */}
         <span className="w-full h-[88px] rounded-[24px] bg-gray-50 border p-[12px] flex gap-3 items-center">
           <span className="w-[64px] h-[64px] rounded-[18px] bg-[#E6F4EA] text-[#1E7F43] text-3xl flex items-center justify-center">
             <FaWallet />
           </span>
           <div className="flex flex-col">
             <span className="text-[18px] font-bold text-black">
-              {driverdata?.wallet != null ? driverdata.wallet.toFixed(2) : "0.00"}
+              ${driverdata?.wallet != null && !isNaN(Number(driverdata.wallet)) ? Number(driverdata.wallet).toFixed(2) : "0.00"}
             </span>
             <span className="text-[14px] text-gray-700">Wallet Balance</span>
           </div>
@@ -830,9 +910,7 @@ const DriverDetails = () => {
           </span>
           <div className="flex flex-col">
             <span className="text-[18px] font-bold text-black">
-              {driver?.approvedWithdrawAmount
-                ? driver?.approvedWithdrawAmount.toFixed(2)
-                : "0.00"}
+              ${driver?.approvedWithdrawAmount != null && !isNaN(Number(driver.approvedWithdrawAmount)) ? Number(driver.approvedWithdrawAmount).toFixed(2) : "0.00"}
             </span>
             <span className="text-[14px] text-gray-700">Withdraw Amount</span>
           </div>
@@ -895,6 +973,7 @@ const DriverDetails = () => {
                     type="file"
                     name={doc.key}
                     onChange={handleDocumentChange}
+                    accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf"
                     className="text-[10px]"
                   />
                 )}
@@ -954,6 +1033,7 @@ const DriverDetails = () => {
             id="fileUpload"
             className="hidden"
             onChange={handleFileChange}
+            accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf"
             multiple // allow multiple files
           />
 
@@ -1279,21 +1359,33 @@ const DriverDetails = () => {
                   <div className="mt-2">
                     <p className="text-[14px] text-gray-500">Wheelchair:</p>
                     <p className="text-[16px] font-medium text-black">
-                      {vehicle?.isWheelChairAccessible ? "Yes" : "No"}
+                      {(vehicle?.isWheelChairAccessible ?? vehicle?.isWheelchairAccessible) ? "Yes" : "No"}
                     </p>{" "}
                     {/* Replace with actual data */}
                   </div>
 
                   <div className="w-auto flex justify-center mt-4 items-end gap-1">
-                    {vehicle?.status?.toLowerCase() == "approved" ? (
+                    {vehicle?.status?.toLowerCase() === "approved" || vehicle?.status?.toLowerCase() === "accepted" ? (
                       <button
                         onClick={() => {
                           setCloseOpen(true);
                           Cookies.set("vehicle", JSON.stringify(vehicle));
                         }}
                         className="bg-red-500 text-white cursor-pointer w-[26px] h-[26px] flex items-center justify-center  rounded-[8px] hover:bg-red-600"
+                        title="Decline Vehicle"
                       >
                         <MdClose className="w-5 h-5" />
+                      </button>
+                    ) : vehicle?.status?.toLowerCase() === "unapproved" || vehicle?.status?.toLowerCase() === "declined" || vehicle?.status?.toLowerCase() === "rejected" ? (
+                      <button
+                        onClick={() => {
+                          setOpen(true);
+                          Cookies.set("vehicle", JSON.stringify(vehicle));
+                        }}
+                        className="bg-green-500 text-white cursor-pointer w-[26px] h-[26px] flex items-center justify-center rounded-[8px] hover:bg-green-600"
+                        title="Approve Vehicle"
+                      >
+                        <MdCheck className="w-5 h-5" />
                       </button>
                     ) : (
                       <>
@@ -1408,7 +1500,7 @@ const DriverDetails = () => {
             <table className="min-w-full  border-separate">
               {driver?.referrals?.length > 0 && (
                 <thead>
-                  <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
+                  <tr className="text-left text-[12px] font-bold leading-[17.42px] text-black">
                     <th className="py-2 ">User Name</th>
                     <th className="py-2 px-4">Email </th>
                     <th className="py-2 px-4">Contact </th>

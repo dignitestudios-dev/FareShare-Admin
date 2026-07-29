@@ -4,7 +4,7 @@ import { BiCar } from "react-icons/bi";
 import { GrUserPolice } from "react-icons/gr";
 import { LuUser2 } from "react-icons/lu";
 import { MdOutlineDocumentScanner, MdSubscriptions } from "react-icons/md";
-import { IoCarSportOutline } from "react-icons/io5";
+import { IoCarSportOutline, IoNotificationsOutline } from "react-icons/io5";
 import { TbFileInvoice } from "react-icons/tb";
 import { MdOutlineContactSupport } from "react-icons/md";
 import { LiaFileInvoiceSolid } from "react-icons/lia";
@@ -91,5 +91,10 @@ export const sidebarArr = [
     title: "Insurance Carriers",
     url: "/insurance-carriers",
     icon: <LiaFileInvoiceSolid />,
+  },
+  {
+    title: "Push Notifications",
+    url: "/notifications",
+    icon: <IoNotificationsOutline />,
   },
 ];

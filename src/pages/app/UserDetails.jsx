@@ -191,7 +191,7 @@ const UserDetails = () => {
               <span className="text-sm font-semibold text-red-700">
                 User Blocked
               </span>
-              <p className="text-sm text-red-600 leading-relaxed mt-1">
+              <p className="text-sm text-red-600 leading-relaxed mt-1 break-all">
                 {user.blockedReason}
               </p>
             </div>
@@ -262,7 +262,7 @@ const UserDetails = () => {
                     field.name === "postalCode" ? (
                     <span className="text-[13px] font-medium text-black">
                       {field.name === "funds"
-                        ? `$${formData[field.name]}`
+                        ? `$${formData[field.name] != null && !isNaN(Number(formData[field.name])) ? Number(formData[field.name]).toFixed(2) : "0.00"}`
                         : formData[field.name]}
                     </span>
                   ) : field.extra ? (
@@ -312,7 +312,7 @@ const UserDetails = () => {
                     year: "numeric",
                   })
                 ) : field.name === "funds" ? (
-                  `$${formData[field.name]}`
+                  `$${formData[field.name] != null && !isNaN(Number(formData[field.name])) ? Number(formData[field.name]).toFixed(2) : "0.00"}`
                 ) : (
                   formData[field.name]
                 )}

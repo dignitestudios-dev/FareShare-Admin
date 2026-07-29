@@ -77,12 +77,17 @@ const NotificationCreateModal = ({ isOpen, setIsOpen, setReload }) => {
         </div>
 
         <div className="w-full flex flex-col justify-start items-start">
-          <label
-            htmlFor="title"
-            className="block ml-1 text-sm font-medium text-gray-700"
-          >
-            Title
-          </label>
+          <div className="flex justify-between items-center w-full">
+            <label
+              htmlFor="title"
+              className="block ml-1 text-sm font-medium text-gray-700"
+            >
+              Title
+            </label>
+            <span className="text-xs text-gray-400 font-medium">
+              {(values.title || "").length}/150
+            </span>
+          </div>
           <input
             type="text"
             id="title"
@@ -90,7 +95,7 @@ const NotificationCreateModal = ({ isOpen, setIsOpen, setReload }) => {
             value={values.title}
             onChange={handleChange}
             onBlur={handleBlur}
-            maxlength={20}
+            maxLength={150}
             placeholder="e.g. New Feature Update"
             className={`mt-1 px-3 h-12 placeholder:text-sm w-full border rounded-md bg-gray-100 focus:border-gray-200 focus:outline-none  focus:ring-offset-2 focus:ring-gray-300 transition-colors duration ${errors.title && touched.title ? "border-red-600 shake" : null
               }`}
@@ -100,12 +105,17 @@ const NotificationCreateModal = ({ isOpen, setIsOpen, setReload }) => {
           ) : null}
         </div>
         <div className="w-full flex flex-col justify-start items-start">
-          <label
-            htmlFor="message"
-            className="block ml-1 text-sm font-medium text-gray-700"
-          >
-            Message
-          </label>
+          <div className="flex justify-between items-center w-full">
+            <label
+              htmlFor="message"
+              className="block ml-1 text-sm font-medium text-gray-700"
+            >
+              Message
+            </label>
+            <span className="text-xs text-gray-400 font-medium">
+              {(values.message || "").length}/1000
+            </span>
+          </div>
           <textarea
             type="text"
             id="message"
@@ -113,7 +123,7 @@ const NotificationCreateModal = ({ isOpen, setIsOpen, setReload }) => {
             value={values.message}
             onChange={handleChange}
             onBlur={handleBlur}
-            maxlength={200}
+            maxLength={1000}
             placeholder="e.g. Our app is getting a new feature"
             className={`mt-1 p-3 h-32 resize-none bg-gray-100 w-full placeholder:text-sm border rounded-md focus:border-gray-200 focus:outline-none  focus:ring-offset-2 focus:ring-gray-300 transition-colors duration ${errors.message && touched.message ? "border-red-600 shake" : null
               }`}

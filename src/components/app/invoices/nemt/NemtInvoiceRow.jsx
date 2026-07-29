@@ -90,7 +90,7 @@ const NemtInvoiceRow = ({ invoice, setUpdate }) => {
           </div>
         </td>
         <td className="py-1 px-4 text-md text-[#c00000] font-bold">
-          ${invoice?.amount}
+          ${invoice?.amount != null && !isNaN(Number(invoice.amount)) ? Number(invoice.amount).toFixed(2) : "0.00"}
         </td>
 
         <td className="py-1 px-4">

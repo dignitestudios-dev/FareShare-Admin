@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { ErrorToast } from "../../components/app/global/Toast";
 import axios from "../../axios";
@@ -187,7 +187,7 @@ const Subscriptions = () => {
                 <div className="overflow-x-auto">
                     <table className="min-w-full border-separate">
                         <thead>
-                            <tr className="text-left text-[11px] font-medium uppercase tracking-wider text-[#0A150F80]">
+                            <tr className="text-left text-[12px] font-bold uppercase tracking-wider text-black">
                                 <th className="py-3 pr-4">Name</th>
                                 <th className="py-3 pr-4">Email</th>
                                 <th className="py-3 pr-4">Phone</th>
@@ -228,7 +228,7 @@ const Subscriptions = () => {
                                             <td className="py-4 pr-4">{email || "-"}</td>
                                             <td className="py-4 pr-4">{phoneNo || "-"}</td>
                                             <td className="py-4 pr-4 capitalize">{status || "-"}</td>
-                                            <td className="py-4 pr-4">{amount != null ? `$${amount}` : "-"}</td>
+                                            <td className="py-4 pr-4">{amount != null && amount !== "" && !isNaN(Number(amount)) ? `$${Number(amount).toFixed(2)}` : "-"}</td>
                                             <td className="py-4 pr-4">{formatDate(subscribedAt)}</td>
                                         </tr>
                                     );
@@ -288,7 +288,7 @@ const Subscriptions = () => {
                                 { label: "Email", value: selectedDriver?.email },
                                 { label: "Phone", value: selectedDriver?.phoneNo },
                                 { label: "Status", value: selectedDriver?.status },
-                                { label: "Amount", value: selectedDriver?.amount != null ? `$${selectedDriver.amount}` : "-" },
+                                { label: "Amount", value: selectedDriver?.amount != null && selectedDriver?.amount !== "" && !isNaN(Number(selectedDriver.amount)) ? `$${Number(selectedDriver.amount).toFixed(2)}` : "-" },
                                 { label: "Subscription ID", value: selectedDriver?.subscriptionId || "-" },
                                 { label: "Price ID", value: selectedDriver?.priceId || "-" },
                                 { label: "Subscribed At", value: formatDate(selectedDriver?.subscribedAt) },

@@ -21,7 +21,7 @@ export function ReportTable({ columns, data, loading,currentPage ,setCurrentPage
       <div className="overflow-x-auto rounded-xl">
         <table className="min-w-full border-separate">
           <thead>
-            <tr className="text-left text-[11px] text-[#0A150F80]">
+            <tr className="text-left text-[12px] font-bold text-black">
               {columns.map((col) => (
                 <th key={col} className="py-2 px-4">
                   {col}

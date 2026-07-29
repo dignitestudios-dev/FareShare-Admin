@@ -32,9 +32,14 @@ const BlockModal = ({
         </p>
         {isReason && (
           <div className="mb-6 text-left">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Reason
-            </label>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Reason
+              </label>
+              <span className="text-xs text-gray-400 font-medium">
+                {(reason || "").length}/200
+              </span>
+            </div>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
@@ -44,7 +49,6 @@ const BlockModal = ({
               className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
             />
           </div>
-
         )}
 
         <div className="flex justify-center space-x-4">

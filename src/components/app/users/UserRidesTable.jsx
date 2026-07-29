@@ -352,7 +352,7 @@ const UserRidesTable = ({ user }) => {
                 {/* RIGHT */}
                 <div className="text-right">
                   <span className="text-lg font-bold text-green-600">
-                    +${item.amount}
+                    +${item?.amount != null && !isNaN(Number(item.amount)) ? Number(item.amount).toFixed(2) : "0.00"}
                   </span>
                   <p className="text-xs text-gray-400">
                     Card Payment
@@ -402,7 +402,7 @@ const UserRidesTable = ({ user }) => {
               <table className="min-w-full  border-separate">
                 {groupRides(rides)?.others?.length > 0 && (
                   <thead>
-                    <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
+                    <tr className="text-left text-[12px] font-bold leading-[17.42px] text-black">
                       <th className="py-2 ">Driver Name</th>
                       <th className="py-2 px-4">Contact </th>
                       <th className="py-2 px-4">Booking Date</th>
@@ -619,7 +619,7 @@ const UserRidesTable = ({ user }) => {
               <table className="min-w-full  border-separate">
                 {groupRides(rides)?.nemt?.length > 0 && (
                   <thead>
-                    <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
+                    <tr className="text-left text-[12px] font-bold leading-[17.42px] text-black">
                       <th className="py-2 ">Driver Name</th>
                       <th className="py-2 px-4">Contact </th>
                       <th className="py-2 px-4">Booking Date</th>
@@ -835,7 +835,7 @@ const UserRidesTable = ({ user }) => {
             <table className="min-w-full  border-separate">
               {filteredUsers?.length > 0 && (
                 <thead>
-                  <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
+                  <tr className="text-left text-[12px] font-bold leading-[17.42px] text-black">
                     <th className="py-2 ">User Name</th>
                     <th className="py-2 px-4">Email </th>
                     <th className="py-2 px-4">Contact </th>

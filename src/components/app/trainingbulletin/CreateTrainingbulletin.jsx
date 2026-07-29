@@ -120,14 +120,19 @@ const CreateTrainingbulletin = ({ handleback, setCreateTrainingbulletin }) => {
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="font-medium text-[15px] text-[#333]">Title</label>
+          <div className="flex justify-between items-center w-full">
+            <label className="font-medium text-[15px] text-[#333]">Title</label>
+            <span className="text-xs text-gray-400 font-medium">
+              {(formik.values.title || "").length}/150
+            </span>
+          </div>
           <input
             type="text"
             name="title"
             value={formik.values.title}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            maxLength={50}
+            maxLength={150}
             placeholder="Enter training or bulletin title"
             className={`w-full p-3 rounded-xl bg-[#f8f8f8] text-[#333] outline-none border ${formik.errors.title && formik.touched.title
               ? "border-red-500 focus:ring-red-500"
@@ -140,9 +145,14 @@ const CreateTrainingbulletin = ({ handleback, setCreateTrainingbulletin }) => {
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="font-medium text-[15px] text-[#333]">
-            Description
-          </label>
+          <div className="flex justify-between items-center w-full">
+            <label className="font-medium text-[15px] text-[#333]">
+              Description
+            </label>
+            <span className="text-xs text-gray-400 font-medium">
+              {(formik.values.description || "").length}/1000
+            </span>
+          </div>
           <textarea
             name="description"
             value={formik.values.description}
@@ -150,7 +160,7 @@ const CreateTrainingbulletin = ({ handleback, setCreateTrainingbulletin }) => {
             onBlur={formik.handleBlur}
             placeholder="Write short description..."
             rows={5}
-            maxLength={350}
+            maxLength={1000}
             className={`w-full p-3 rounded-xl bg-[#f8f8f8] text-[#333] outline-none border resize-none ${formik.errors.description && formik.touched.description
               ? "border-red-500 focus:ring-red-500"
               : "border-gray-200 focus:ring-[#c00000]"

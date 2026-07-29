@@ -113,7 +113,7 @@ const WithdrawRequestTable = ({ data, loading, setUpdate }) => {
         <table className="min-w-full  border-separate">
           <thead>
             {filteredUsers?.length > 0 && (
-              <tr className="text-left text-[11px] font-normal leading-[17.42px] text-[#0A150F80]">
+              <tr className="text-left text-[12px] font-bold leading-[17.42px] text-black">
                 <th className="">Name</th>
                 <th className="px-4">Email</th>
                 <th className="px-4">Withdrawn On</th>
@@ -175,7 +175,7 @@ const WithdrawRequestTable = ({ data, loading, setUpdate }) => {
                     </td>
 
                     <td className="py-1 px-4 max-w-sm text-wrap break-words">
-                      ${parseFloat(user?.amount).toFixed(2)}
+                      ${user?.amount != null && !isNaN(Number(user.amount)) ? Number(user.amount).toFixed(2) : "0.00"}
                     </td>
                     <td className="py-1 px-4">
                       {user?.status == "pending" ? (
