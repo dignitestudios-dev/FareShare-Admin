@@ -217,7 +217,7 @@ const RideDetails = () => {
       case "cancelled":
         return "bg-red-500/10 border border-red-500 text-red-500";
       default:
-        return "bg-gray-500/10 border border-gray-500 text-gray-500"; // Default style
+        return "bg-gray-500/10 border border-gray-500 text-gray-500"; 
     }
   };
   const formatStatus = (status) => {
