@@ -18,6 +18,7 @@ const GlobalLayout = ({ page }) => {
   return (
     <div className="w-full h-screen overflow-y-hidden flex justify-start items-start">
       <Sidebar />
+      
       <div className="w-full lg:w-[calc(100%-280px)]   h-full relative flex flex-col justify-start items-start">
         <Navbar />
         <div className="w-full h-[calc(100%-60px)] overflow-y-auto p-4 text-gray-900   flex flex-col justify-start items-start">
