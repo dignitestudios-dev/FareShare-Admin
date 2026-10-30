@@ -47,6 +47,11 @@ export const APP_ROUTES = [
     page: <GlobalLayout page={<UserDetails />} />,
   },
   {
+    title: "User Details",
+    url: "/user/:id",
+    page: <GlobalLayout page={<UserDetails />} />,
+  },
+  {
     title: "Rides",
     url: "/rides/",
     page: <GlobalLayout page={<Rides />} />,

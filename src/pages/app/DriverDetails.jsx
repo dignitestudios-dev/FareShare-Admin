@@ -27,6 +27,7 @@ import { FiEye, FiSearch } from "react-icons/fi";
 import DriverAcceptModal from "../../components/app/driver/DriverAcceptModal";
 import DriverRejectModal from "../../components/app/driver/DriverRejectModal";
 import BlockModal from "../../components/app/global/BlockModal";
+import DriverPayments from "../../components/app/driver/DriverPayments";
 
 const DriverDetails = () => {
   const location = useLocation();
@@ -74,23 +75,58 @@ const DriverDetails = () => {
   const [vehicleType, setVehicleType] = useState("");
   const [closeOpen, setCloseOpen] = useState(false);
 
+  const [subscription, setSubscription] = useState(null);
+  const [grantLoading, setGrantLoading] = useState(false);
+
   const getDrivers = async () => {
     try {
       setLoading(true);
       const { data } = await axios.get(`/admin/driver/${id}`);
-      setDriver(data?.data?.driver); // Use the data from the API response
+      setDriver(data?.data?.driver);
+      if (data?.data?.subscription) {
+        setSubscription(data.data.subscription);
+      }
+      if (Array.isArray(data?.data?.vehicles) && data.data.vehicles.length > 0) {
+        setVehicles(data.data.vehicles);
+      }
+      if (Array.isArray(data?.data?.feedbacks) && data.data.feedbacks.length > 0) {
+        setFeedback(data.data.feedbacks);
+      }
     } catch (error) {
       ErrorToast(error?.response?.data?.message);
-
       console.log("Error:", error);
     } finally {
       setLoading(false);
     }
   };
 
+  const toggleAdminGrant = async () => {
+    try {
+      setGrantLoading(true);
+      const isGranted =
+        subscription?.isAdminGranted ?? driverdata?.isAdminGrantedSubscription ?? driverdata?.isAdminGranted;
+      const { data } = await axios.post("/admin/subscriptions/access", {
+        driverId: id,
+        action: isGranted ? "revoke" : "grant",
+      });
+      if (data?.success) {
+        SuccessToast(
+          `Subscription access ${isGranted ? "revoked" : "granted"} successfully.`
+        );
+        getDrivers();
+      }
+    } catch (error) {
+      ErrorToast(error?.response?.data?.message || "Failed to update subscription access.");
+    } finally {
+      setGrantLoading(false);
+    }
+  };
+
   useEffect(() => {
-    getDrivers();
-  }, []);
+    if (id) {
+      getDrivers();
+    }
+  }, [id]);
   console.log(driverdata, "driver");
   const handleDocumentChange = (e) => {
     const { name, files } = e.target;
@@ -215,9 +251,11 @@ const DriverDetails = () => {
   };
 
   useEffect(() => {
-    getFeedback();
-    getVehicle();
-  }, []);
+    if (id) {
+      getFeedback();
+      getVehicle();
+    }
+  }, [id]);
 
   // pagination related data:
   const filteredFeedback = feedback.filter((item) => {
@@ -244,6 +282,18 @@ const DriverDetails = () => {
 
   const goToPage = (pageNumber) => {
     setCurrentPage(pageNumber);
+  };
+
+  const referralList = driverdata?.referrals || driver?.referrals || [];
+  const [currentPage3, setCurrentPage3] = useState(1);
+  const itemsPerPage3 = 5;
+  const totalPages3 = Math.ceil((referralList.length || 1) / itemsPerPage3);
+  const currentReferrals = referralList.slice(
+    (currentPage3 - 1) * itemsPerPage3,
+    currentPage3 * itemsPerPage3
+  );
+  const goToPage3 = (pageNumber) => {
+    setCurrentPage3(pageNumber);
   };
 
   // VEhcile accept decline
@@ -414,7 +464,7 @@ const DriverDetails = () => {
     try {
       setAcceptDriverLoading(true);
       const { data } = await axios.post("/admin/approveDriver", {
-        driverId: JSON.parse(Cookies?.get("driver"))?._id,
+        driverId: id || JSON.parse(Cookies?.get("driver") || "{}")?._id || driverdata?._id,
         isApproved: true,
         vehicleType: "Standard",
       });
@@ -435,7 +485,7 @@ const DriverDetails = () => {
       setDeclineDriverLoading(true);
 
       const { data } = await axios.post("/admin/approveDriver", {
-        driverId: JSON.parse(Cookies?.get("driver"))?._id,
+        driverId: id || JSON.parse(Cookies?.get("driver") || "{}")?._id || driverdata?._id,
         isApproved: false,
 
         reason:
@@ -568,7 +618,7 @@ const DriverDetails = () => {
     return `${month}-${day}-${year}`;
   }
   useEffect(() => {
-    if (driverdata) {
+    if (driverdata && typeof driverdata === "object" && Object.keys(driverdata).length > 0) {
       setFormData({
         firstName: driverdata.firstName || "",
         lastName: driverdata.lastName || "",
@@ -584,6 +634,16 @@ const DriverDetails = () => {
         preview: driverdata.profilePicture || "",
         file: null,
       });
+      setDocuments({
+        socialSecurityCardFront: driverdata?.socialSecurityCardFront || "",
+        socialSecurityCardBack: driverdata?.socialSecurityCardBack || "",
+        driverLicenseCardFront: driverdata?.driverLicenseCardFront || "",
+        driverLicenseCardBack: driverdata?.driverLicenseCardBack || "",
+        criminalRecords: driverdata?.criminalRecord || [],
+        files: {},
+      });
+      setCriminalRecords(driverdata?.criminalRecord || []);
+      setIsBlocked(Boolean(driverdata?.isBlocked));
     }
   }, [driverdata]);
 
@@ -635,7 +695,7 @@ const DriverDetails = () => {
                 <button
                   onClick={() => {
                     setCloseDriverOpen(true);
-                    Cookies.set("driver", JSON.stringify(driver));
+                    Cookies.set("driver", JSON.stringify(driverdata?._id ? driverdata : (driver || {})));
                   }}
                   className="bg-red-500 text-white w-[26px] h-[26px] flex items-center justify-center  rounded-[8px] hover:bg-red-600"
                 >
@@ -645,7 +705,7 @@ const DriverDetails = () => {
                 <button
                   onClick={() => {
                     setDriverOpen(true);
-                    Cookies.set("driver", JSON.stringify(driver));
+                    Cookies.set("driver", JSON.stringify(driverdata?._id ? driverdata : (driver || {})));
                   }}
                   className="bg-green-500 text-white w-[26px] h-[26px] flex items-center justify-center rounded-[8px] hover:bg-green-600"
                 >
@@ -877,14 +937,14 @@ const DriverDetails = () => {
         <ul className="list-disc pl-4">
           <li>
             Driver being verbally abusive{" "}
-            <span className="font-bold">({driver?.cancellationReasons?.["verbally-abusive"]})</span>
+            <span className="font-bold">({driverdata?.cancellationReasons?.["verbally-abusive"] ?? driver?.cancellationReasons?.["verbally-abusive"] ?? 0})</span>
           </li>
           <li>
             Driver being physically abusive{" "}
-            <span className="font-bold">({driver?.cancellationReasons?.["physically-abusive"]})</span>
+            <span className="font-bold">({driverdata?.cancellationReasons?.["physically-abusive"] ?? driver?.cancellationReasons?.["physically-abusive"] ?? 0})</span>
           </li>
           <li>
-            Other <span className="font-bold">({driver?.cancellationReasons?.other})</span>
+            Other <span className="font-bold">({driverdata?.cancellationReasons?.other ?? driver?.cancellationReasons?.other ?? 0})</span>
           </li>
         </ul>
       </div>
@@ -910,7 +970,7 @@ const DriverDetails = () => {
           </span>
           <div className="flex flex-col">
             <span className="text-[18px] font-bold text-black">
-              ${driver?.approvedWithdrawAmount != null && !isNaN(Number(driver.approvedWithdrawAmount)) ? Number(driver.approvedWithdrawAmount).toFixed(2) : "0.00"}
+              ${(driverdata?.approvedWithdrawAmount != null && !isNaN(Number(driverdata.approvedWithdrawAmount))) ? Number(driverdata.approvedWithdrawAmount).toFixed(2) : (driver?.approvedWithdrawAmount != null && !isNaN(Number(driver.approvedWithdrawAmount)) ? Number(driver.approvedWithdrawAmount).toFixed(2) : "0.00")}
             </span>
             <span className="text-[14px] text-gray-700">Withdraw Amount</span>
           </div>
@@ -923,12 +983,116 @@ const DriverDetails = () => {
           </span>
           <div className="flex flex-col">
             <span className="text-[18px] font-bold text-black">
-              {driver?.preferrability ? driver.preferrability * 100 : 0}%
+              {driverdata?.preferrability != null ? (Number(driverdata.preferrability) * 100).toFixed(0) : (driver?.preferrability ? (Number(driver.preferrability) * 100).toFixed(0) : 0)}%
             </span>
             <span className="text-[14px] text-gray-700">Preferability</span>
           </div>
         </span>
       </div>
+
+      {/* Subscription Details */}
+      {(subscription || driverdata?.isSubscriptionPaid !== undefined || driverdata?.isAdminGrantedSubscription !== undefined) && (
+        <div className="w-full bg-gray-50 border rounded-3xl p-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h3 className="font-bold text-black text-[22px]">
+                Subscription Details
+              </h3>
+              <span
+                className={`text-xs font-semibold px-3 py-1 rounded-full capitalize ${
+                  (subscription?.status === "active" || subscription?.isSubscriptionPaid || driverdata?.isSubscriptionPaid)
+                    ? "bg-green-100 text-green-700 border border-green-200"
+                    : "bg-red-100 text-red-700 border border-red-200"
+                }`}
+              >
+                Status: {subscription?.status || (driverdata?.isSubscriptionPaid ? "Active" : "Inactive")}
+              </span>
+            </div>
+
+            {/* <button
+              onClick={toggleAdminGrant}
+              disabled={grantLoading}
+              className={`px-4 py-2 rounded-full text-xs font-medium transition shadow-sm ${
+                (subscription?.isAdminGranted ?? driverdata?.isAdminGrantedSubscription)
+                  ? "bg-amber-600 hover:bg-amber-700 text-white"
+                  : "bg-green-600 hover:bg-green-700 text-white"
+              }`}
+            >
+              {grantLoading
+                ? "Updating..."
+                : (subscription?.isAdminGranted ?? driverdata?.isAdminGrantedSubscription)
+                ? "Revoke Admin Grant"
+                : "Grant Subscription"}
+            </button> */}
+          </div>
+
+          <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="flex flex-col bg-gray-100 border p-3 rounded-xl">
+              <span className="text-[12px] text-[#9E9E9E]">Subscription Plan</span>
+              <span className="text-[14px] font-semibold text-black">
+                ${subscription?.amount != null && !isNaN(Number(subscription.amount))
+                  ? Number(subscription.amount).toFixed(2)
+                  : "200.00"}/month
+              </span>
+            </div>
+
+            <div className="flex flex-col bg-gray-100 border p-3 rounded-xl">
+              <span className="text-[12px] text-[#9E9E9E]">Payment Status</span>
+              <span className="text-[14px] font-semibold text-black">
+                {subscription?.isSubscriptionPaid ?? driverdata?.isSubscriptionPaid ? "Paid" : "Unpaid"}
+              </span>
+            </div>
+
+            <div className="flex flex-col bg-gray-100 border p-3 rounded-xl">
+              <span className="text-[12px] text-[#9E9E9E]">Admin Granted</span>
+              <span className="text-[14px] font-semibold text-black">
+                {subscription?.isAdminGranted ?? driverdata?.isAdminGrantedSubscription ? "Yes" : "No"}
+              </span>
+            </div>
+
+            <div className="flex flex-col bg-gray-100 border p-3 rounded-xl">
+              <span className="text-[12px] text-[#9E9E9E]">Subscribed Date</span>
+              <span className="text-[14px] font-semibold text-black">
+                {convertToMMDDYYYY(subscription?.subscribedAt || driverdata?.createdAt)}
+              </span>
+            </div>
+
+            {/* <div className="flex flex-col bg-gray-100 border p-3 rounded-xl">
+              <span className="text-[12px] text-[#9E9E9E]">Subscription ID</span>
+              <span className="text-[14px] font-semibold text-black break-all">
+                {subscription?.subscriptionId || "N/A"}
+              </span>
+            </div> */}
+
+            {/* <div className="flex flex-col bg-gray-100 border p-3 rounded-xl">
+              <span className="text-[12px] text-[#9E9E9E]">Price ID</span>
+              <span className="text-[14px] font-semibold text-black break-all">
+                {subscription?.priceId || "N/A"}
+              </span>
+            </div> */}
+
+            <div className="flex flex-col bg-gray-100 border p-3 rounded-xl">
+              <span className="text-[12px] text-[#9E9E9E]">Unpaid Cycles</span>
+              <span className="text-[14px] font-semibold text-black">
+                {subscription?.unpaidCount ?? 0}
+              </span>
+            </div>
+
+            <div className="flex flex-col bg-gray-100 border p-3 rounded-xl">
+              <span className="text-[12px] text-[#9E9E9E]">Payment Method</span>
+              <span className="text-[14px] font-semibold text-black">
+                {subscription?.card?.last4 || driverdata?.cardLast4 || driverdata?.subscriptionCard?.last4
+                  ? `${subscription?.card?.brand || driverdata?.cardBrand || driverdata?.subscriptionCard?.brand || "Card"} •••• ${subscription?.card?.last4 || driverdata?.cardLast4 || driverdata?.subscriptionCard?.last4}`
+                  : (subscription?.isAdminGranted ?? driverdata?.isAdminGrantedSubscription)
+                  ? "Admin Granted Access"
+                  : "No card on file"}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <DriverPayments driverId={id} />
 
       <div className="w-full grid grid-cols-2 gap-4">
         <div className="bg-gray-50 border rounded-3xl p-6 ">
@@ -1472,7 +1636,7 @@ const DriverDetails = () => {
           <h3 className="text-[24px] font-bold text-black">
             Referral Driver
             <span className="text-[16px] text-gray-500">
-              ({driver?.referrals?.length})
+              ({(driverdata?.referrals || driver?.referrals || []).length})
             </span>
           </h3>
           {/* Filters and Search Bar */}
@@ -1498,7 +1662,7 @@ const DriverDetails = () => {
           {/* Table Section */}
           <div className="overflow-x-auto   rounded-xl ">
             <table className="min-w-full  border-separate">
-              {driver?.referrals?.length > 0 && (
+              {(driverdata?.referrals || driver?.referrals || []).length > 0 && (
                 <thead>
                   <tr className="text-left text-[12px] font-bold leading-[17.42px] text-black">
                     <th className="py-2 ">User Name</th>
@@ -1544,8 +1708,8 @@ const DriverDetails = () => {
                       </tr>
                     </React.Fragment>
                   ))
-                ) : driver?.referrals?.length > 0 ? (
-                  driver?.referrals?.map((referral, index) => (
+                ) : currentReferrals.length > 0 ? (
+                  currentReferrals.map((referral, index) => (
                     <React.Fragment key={index}>
                       <tr className=" text-[10px] text-gray-900 ">
                         <td className="flex  items-center gap-3 py-1">
@@ -1616,44 +1780,46 @@ const DriverDetails = () => {
           </div>{" "}
         </div>
 
-        {!loading && driver.referrals.length > 0 && (
+        {!loading && referralList.length > 0 && (
           <nav
-            class="flex items-center  justify-end mt-2 -space-x-px"
+            className="flex items-center justify-end mt-2 -space-x-px"
             aria-label="Pagination"
           >
             <button
               type="button"
               onClick={() =>
-                goToPage3(currentPage > 1 ? currentPage - 1 : currentPage)
+                goToPage3(currentPage3 > 1 ? currentPage3 - 1 : currentPage3)
               }
-              class="min-h-[38px] min-w-[38px] py-2 bg-gray-100 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
+              className="min-h-[38px] min-w-[38px] py-2 bg-gray-100 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none"
               aria-label="Previous"
+              disabled={currentPage3 <= 1}
             >
               <svg
-                class="shrink-0 size-3.5"
+                className="shrink-0 size-3.5"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
                 <path d="m15 18-6-6 6-6"></path>
               </svg>
-              <span class="hidden sm:block">Previous</span>
+              <span className="hidden sm:block">Previous</span>
             </button>
-            {Array.from({ length: totalPages }, (_, i) => (
+            {Array.from({ length: totalPages3 }, (_, i) => (
               <button
                 type="button"
                 key={i}
                 onClick={() => goToPage3(i + 1)}
-                class={`min-h-[38px] min-w-[38px]  flex hover:bg-gray-100 justify-center items-center  text-gray-800 ${currentPage === i + 1
-                  ? " border bg-[#c00000] text-white hover:bg-[#c00000] "
-                  : "border bg-gray-100"
-                  }    py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none  disabled:opacity-50 disabled:pointer-events-none `}
+                className={`min-h-[38px] min-w-[38px] flex hover:bg-gray-100 justify-center items-center text-gray-800 ${
+                  currentPage3 === i + 1
+                    ? "border bg-[#c00000] text-white hover:bg-[#c00000]"
+                    : "border bg-gray-100"
+                } py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-none disabled:opacity-50 disabled:pointer-events-none`}
                 aria-current="page"
               >
                 {i + 1}
@@ -1663,24 +1829,25 @@ const DriverDetails = () => {
               type="button"
               onClick={() =>
                 goToPage3(
-                  currentPage < totalPages ? currentPage + 1 : currentPage
+                  currentPage3 < totalPages3 ? currentPage3 + 1 : currentPage3
                 )
               }
-              class="min-h-[38px] min-w-[38px] py-2 bg-gray-100 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border  text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none "
+              className="min-h-[38px] min-w-[38px] py-2 bg-gray-100 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-xl last:rounded-e-xl border text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none"
               aria-label="Next"
+              disabled={currentPage3 >= totalPages3}
             >
-              <span class="hidden sm:block">Next</span>
+              <span className="hidden sm:block">Next</span>
               <svg
-                class="shrink-0 size-3.5"
+                className="shrink-0 size-3.5"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
                 <path d="m9 18 6-6-6-6"></path>
               </svg>

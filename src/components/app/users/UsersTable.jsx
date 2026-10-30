@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { FiEye } from "react-icons/fi";
 import { FiSearch } from "react-icons/fi";
 import { TbCaretDownFilled } from "react-icons/tb";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "../../../axios";
 import { ErrorToast } from "../global/Toast";
+
 const UsersTable = ({
   data,
   loading,
@@ -15,6 +16,8 @@ const UsersTable = ({
 }) => {
   const [searchQuery, setSearchQuery] = React.useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+
   const handleView = (user) => {
     navigate(`/users/${user?._id}`, { state: user }); // Pass the entire driver object as state
   };
@@ -31,7 +34,13 @@ const UsersTable = ({
     return `${month}-${day}-${year}`;
   }
 
-  const [tab, setTab] = useState("unblocked");
+  const [tab, setTab] = useState(location?.state?.tab || "unblocked");
+
+  useEffect(() => {
+    if (location?.state?.tab !== undefined) {
+      setTab(location.state.tab);
+    }
+  }, [location?.state?.tab]);
 
   const filteredUsers = data.filter((user) => {
     const fullName = `${user?.firstName || ""} ${user?.lastName || ""
@@ -61,17 +70,6 @@ const UsersTable = ({
     return searchMatch && blockedMatch;
   });
 
-  // pagination related data:
-
-  // const [currentPage, setCurrentPage] = useState(1);
-  // const itemsPerPage = 10;
-
-  // const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-
-  // const currentData = filteredUsers.slice(
-  //   (currentPage - 1) * itemsPerPage,
-  //   currentPage * itemsPerPage
-  // );
   const totalPages = Math.ceil(totalUsers / itemsPerPage);
   const goToPage = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -132,58 +130,6 @@ const UsersTable = ({
               Unblocked
             </button>
           </div>
-          {/* <div class=" w-44 relative inline-flex">
-            <button
-              onClick={() => setOpenInsurance((prev) => !prev)}
-              type="button"
-              class={`hs-dropdown-toggle h-11 w-full ${
-                openInsurance ? "rounded-2xl border" : "rounded-2xl border"
-              } px-2 text-xs font-medium  bg-gray-50 text-gray-600 inline-flex justify-center items-center gap-x-2`}
-              aria-expanded="false"
-              aria-label="Menu"
-            >
-              <span>
-                {insurance == null ? "Insurrance Carrier" : insurance?.name}
-              </span>
-              <TbCaretDownFilled />
-            </button>
-
-            <div
-              class={`group w-full transition-all rounded-2xl p-2 duration    ${
-                openInsurance
-                  ? "flex flex-col justify-start items-start  opacity-100"
-                  : "hidden opacity-0"
-              } z-10 mt-2  bg-gray-50 divide-y group-last::rounded-b-2xl border shadow absolute top-10 left-0`}
-            >
-              <div className="w-full max-h-56 p-1  overflow-y-auto grid grid-cols-1 gap-1 justify-start items-start">
-                <div className="relative w-full">
-                  <input
-                    type="text"
-                    value={insuranceSearch}
-                    onChange={(e) => {
-                      setInsuranceSearch(e.target.value);
-                    }}
-                    placeholder="Search"
-                    className="border rounded-lg pl-2 pr-10 py-2 text-sm bg-gray-100 text-gray-700 focus:outline-none w-full h-8" // Increased size
-                  />
-                  <FiSearch className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400" />
-                </div>
-                {filteredInsurance?.map((carrier, key) => (
-                  <button
-                    onClick={() => {
-                      setInsurance(carrier);
-                      setOpenInsurance(false);
-                    }}
-                    class={`w-full h-7  hover:bg-gray-200 ${
-                      insurance?.name == carrier?.name && "bg-gray-200"
-                    }  flex items-center justify-start px-2 text-xs rounded-md font-medium text-gray-600`}
-                  >
-                    {carrier?.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div> */}
         </div>
       </div>
       <div className="w-full  bg-gray-50 border p-5 rounded-[18px] ">

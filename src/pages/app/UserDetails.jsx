@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import UserRidesTable from "../../components/app/users/UserRidesTable";
+import UserFeedbacks from "../../components/app/users/UserFeedbacks";
 import { ErrorToast, SuccessToast } from "../../components/app/global/Toast";
 import axios from "../../axios";
 import BlockModal from "../../components/app/global/BlockModal";
@@ -448,6 +449,7 @@ const UserDetails = () => {
       </div>
 
       <UserRidesTable user={user} />
+      <UserFeedbacks userId={id} />
     </div>
   );
 };
